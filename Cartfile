@@ -1,0 +1,12 @@
+github "Flight-School/AnyCodable" ~> 0.6
+github "malcommac/SwiftDate"
+github "yannickl/DynamicColor"
+github "Exyte/ActivityIndicatorView"
+github "vadymmarkov/Fakery"
+github "kean/Nuke"
+github "rollbar/rollbar-apple"
+github "SwiftyJSON/SwiftyJSON"
+github "Giphy/giphy-ios-sdk"
+github "siteline/SwiftUI-Introspect"
+github "Alamofire/Alamofire"
+github "emqx/CocoaMQTT"
