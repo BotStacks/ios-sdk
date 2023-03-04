@@ -1,12 +1,13 @@
 github "Flight-School/AnyCodable" ~> 0.6
-github "malcommac/SwiftDate"
-github "yannickl/DynamicColor"
-github "Exyte/ActivityIndicatorView"
-github "vadymmarkov/Fakery"
-github "kean/Nuke"
-github "rollbar/rollbar-apple"
-github "SwiftyJSON/SwiftyJSON"
-github "Giphy/giphy-ios-sdk"
-github "siteline/SwiftUI-Introspect"
-github "Alamofire/Alamofire"
-github "emqx/CocoaMQTT"
+github "malcommac/SwiftDate" >= 7.0.0
+github "yannickl/DynamicColor" >= 5.0.0
+github "Exyte/ActivityIndicatorView" >= 1.0.0
+github "vadymmarkov/Fakery" >= 5.0.0
+github "kean/Nuke" >= 12.0.0-rc.1
+github "rollbar/rollbar-apple" >= 2.4.0
+github "SwiftyJSON/SwiftyJSON" >= 5.0.0
+github "Giphy/giphy-ios-sdk" >= 2.0.0
+github "siteline/SwiftUI-Introspect" >= 0.2.0
+github "Alamofire/Alamofire" >= 5.0.0
+github "emqx/CocoaMQTT" >= 2.0.0
+github "kaishin/Gifu" >= 3.0.0
