@@ -18,7 +18,7 @@
 		</data>
 		<key>Modules/InAppChat.swiftmodule/arm64-apple-ios.abi.json</key>
 		<data>
-		dXrgillUEuiVy6wrnI9QI76/DwA=
+		yA8Y8/Nq6rTaKntxBn7u1HCA5es=
 		</data>
 		<key>Modules/InAppChat.swiftmodule/arm64-apple-ios.private.swiftinterface</key>
 		<data>
@@ -34,7 +34,7 @@
 		</data>
 		<key>Modules/InAppChat.swiftmodule/arm64-apple-ios.swiftmodule</key>
 		<data>
-		8lHWANSSz6bA8/hw9zLA2ptwRFU=
+		BYSRGXQCLb4c4SuqOAe2lT8YUBw=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -69,7 +69,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			zk+mxoxmVs/bVUENEmIBix9JHIs70WBY6rIpRnL53/4=
+			kMjHYxboEQMLzocENXdcCixB2hnUeaw0XGpls/7NMv0=
 			</data>
 		</dict>
 		<key>Modules/InAppChat.swiftmodule/arm64-apple-ios.private.swiftinterface</key>
@@ -97,7 +97,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			Iavkg2AQzrbi0oCM3fWQGAEELJxcRckZGr42d3QiMns=
+			w/nCKDuoOfJU1aBkGMCHyytF6pDie9XLaHkbg4AesDk=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>
