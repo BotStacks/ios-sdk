@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
     Quickly and easily integrated fully featured chat into your iOS applications.
   DESC
   s.social_media_url = 'https://twitter.com/inappchat'
-  s.license = "MIT"
+  s.license = { :type => "MPL", :file => "LICENSE" }
   s.homepage = 'https://inappchat.io'
   s.documentation_url = 'https://inappchat.io/docs/chatsdk/ios'
   s.pod_target_xcconfig = { 'PRODUCT_BUNDLE_IDENTIFIER': 'io.inappchat.sdk' }
