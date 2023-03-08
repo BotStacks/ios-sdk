@@ -54,7 +54,7 @@ let package = Package(
         "Alamofire",
         "CocoaMQTT",
         "Gifu",
-        "Auth0",
+        .product(name: "Auth0", package: "Auth0.swift"),
       ], path: "Sources"),
   ]
 )
