@@ -15,6 +15,7 @@ Pod::Spec.new do |s|
   s.documentation_url = 'https://inappchat.io/docs/chatsdk/ios'
   s.pod_target_xcconfig = { 'PRODUCT_BUNDLE_IDENTIFIER': 'io.inappchat.sdk' }
   s.swift_version = "5.0"
+  s.source = {:http => "https://raw.githubusercontent.com/RipBullNetworks/inappchat-ios/main/InAppChat.xcframework.zip"}
   s.dependency        'AnyCodable-FlightSchool'
   s.dependency        'SwiftDate'
   s.dependency        'DynamicColor'
