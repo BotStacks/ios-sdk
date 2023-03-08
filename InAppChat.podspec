@@ -2,7 +2,7 @@ Pod::Spec.new do |s|
   s.name = 'InAppChat'
   s.ios.deployment_target = '15.0'
   s.version = '1.0.0'
-  s.source = { :git => 'git@github.com:RipBullNetworks/inappchat-ios.git', :tag => 'v1.0.0' }
+  s.source = { :git => 'https://github.com/RipBullNetworks/inappchat-ios', :tag => 'v1.0.0' }
   s.authors = 'Zaid Daghestani'
   s.summary  = 'Quickly and easily integrate fully featured chat into your iOS application'
   s.description      = <<-DESC
@@ -14,6 +14,7 @@ Pod::Spec.new do |s|
   s.homepage = 'https://inappchat.io'
   s.documentation_url = 'https://inappchat.io/docs/chatsdk/ios'
   s.pod_target_xcconfig = { 'PRODUCT_BUNDLE_IDENTIFIER': 'io.inappchat.sdk' }
+  s.swift_version = "5.0"
   s.dependency        'AnyCodable-FlightSchool'
   s.dependency        'SwiftDate'
   s.dependency        'DynamicColor'
