@@ -31,6 +31,7 @@ let package = Package(
     .package(url: "https://github.com/emqx/CocoaMQTT", .upToNextMajor(from: "2.0.0")),
     .package(url: "https://github.com/kaishin/Gifu", .upToNextMajor(from: "3.0.0")),
     .package(url: "https://github.com/auth0/Auth0.swift", .upToNextMajor(from: "2.0.0")),
+    .package(url: "https://github.com/robbiehanson/CocoaAsyncSocket", from: "7.6.4"),
   ],
   targets: [
     .binaryTarget(
@@ -55,6 +56,7 @@ let package = Package(
         "CocoaMQTT",
         "Gifu",
         .product(name: "Auth0", package: "Auth0.swift"),
+        "CocoaAsyncSocket",
       ], path: "Sources"),
   ]
 )
