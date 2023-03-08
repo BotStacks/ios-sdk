@@ -29,10 +29,11 @@ let package = Package(
     .package(url: "https://github.com/Alamofire/Alamofire.git", .upToNextMajor(from: "5.6.1")),
     .package(url: "https://github.com/emqx/CocoaMQTT", .upToNextMajor(from: "2.0.0")),
     .package(url: "https://github.com/kaishin/Gifu", .upToNextMajor(from: "3.0.0")),
+    .package(url: "https://github.com/auth0/Auth0.swift", .upToNextMajor(from: "2.0.0")),
   ],
   targets: [
     .binaryTarget(
-        name: "InAppChat",
-        path: "InAppChat.xcframework")
+      name: "InAppChat",
+      path: "InAppChat.xcframework")
   ]
 )

@@ -28,6 +28,15 @@
       }
     },
     {
+      "identity" : "auth0.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/auth0/Auth0.swift",
+      "state" : {
+        "revision" : "f60927196902e83934adc9407134994347f24db8",
+        "version" : "2.3.2"
+      }
+    },
+    {
       "identity" : "cocoalumberjack",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/CocoaLumberjack/CocoaLumberjack.git",
@@ -82,6 +91,15 @@
       }
     },
     {
+      "identity" : "jwtdecode.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/auth0/JWTDecode.swift.git",
+      "state" : {
+        "revision" : "7918a343e674c7707e0be120bb4e21d679be014c",
+        "version" : "3.0.1"
+      }
+    },
+    {
       "identity" : "kscrash",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kstenerud/KSCrash.git",
@@ -133,6 +151,15 @@
       "state" : {
         "revision" : "b06f373be5ca336f1d8f5e8a7389449612551776",
         "version" : "2.4.0"
+      }
+    },
+    {
+      "identity" : "simplekeychain",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/auth0/SimpleKeychain.git",
+      "state" : {
+        "revision" : "7f7be4a7dfc9164c2c66f95193cec9df9ac47d58",
+        "version" : "1.0.1"
       }
     },
     {
