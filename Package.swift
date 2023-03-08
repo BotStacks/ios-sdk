@@ -12,7 +12,8 @@ let package = Package(
     .library(
       name: "InAppChat",
       targets: ["InAppChat"]
-    )
+    ),
+    .library(name: "InAppChatDeps", targets: ["InAppChatDeps"]),
   ],
   dependencies: [
     // Dependencies declare other packages that this package depends on.
@@ -34,6 +35,26 @@ let package = Package(
   targets: [
     .binaryTarget(
       name: "InAppChat",
-      path: "InAppChat.xcframework")
+      path: "InAppChat.xcframework"),
+    .target(
+      name: "InAppChatDeps",
+      dependencies: [
+        "AnyCodable",
+        "SwiftDate",
+        "DynamicColor",
+        "ActivityIndicatorView",
+        "Fakery",
+        "Nuke",
+        .product(name: "NukeUI", package: "nuke"),
+        .product(name: "RollbarPLCrashReporter", package: "rollbar-apple"),
+        .product(name: "RollbarSwift", package: "rollbar-apple"),
+        "SwiftyJSON",
+        .product(name: "GiphyUISDK", package: "giphy-ios-sdk"),
+        .product(name: "Introspect", package: "SwiftUI-Introspect"),
+        "Alamofire",
+        "CocoaMQTT",
+        "Gifu",
+        "Auth0",
+      ], path: "Sources"),
   ]
 )
