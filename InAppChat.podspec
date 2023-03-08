@@ -21,17 +21,17 @@ Pod::Spec.new do |s|
   s.dependency        'DynamicColor'
   s.dependency        'Nuke'
   s.dependency        'NukeUI'
-  s.dependency        'SVGView'
   s.dependency        'ActivityIndicatorView'
   s.dependency        'Fakery'
   s.dependency        "SwiftyJSON"
   s.dependency        "Introspect"
   s.dependency        "Alamofire"
   s.dependency        "Giphy"
-  s.dependency        'Curve25519'
   s.dependency        "RollbarNotifier"
   s.dependency        "RollbarPLCrashReporter"
   s.dependency        "CocoaMQTT"
+  s.dependency        "Auth0"
+  s.dependency        "Gifu"
 
   vendored_frameworks = "InAppChat.xcframework"
 end
