@@ -1,8 +1,8 @@
 Pod::Spec.new do |s|
   s.name = 'InAppChat'
   s.ios.deployment_target = '15.0'
-  s.version = '1.0.0'
-  s.source = { :git => 'https://github.com/RipBullNetworks/inappchat-ios.git', :tag => '1.0.0' }
+  s.version = '1.0.1'
+  s.source = { :git => 'https://github.com/RipBullNetworks/inappchat-ios.git', :tag => '1.0.1' }
   s.authors = 'Zaid Daghestani'
   s.summary  = 'Quickly and easily integrate fully featured chat into your iOS application'
   s.description      = <<-DESC
@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
     Quickly and easily integrated fully featured chat into your iOS applications.
   DESC
   s.social_media_url = 'https://twitter.com/inappchat'
-  s.license = "Commercial"
+  s.license = {:type => "MIT", :file => "LICENSE" }
   s.homepage = 'https://inappchat.io'
   s.documentation_url = 'https://inappchat.io/docs/chatsdk/ios'
   s.pod_target_xcconfig = { 'PRODUCT_BUNDLE_IDENTIFIER': 'io.inappchat.sdk' }
