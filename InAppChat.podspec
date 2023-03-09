@@ -14,6 +14,7 @@ Pod::Spec.new do |s|
   s.ios.vendored_frameworks = 'Sources/InAppChat.xcframework'
   s.ios.frameworks = ['UIKit', 'CFNetwork', 'Security', 'Foundation', 'MobileCoreServices', 'SystemConfiguration', 'CoreFoundation']
   s.ios.library   = 'icucore'
+  s.swift_version = "5.0"
   s.dependency        'AnyCodable-FlightSchool'
   s.dependency        'SwiftDate'
   s.dependency        'DynamicColor'
