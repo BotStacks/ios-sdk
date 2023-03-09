@@ -20,7 +20,7 @@ Add the dependency to your package
 
 Add the pod to your podfile
 
-`pod "InAppChat"`
+`pod "InAppChat", :git`
 
 ### Carthage
 

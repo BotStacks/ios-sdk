@@ -56,6 +56,6 @@ let package = Package(
         "Gifu",
         .product(name: "Auth0", package: "Auth0.swift"),
         .target(name: "InAppChat"),
-      ], path: "Sources"),
+      ], path: "Sources/Wrapper"),
   ]
 )
