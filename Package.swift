@@ -13,7 +13,7 @@ let package = Package(
       name: "InAppChat",
       targets: ["InAppChat"]
     ),
-    .library(name: "InAppChatDeps", targets: ["InAppChatDeps"]),
+    .library(name: "InAppChatWrapper", targets: ["InAppChatWrapper", "InAppChat"]),
   ],
   dependencies: [
     // Dependencies declare other packages that this package depends on.
@@ -38,7 +38,7 @@ let package = Package(
       name: "InAppChat",
       path: "InAppChat.xcframework"),
     .target(
-      name: "InAppChatDeps",
+      name: "InAppChatWrapper",
       dependencies: [
         "AnyCodable",
         "SwiftDate",
@@ -57,6 +57,7 @@ let package = Package(
         "Gifu",
         .product(name: "Auth0", package: "Auth0.swift"),
         "MqttCocoaAsyncSocket",
+        .target(name: "InAppChat"),
       ], path: "Sources"),
   ]
 )
