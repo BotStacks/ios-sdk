@@ -12,8 +12,7 @@ let package = Package(
     .library(
       name: "InAppChat",
       targets: ["InAppChat"]
-    ),
-    .library(name: "InAppChatWrapper", targets: ["InAppChatWrapper"]),
+    )
   ],
   dependencies: [
     // Dependencies declare other packages that this package depends on.
@@ -26,18 +25,15 @@ let package = Package(
     .package(url: "https://github.com/rollbar/rollbar-apple.git", from: "2.4.0"),
     .package(url: "https://github.com/SwiftyJSON/SwiftyJSON", from: "5.0.0"),
     .package(url: "https://github.com/Giphy/giphy-ios-sdk", from: "2.1.3"),
-    .package(url: "https://github.com/siteline/SwiftUI-Introspect.git", from: "0.2.0"),
     .package(url: "https://github.com/Alamofire/Alamofire.git", .upToNextMajor(from: "5.6.1")),
     .package(url: "https://github.com/emqx/CocoaMQTT", .upToNextMajor(from: "2.0.0")),
     .package(url: "https://github.com/kaishin/Gifu", .upToNextMajor(from: "3.0.0")),
-    .package(url: "https://github.com/auth0/Auth0.swift", .upToNextMajor(from: "2.0.0")),
   ],
   targets: [
-    .binaryTarget(
-      name: "InAppChat",
-      path: "InAppChat.xcframework"),
+    // Targets are the basic building blocks of a package. A target can define a module or a test suite.
+    // Targets can depend on other targets in this package, and on products in packages which this package depends on.
     .target(
-      name: "InAppChatWrapper",
+      name: "InAppChat",
       dependencies: [
         "AnyCodable",
         "SwiftDate",
@@ -50,12 +46,14 @@ let package = Package(
         .product(name: "RollbarSwift", package: "rollbar-apple"),
         "SwiftyJSON",
         .product(name: "GiphyUISDK", package: "giphy-ios-sdk"),
-        .product(name: "Introspect", package: "SwiftUI-Introspect"),
         "Alamofire",
         "CocoaMQTT",
         "Gifu",
-        .product(name: "Auth0", package: "Auth0.swift"),
-        .target(name: "InAppChat"),
-      ], path: "Sources/Wrapper"),
+      ],
+      path: "Sources/InAppChat"
+    ),
+    .testTarget(
+      name: "InAppChatTests",
+      dependencies: ["InAppChat"]),
   ]
 )

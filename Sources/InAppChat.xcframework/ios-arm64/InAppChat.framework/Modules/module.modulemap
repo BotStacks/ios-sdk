@@ -1,4 +1,0 @@
-framework module InAppChat {
-  header "InAppChat-Swift.h"
-  requires objc
-}

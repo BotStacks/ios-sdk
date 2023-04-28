@@ -8,11 +8,7 @@ This SDK integrates a fully serviced chat experience on the [InAppChat](https://
 
 ## Installation
 
-This SDK is accessible via conventional means as a Swift PM, CocoaPods or Carthage
-
-### Swift PM
-
-Add the dependency to your package
+This SDK is accessible via conventional means as a Cocoapod
 
 `.package(url: "https://github.com/RipBullNetworks/inappchat-ios", .upToNextMajor(from: "1.0.0")),`
 
@@ -20,13 +16,7 @@ Add the dependency to your package
 
 Add the pod to your podfile
 
-`pod "InAppChat", :git`
-
-### Carthage
-
-Add it to your Cartfile
-
-`github "RipBullNetworks/inappchat-ios"`
+`pod "InAppChat"`
 
 ## Usage
 

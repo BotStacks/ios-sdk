@@ -1,0 +1,6 @@
+framework module InAppChat {
+  umbrella header "InAppChat-umbrella.h"
+
+  export *
+  module * { export * }
+}

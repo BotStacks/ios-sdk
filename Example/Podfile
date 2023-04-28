@@ -1,0 +1,17 @@
+use_frameworks!
+
+platform :ios, '15.0'
+
+target 'InAppChat-Example' do
+  pod 'InAppChat', :path => '../'
+
+  target 'InAppChat-ExampleTests' do
+    inherit! :search_paths
+
+    pod 'FBSnapshotTestCase'
+    pod 'Expecta+Snapshots'
+    pod 'Quick', '~> 2.2.0'
+    pod 'Nimble', '~> 10.0.0'
+    pod 'Nimble-Snapshots' , '~> 9.4.0'
+  end
+end
