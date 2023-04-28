@@ -25,7 +25,6 @@ Pod::Spec.new do |s|
   s.dependency        'Nuke'
   s.dependency        'NukeUI'
   s.dependency        'ActivityIndicatorView'
-  s.dependency        'Fakery'
   s.dependency        "SwiftyJSON"
   s.dependency        "Alamofire"
   s.dependency        "Giphy"

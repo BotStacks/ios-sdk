@@ -25,9 +25,6 @@ public struct InAppChatUI<Content>: View where Content: View {
     UITableView.appearance().backgroundColor = .clear
     UITableView.appearance().separatorStyle = .none
     UICollectionView.appearance().backgroundColor = .clear
-    if preview {
-      Chats.current.makePreview()
-    }
   }
 
   public var body: some View {

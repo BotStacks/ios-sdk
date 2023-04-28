@@ -13,9 +13,6 @@ public class UserSharedMedia: Pager<Message> {
   public init(_ id: String) {
     self.id = id
     super.init()
-    if preview {
-      self.items = random(count: 10) { Message.sampleImage }
-    }
   }
 
   override public func load(skip: Int, limit: Int) async -> [Message] {

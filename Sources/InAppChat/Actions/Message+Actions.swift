@@ -1,10 +1,9 @@
-
 extension Message {
-  
+
   func decr(_ reaction: String) {
-    if let i = self.reactions?.firstIndex(where: {$0.emojiCode == reaction}) {
+    if let i = self.reactions?.firstIndex(where: { $0.emojiCode == reaction }) {
       let r = self.reactions![i]
-      let users = r.users.filter({$0 != User.current!.id})
+      let users = r.users.filter({ $0 != User.current!.id })
       if !users.isEmpty {
         self.reactions![i] = Reaction(emojiCode: reaction, count: users.count, users: users)
       } else {
@@ -47,7 +46,7 @@ extension Message {
         var users = r.users
         users.append(User.current!.id)
         users = users.unique()
-        self.reactions![i] = Reaction(emojiCode: reaction, count: users.count, users:users)
+        self.reactions![i] = Reaction(emojiCode: reaction, count: users.count, users: users)
       } else {
         self.reactions?.append(Reaction(emojiCode: reaction, count: 1, users: [User.current!.id]))
       }
@@ -65,11 +64,9 @@ extension Message {
         _ = try await api.react(to: self, reaction: reaction, set: isSet)
       } catch let err {
         Monitoring.error(err)
-        if !preview {
-          publish {
-            self.currentReaction = ogCurrent
-            self.reactions = og
-          }
+        publish {
+          self.currentReaction = ogCurrent
+          self.reactions = og
         }
       }
       publish {
@@ -87,10 +84,8 @@ extension Message {
         _ = try await api.favorite(message: self, add: self.favorite)
       } catch let err {
         Monitoring.error(err)
-        if !preview {
-          publish {
-            self.favorite = !self.favorite
-          }
+        publish {
+          self.favorite = !self.favorite
         }
       }
       publish {
@@ -109,10 +104,8 @@ extension Message {
         _ = try await api.edit(message: self, text: text)
       } catch let err {
         Monitoring.error(err)
-        if !preview {
-          publish {
-            self.text = og
-          }
+        publish {
+          self.text = og
         }
       }
       publish {

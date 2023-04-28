@@ -1,4 +1,3 @@
-
 import Foundation
 
 public class Chats: ObservableObject {
@@ -33,18 +32,6 @@ public class Chats: ObservableObject {
   }
 
   @Published var loading = false
-
-  func makePreview() {
-    let all = random(count: 60) {
-      Thread.gen()
-    }.sorted(by: sortThreads)
-    groups.items = all.filter { $0.group != nil }.sorted(by: sortThreads)
-    users.items = all.filter { $0.user != nil }.sorted(by: sortThreads)
-    network.items = random(count: 50) { Group.gen() }
-    network.items.sort(by: { $0.participants.count > $1.participants.count })
-    phoneContacts =
-      random(count: 20) { User.gen() } + randomAmount(from: users.items.compactMap(\.user))
-  }
 
   public static var current = Chats()
 
@@ -138,19 +125,18 @@ public class Chats: ObservableObject {
   }
 
   var cache = Caches()
-    
 
-    func onLogin(user: User) async throws {
-        await MainActor.run {
-            self.user = user
-            self.currentUserID = user.id
-            User.current = user
-        }
-        do {
-          try await loadAsync()
-          Socket.shared.connect()
-        } catch let err {
-          Monitoring.error(err)
-        }
+  func onLogin(user: User) async throws {
+    await MainActor.run {
+      self.user = user
+      self.currentUserID = user.id
+      User.current = user
     }
+    do {
+      try await loadAsync()
+      Socket.shared.connect()
+    } catch let err {
+      Monitoring.error(err)
+    }
+  }
 }

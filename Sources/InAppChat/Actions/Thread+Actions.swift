@@ -30,12 +30,10 @@ extension Thread {
         }
       } catch let err {
         Monitoring.error(err)
-        if !preview {
-          publish {
-            self.sending.remove(element: m)
-            m.status = .failed
-            self.failed.append(m)
-          }
+        publish {
+          self.sending.remove(element: m)
+          m.status = .failed
+          self.failed.append(m)
         }
       }
     }
@@ -67,12 +65,10 @@ extension Thread {
         }
       } catch let err {
         Monitoring.error(err)
-        if !preview {
-          publish {
-            self.sending.remove(element: m)
-            m.status = .failed
-            self.failed.append(m)
-          }
+        publish {
+          self.sending.remove(element: m)
+          m.status = .failed
+          self.failed.append(m)
         }
       }
     }
@@ -146,12 +142,10 @@ extension Thread {
         }
       } catch let err {
         Monitoring.error(err)
-        if !preview {
-          publish {
-            self.sending.remove(element: m)
-            m.status = .failed
-            self.failed.append(m)
-          }
+        publish {
+          self.sending.remove(element: m)
+          m.status = .failed
+          self.failed.append(m)
         }
       }
     }

@@ -18,10 +18,8 @@ extension User {
         Chats.current.settings.setBlock(self.id, self.blocked)
       } catch let err {
         Monitoring.error(err)
-        if !preview {
-          publish {
-            self.blocked = !self.blocked
-          }
+        publish {
+          self.blocked = !self.blocked
         }
       }
       publish {

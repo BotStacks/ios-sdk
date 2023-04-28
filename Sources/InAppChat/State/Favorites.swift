@@ -11,9 +11,6 @@ public class Favorites: Pager<Message> {
 
   public override init() {
     super.init()
-    if preview {
-      self.items = random(count: 20, item: { Message.gen(favorite: true) })
-    }
   }
 
   public override func load(skip: Int, limit: Int) async -> [Message] {

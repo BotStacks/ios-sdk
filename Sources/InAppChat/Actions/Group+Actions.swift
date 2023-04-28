@@ -13,10 +13,8 @@ extension Group {
         _ = try await api.dismissInvites(for: self)
       } catch let err {
         Monitoring.error(err)
-        if !preview {
-          publish {
-            self.invites = og
-          }
+        publish {
+          self.invites = og
         }
       }
     }
@@ -38,10 +36,8 @@ extension Group {
         }
       } catch let err {
         Monitoring.error(err)
-        if !preview {
-          await MainActor.run {
-            self.participants.removeAll(where: { $0.eRTCUserId == User.current!.id })
-          }
+        await MainActor.run {
+          self.participants.removeAll(where: { $0.eRTCUserId == User.current!.id })
         }
       }
       await MainActor.run {
@@ -75,10 +71,8 @@ extension Group {
       }
     } catch let err {
       Monitoring.error(err)
-      if !preview {
-        await MainActor.run {
-          self.participants.append(me)
-        }
+      await MainActor.run {
+        self.participants.append(me)
       }
     }
     await MainActor.run {
@@ -124,13 +118,11 @@ extension Group {
       )
     } catch let err {
       Monitoring.error(err)
-      if !preview {
-        await MainActor.run {
-          self.name = ogName
-          self.description = ogDescription
-          self.image = ogImage
-          self._private = ogPrivate
-        }
+      await MainActor.run {
+        self.name = ogName
+        self.description = ogDescription
+        self.image = ogImage
+        self._private = ogPrivate
       }
     }
     await MainActor.run {

@@ -20,7 +20,6 @@ let package = Package(
     .package(url: "https://github.com/malcommac/SwiftDate.git", from: "7.0.0"),
     .package(url: "https://github.com/yannickl/DynamicColor.git", from: "5.0.0"),
     .package(url: "https://github.com/exyte/ActivityIndicatorView.git", from: "1.1.0"),
-    .package(url: "https://github.com/vadymmarkov/Fakery", from: "5.0.0"),
     .package(url: "https://github.com/kean/Nuke", from: "12.0.0-rc.1"),
     .package(url: "https://github.com/rollbar/rollbar-apple.git", from: "2.4.0"),
     .package(url: "https://github.com/SwiftyJSON/SwiftyJSON", from: "5.0.0"),

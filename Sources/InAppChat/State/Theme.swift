@@ -138,15 +138,9 @@ public class Theme {
 
   public var current: ColorScheme = .light
   public var colors: Colors {
-    if preview {
-      return darkMode ? self.dark : self.light
-    }
     return current == .light ? light : dark
   }
   public var inverted: Colors {
-    if preview {
-      return darkMode ? self.light : self.dark
-    }
     return current == .light ? dark : light
   }
 

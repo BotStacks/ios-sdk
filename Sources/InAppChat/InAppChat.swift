@@ -5,7 +5,6 @@ import SwiftyJSON
 let assets =
   Bundle.main.url(forResource: "InAppChat", withExtension: "bundle").flatMap({ Bundle(url: $0) })
   ?? Bundle.main
-let preview = false
 
 public class InAppChat: ObservableObject {
 
@@ -59,14 +58,19 @@ public class InAppChat: ObservableObject {
   }
 
   @Published var loggingIn = false
-    public func auth0Login(accessToken: String, refreshToken: String, expiresIn: Date, email: String, picture: String, name: String,
-                         nickname: String) async throws {
+  public func auth0Login(
+    accessToken: String, refreshToken: String, expiresIn: Date, email: String, picture: String,
+    name: String,
+    nickname: String
+  ) async throws {
     if loggingIn { return }
     await MainActor.run {
       loggingIn = true
     }
     do {
-        let _ = try await api.auth0Login(accessToken: accessToken, refreshToken: refreshToken, expiresIn: expiresIn, email: email, picture: picture, name: name, nickname: nickname)
+      let _ = try await api.auth0Login(
+        accessToken: accessToken, refreshToken: refreshToken, expiresIn: expiresIn, email: email,
+        picture: picture, name: name, nickname: nickname)
     } catch let err {
       Monitoring.error(err)
     }
