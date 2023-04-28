@@ -28,15 +28,6 @@
       }
     },
     {
-      "identity" : "auth0.swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/auth0/Auth0.swift",
-      "state" : {
-        "revision" : "f60927196902e83934adc9407134994347f24db8",
-        "version" : "2.3.2"
-      }
-    },
-    {
       "identity" : "cocoalumberjack",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/CocoaLumberjack/CocoaLumberjack.git",
@@ -64,15 +55,6 @@
       }
     },
     {
-      "identity" : "fakery",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/vadymmarkov/Fakery",
-      "state" : {
-        "revision" : "71cb3bf36a808534659d1248780c2bf3c4c4fc91",
-        "version" : "5.1.0"
-      }
-    },
-    {
       "identity" : "gifu",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kaishin/Gifu",
@@ -88,15 +70,6 @@
       "state" : {
         "revision" : "699483a3a2b534e9dc3a3ab85a9f7095e306bde1",
         "version" : "2.2.2"
-      }
-    },
-    {
-      "identity" : "jwtdecode.swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/auth0/JWTDecode.swift.git",
-      "state" : {
-        "revision" : "7918a343e674c7707e0be120bb4e21d679be014c",
-        "version" : "3.0.1"
       }
     },
     {
@@ -154,15 +127,6 @@
       }
     },
     {
-      "identity" : "simplekeychain",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/auth0/SimpleKeychain.git",
-      "state" : {
-        "revision" : "7f7be4a7dfc9164c2c66f95193cec9df9ac47d58",
-        "version" : "1.0.1"
-      }
-    },
-    {
       "identity" : "starscream",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/daltoniam/Starscream.git",
@@ -187,15 +151,6 @@
       "state" : {
         "revision" : "5d943224c3bb173e6ecf27295611615eba90c80e",
         "version" : "7.0.0"
-      }
-    },
-    {
-      "identity" : "swiftui-introspect",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/siteline/SwiftUI-Introspect.git",
-      "state" : {
-        "revision" : "c18951c747ab62af7c15e17a81bd37d4fd5a9979",
-        "version" : "0.2.3"
       }
     },
     {

@@ -34,7 +34,7 @@ public struct InAppChatUI<Content>: View where Content: View {
       content()
         .environment(\.geometry, Geometry(size: proxy.size, insets: proxy.safeAreaInsets))
         .environment(\.iacTheme, theme.with(colorScheme))
-        .preferredColorScheme(preview ? darkMode ? .dark : .light : colorScheme)
+        .preferredColorScheme(colorScheme)
         .buttonStyle(.borderless)
     }
   }
