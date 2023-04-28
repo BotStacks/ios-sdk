@@ -22,8 +22,7 @@ Pod::Spec.new do |s|
   s.dependency        'AnyCodable-FlightSchool'
   s.dependency        'SwiftDate'
   s.dependency        'DynamicColor'
-  s.dependency        'Nuke'
-  s.dependency        'NukeUI'
+  s.dependency        'SDWebImageSwiftUI'
   s.dependency        'ActivityIndicatorView'
   s.dependency        "SwiftyJSON"
   s.dependency        "Alamofire"
