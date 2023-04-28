@@ -18,6 +18,7 @@ Pod::Spec.new do |s|
     "InAppChat": ["Sources/InAppChat/Media.xcassets"]
   }
   s.source_files = 'Sources/InAppChat/**/*.swift'
+  s.static_framework = true
   s.dependency        'AnyCodable-FlightSchool'
   s.dependency        'SwiftDate'
   s.dependency        'DynamicColor'
