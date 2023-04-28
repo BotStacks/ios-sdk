@@ -323,9 +323,9 @@ class Api {
                     refreshToken: String?,
                     expiresIn: Date,
                     email: String,
-                    picture: String,
-                    name: String,
-                    nickname: String) async throws -> User {
+                    picture: String?,
+                    name: String?,
+                    nickname: String?) async throws -> User {
     onToken(
       accessToken: accessToken, refreshToken: refreshToken,
       tokenExpiresAt: expiresIn)

@@ -59,9 +59,9 @@ public class InAppChat: ObservableObject {
 
   @Published var loggingIn = false
   public func auth0Login(
-    accessToken: String, refreshToken: String?, expiresIn: Date, email: String, picture: String,
-    name: String,
-    nickname: String
+    accessToken: String, refreshToken: String?, expiresIn: Date, email: String, picture: String?,
+    name: String?,
+    nickname: String?
   ) async throws {
     if loggingIn { return }
     await MainActor.run {
