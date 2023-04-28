@@ -320,7 +320,7 @@ class Api {
   }
 
     func auth0Login(accessToken: String,
-                    refreshToken: String,
+                    refreshToken: String?,
                     expiresIn: Date,
                     email: String,
                     picture: String,
