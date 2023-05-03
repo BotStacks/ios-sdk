@@ -11,7 +11,7 @@ import SwiftUI
 struct ContentView: View {
 
   init() {
-    _ = User.sampleCurrent
+    
   }
 
   var body: some View {
