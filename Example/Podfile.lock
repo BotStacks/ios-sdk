@@ -1,52 +1,47 @@
 PODS:
-  - ActivityIndicatorView (1.1.0)
+  - ActivityIndicatorView (1.1.1)
   - Alamofire (5.6.4)
   - AnyCodable-FlightSchool (0.6.7)
-  - CCurve25519 (1.0.1)
-  - CocoaMQTT (2.1.1):
-    - CocoaMQTT/Core (= 2.1.1)
-  - CocoaMQTT/Core (2.1.1):
+  - Auth0 (2.3.2):
+    - JWTDecode (~> 3.0)
+    - SimpleKeychain (~> 1.0)
+  - CocoaMQTT (2.1.3):
+    - CocoaMQTT/Core (= 2.1.3)
+  - CocoaMQTT/Core (2.1.3):
     - MqttCocoaAsyncSocket (~> 1.0.8)
-  - Curve25519 (2.0.0):
-    - CCurve25519
   - DynamicColor (5.0.1)
   - Expecta (1.0.6)
   - "Expecta+Snapshots (3.1.1)":
     - Expecta (~> 1.0)
     - FBSnapshotTestCase/Core (~> 2.0)
     - Specta (~> 1.0)
-  - Fakery (5.1.0)
   - FBSnapshotTestCase (2.1.4):
     - FBSnapshotTestCase/SwiftSupport (= 2.1.4)
   - FBSnapshotTestCase/Core (2.1.4)
   - FBSnapshotTestCase/SwiftSupport (2.1.4):
     - FBSnapshotTestCase/Core
   - Gifu (3.3.1)
-  - Giphy (2.2.2):
+  - Giphy (2.2.4):
     - libwebp
-  - InAppChat (1.0.0):
+  - InAppChat (1.0.4):
     - ActivityIndicatorView
     - Alamofire
     - AnyCodable-FlightSchool
+    - Auth0
     - CocoaMQTT
-    - Curve25519
     - DynamicColor
-    - Fakery
+    - Gifu
     - Giphy
-    - Introspect
-    - Nuke
-    - NukeUI
-    - RollbarNotifier
-    - RollbarPLCrashReporter
-    - SVGView
+    - SDWebImageSwiftUI
+    - Sentry
     - SwiftDate
     - SwiftyJSON
-  - Introspect (0.2.3)
   - iOSSnapshotTestCase (8.0.0):
     - iOSSnapshotTestCase/SwiftSupport (= 8.0.0)
   - iOSSnapshotTestCase/Core (8.0.0)
   - iOSSnapshotTestCase/SwiftSupport (8.0.0):
     - iOSSnapshotTestCase/Core
+  - JWTDecode (3.0.1)
   - libwebp (1.2.4):
     - libwebp/demux (= 1.2.4)
     - libwebp/mux (= 1.2.4)
@@ -63,24 +58,25 @@ PODS:
   - Nimble-Snapshots/Core (9.4.0):
     - iOSSnapshotTestCase (~> 8.0)
     - Nimble
-  - Nuke (10.7.1)
-  - NukeUI (0.8.0):
-    - Gifu (~> 3.0)
-    - Nuke (~> 10.5)
-  - PLCrashReporter (1.10.2)
   - Quick (2.2.1)
-  - RollbarCommon (2.3.4)
-  - RollbarNotifier (2.3.4):
-    - RollbarCommon (~> 2.3.4)
-  - RollbarPLCrashReporter (2.3.4):
-    - PLCrashReporter (~> 1.10.1)
-    - RollbarCommon (~> 2.3.4)
+  - SDWebImage (5.15.6):
+    - SDWebImage/Core (= 5.15.6)
+  - SDWebImage/Core (5.15.6)
+  - SDWebImageSwiftUI (2.2.3):
+    - SDWebImage (~> 5.10)
+  - Sentry (8.6.0):
+    - Sentry/Core (= 8.6.0)
+    - SentryPrivate (= 8.6.0)
+  - Sentry/Core (8.6.0):
+    - SentryPrivate (= 8.6.0)
+  - SentryPrivate (8.6.0)
+  - SimpleKeychain (1.0.1)
   - Specta (1.0.7)
-  - SVGView (1.0.4)
   - SwiftDate (7.0.0)
   - SwiftyJSON (5.0.1)
 
 DEPENDENCIES:
+  - Auth0 (~> 2.0)
   - "Expecta+Snapshots"
   - FBSnapshotTestCase
   - InAppChat (from `../`)
@@ -93,31 +89,27 @@ SPEC REPOS:
     - ActivityIndicatorView
     - Alamofire
     - AnyCodable-FlightSchool
-    - CCurve25519
+    - Auth0
     - CocoaMQTT
-    - Curve25519
     - DynamicColor
     - Expecta
     - "Expecta+Snapshots"
-    - Fakery
     - FBSnapshotTestCase
     - Gifu
     - Giphy
-    - Introspect
     - iOSSnapshotTestCase
+    - JWTDecode
     - libwebp
     - MqttCocoaAsyncSocket
     - Nimble
     - Nimble-Snapshots
-    - Nuke
-    - NukeUI
-    - PLCrashReporter
     - Quick
-    - RollbarCommon
-    - RollbarNotifier
-    - RollbarPLCrashReporter
+    - SDWebImage
+    - SDWebImageSwiftUI
+    - Sentry
+    - SentryPrivate
+    - SimpleKeychain
     - Specta
-    - SVGView
     - SwiftDate
     - SwiftyJSON
 
@@ -126,38 +118,34 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  ActivityIndicatorView: 2a73f96feeb64c8583a0a9dfeeee27ddb8f71b4d
+  ActivityIndicatorView: f14ac8e200a344fe992577807998b0c8562bd964
   Alamofire: 4e95d97098eacb88856099c4fc79b526a299e48c
   AnyCodable-FlightSchool: 261cbe76757802b17d471b9059b21e6fa5edf57b
-  CCurve25519: 70dc9f84124779f020e417d2fc4ba9e58919f074
-  CocoaMQTT: 204713d369b9a3ed8d90af2e0666f11121d06e74
-  Curve25519: 5f33887c1eeb0308d1e7c4c6721d9907b56e56a3
+  Auth0: 64da28fdc5cd499aa516dc4bfd0ace8efae2c1da
+  CocoaMQTT: f91421327f100d64374792b96bc9787e983bfe29
   DynamicColor: d049834ef86d8ecf150b0ca1ebe54ee733a0ec22
   Expecta: 3b6bd90a64b9a1dcb0b70aa0e10a7f8f631667d5
   "Expecta+Snapshots": dcff217eef506dabd6dfdc7864ea2da321fafbb8
-  Fakery: a90caff00ca5cacde6c161c3eafc72314a03d34d
   FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
   Gifu: 416d4e38c4c2fed012f019e0a1d3ffcb58e5b842
-  Giphy: 18fd77d3a0fe8584bf32d80e59df8e5c0e4215ba
-  InAppChat: 627c3216157589e4230895b414057e23d1463156
-  Introspect: 6917895ed34004271bc8d75a75db6c07839fa971
+  Giphy: 6b5f6986c8df4f71e01a8ef86595f426b3439fb5
+  InAppChat: a30bad6c894ca977cc4f14b625f026504a87c249
   iOSSnapshotTestCase: a670511f9ee3829c2b9c23e6e68f315fd7b6790f
+  JWTDecode: 2eed97c2fa46ccaf3049a787004eedf0be474a87
   libwebp: f62cb61d0a484ba548448a4bd52aabf150ff6eef
   MqttCocoaAsyncSocket: 77d3b74f76228dd5a05d1f9526eab101d415b30c
   Nimble: 5316ef81a170ce87baf72dd961f22f89a602ff84
   Nimble-Snapshots: ef281b908c604f78c8313587e25ea92c8ab513d7
-  Nuke: 279f17a599fd1c83cf51de5e0e1f2db143a287b0
-  NukeUI: 6e99837a8d066c93baa4262692d9ea9ffbc863ba
-  PLCrashReporter: 2a08001f8e6a30abe405ee8f13d2753cfb5d682a
   Quick: f5754d69b7013f5864c29aab9ae6f0c79c5bc200
-  RollbarCommon: 9a8198f5141aba65441c63e76b2ec4bc1a05cd2f
-  RollbarNotifier: 97b177c3493571f74cef5f793801c4a191f4d918
-  RollbarPLCrashReporter: bf0e742bd2d799d4c79a83108e4e7bfd6107db87
+  SDWebImage: d47d81bea8a77187896b620dc79c3c528e8906b9
+  SDWebImageSwiftUI: 17396b7889f9abc27231caaeb64c537564284aab
+  Sentry: d80553ff85ea72def75b792aaa5a71c158e51595
+  SentryPrivate: ef1c5b3dfe44ec0c70e2eb343a5be2689164c021
+  SimpleKeychain: 130211269f88f038d7dc5254cf0b1b9ce978c398
   Specta: 3e1bd89c3517421982dc4d1c992503e48bd5fe66
-  SVGView: 4813b73e85fcea6c7ff92720cf1e778c48d0f0db
   SwiftDate: bbc26e26fc8c0c33fbee8c140c5e8a68293a148a
   SwiftyJSON: 2f33a42c6fbc52764d96f13368585094bfd8aa5e
 
-PODFILE CHECKSUM: ad39ff5bd3abd7dd4af39b0d2fb008c7197b2967
+PODFILE CHECKSUM: 939fcac656cd239e2bf42164589411bc18300692
 
-COCOAPODS: 1.12.0
+COCOAPODS: 1.12.1

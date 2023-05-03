@@ -27,9 +27,9 @@ Pod::Spec.new do |s|
   s.dependency        "SwiftyJSON"
   s.dependency        "Alamofire"
   s.dependency        "Giphy"
-  s.dependency        "RollbarNotifier"
-  s.dependency        "RollbarPLCrashReporter"
   s.dependency        "CocoaMQTT"
   s.dependency        "Auth0"
   s.dependency        "Gifu"
+  s.dependency        'Sentry'
+
 end

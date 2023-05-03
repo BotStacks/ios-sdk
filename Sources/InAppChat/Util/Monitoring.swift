@@ -1,26 +1,18 @@
-
-import RollbarNotifier
-import RollbarPLCrashReporter
+import Sentry
 
 struct Monitoring {
   
-  static var logger: RollbarLogger!
+    static var logger: SentryHub!
   
   static func start() {
-    self.logger = RollbarLogger(accessToken: "f7bb611f09d741c0b77d1032a1a2d71c")
-    let collector = RollbarPLCrashCollector()
-    collector.collectCrashReports(with: CrashReporter())
+    let options = Options()
+      options.dsn = "https://8be72ce2c6f54fb989fac72f82a1a628@o4505121822801920.ingest.sentry.io/4505121826209792"
+      options.debug = true
+      let client = SentryClient(options: options)
+      logger = SentryHub(client: client, andScope: nil)
   }
   
   static func error(_ e: Error) {
-    return logger.log(.error, error: e, data: nil, context: nil)
-  }
-}
-
-private class CrashReporter: RollbarCrashCollectorObserver {
-  func onCrashReportsCollectionCompletion(_ crashReports: [RollbarCrashReportData]!) {
-    for report in crashReports {
-      Monitoring.logger.logCrashReport(report.crashReport)
-    }
+      logger.capture(error: e)
   }
 }

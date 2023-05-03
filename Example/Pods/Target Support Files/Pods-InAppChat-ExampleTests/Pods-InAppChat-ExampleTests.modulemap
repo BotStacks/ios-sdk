@@ -1,6 +1,0 @@
-framework module Pods_InAppChat_ExampleTests {
-  umbrella header "Pods-InAppChat-ExampleTests-umbrella.h"
-
-  export *
-  module * { export * }
-}
