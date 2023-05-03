@@ -310,7 +310,17 @@ class Api {
   }
 
   func onUser(_ user: User) async throws {
-      try await Chats.current.onLogin(user: user)
+      await MainActor.run {
+          Chats.current.user = user
+          Chats.current.currentUserID = user.id
+        User.current = user
+      }
+      do {
+          try await Chats.current.loadAsync()
+        Socket.shared.connect()
+      } catch let err {
+        Monitoring.error(err)
+      }
   }
 
   func onToken(accessToken: String, refreshToken: String?, tokenExpiresAt: Date) {
@@ -319,23 +329,19 @@ class Api {
     self.tokenExpiresAt = tokenExpiresAt
   }
 
-    func auth0Login(accessToken: String,
-                    refreshToken: String?,
-                    expiresIn: Date,
+    func login(accessToken: String,
+                    userId: String,
                     email: String,
                     picture: String?,
                     name: String?,
                     nickname: String?) async throws -> User {
-    onToken(
-      accessToken: accessToken, refreshToken: refreshToken,
-      tokenExpiresAt: expiresIn)
-    let res = try await AuthAPI.auth0Login(
-      auth0LoginInput: .init(
+    let res = try await AuthAPI.login(
+      loginInput: .init(
+        userId: userId,
         accessToken: accessToken, email: email, picture: picture, name: name,
         nickname: nickname, deviceId: deviceId, deviceType: .ios))
-    let user = User.get(res.user)
-    try await onUser(user)
-    return user
+        try await onLogin(res)
+        return User.get(res.user)
   }
 
   public func nftLogin(

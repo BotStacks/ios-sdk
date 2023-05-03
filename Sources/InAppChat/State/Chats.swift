@@ -125,18 +125,4 @@ public class Chats: ObservableObject {
   }
 
   var cache = Caches()
-
-  func onLogin(user: User) async throws {
-    await MainActor.run {
-      self.user = user
-      self.currentUserID = user.id
-      User.current = user
-    }
-    do {
-      try await loadAsync()
-      Socket.shared.connect()
-    } catch let err {
-      Monitoring.error(err)
-    }
-  }
 }

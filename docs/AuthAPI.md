@@ -4,63 +4,13 @@ All URIs are relative to *https://chat.inappchat.io/v3*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**auth0Login**](AuthAPI.md#auth0login) | **POST** /auth/auth0/login | Verify User information
 [**changePassword**](AuthAPI.md#changepassword) | **POST** /auth/change-password | Change Password
+[**login**](AuthAPI.md#login) | **POST** /auth/login | Login to InAppChat as a user on your Application.
 [**logout**](AuthAPI.md#logout) | **POST** /logout | Logout
 [**logoutOtherDevices**](AuthAPI.md#logoutotherdevices) | **POST** /logoutOtherDevices | Logout
 [**nftLogin**](AuthAPI.md#nftlogin) | **POST** /auth/nft/login | signup and login with NFT
 [**resetPassword**](AuthAPI.md#resetpassword) | **POST** /auth/reset-password | Forgot Password
 
-
-# **auth0Login**
-```swift
-    open class func auth0Login(auth0LoginInput: Auth0LoginInput, completion: @escaping (_ data: UserInfo?, _ error: Error?) -> Void)
-```
-
-Verify User information
-
-verify user information, device information
-
-### Example
-```swift
-// The following code samples are still beta. For any issue, please report via http://github.com/OpenAPITools/openapi-generator/issues/new
-import InAppChat
-
-let auth0LoginInput = Auth0LoginInput(accessToken: "accessToken_example", email: "email_example", picture: "picture_example", name: "name_example", nickname: "nickname_example", deviceId: "deviceId_example", deviceType: "deviceType_example", fcmToken: "fcmToken_example", apnsToken: "apnsToken_example") // Auth0LoginInput | 
-
-// Verify User information
-AuthAPI.auth0Login(auth0LoginInput: auth0LoginInput) { (response, error) in
-    guard error == nil else {
-        print(error)
-        return
-    }
-
-    if (response) {
-        dump(response)
-    }
-}
-```
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **auth0LoginInput** | [**Auth0LoginInput**](Auth0LoginInput.md) |  | 
-
-### Return type
-
-[**UserInfo**](UserInfo.md)
-
-### Authorization
-
-[DeviceId](../README.md#DeviceId), [ApiKeyAuth](../README.md#ApiKeyAuth)
-
-### HTTP request headers
-
- - **Content-Type**: application/json
- - **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **changePassword**
 ```swift
@@ -109,6 +59,56 @@ Void (empty response body)
 
  - **Content-Type**: application/json
  - **Accept**: Not defined
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **login**
+```swift
+    open class func login(loginInput: LoginInput, completion: @escaping (_ data: Auth?, _ error: Error?) -> Void)
+```
+
+Login to InAppChat as a user on your Application.
+
+Login to InAppChat as a user on your Application. This will updated the User's profile info in InAppChat. InAppChat will verify the authenticity of the credentials provided by calling the configured backend function of your server.
+
+### Example
+```swift
+// The following code samples are still beta. For any issue, please report via http://github.com/OpenAPITools/openapi-generator/issues/new
+import InAppChat
+
+let loginInput = LoginInput(userId: "userId_example", accessToken: "accessToken_example", email: "email_example", picture: "picture_example", name: "name_example", nickname: "nickname_example", deviceId: "deviceId_example", deviceType: "deviceType_example", fcmToken: "fcmToken_example", apnsToken: "apnsToken_example") // LoginInput | 
+
+// Login to InAppChat as a user on your Application.
+AuthAPI.login(loginInput: loginInput) { (response, error) in
+    guard error == nil else {
+        print(error)
+        return
+    }
+
+    if (response) {
+        dump(response)
+    }
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **loginInput** | [**LoginInput**](LoginInput.md) |  | 
+
+### Return type
+
+[**Auth**](Auth.md)
+
+### Authorization
+
+[DeviceId](../README.md#DeviceId), [ApiKeyAuth](../README.md#ApiKeyAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

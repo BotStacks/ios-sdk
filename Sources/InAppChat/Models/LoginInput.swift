@@ -12,16 +12,14 @@ import AnyCodable
 
 public struct LoginInput: Codable, JSONEncodable, Hashable {
 
-    public enum LoginType: String, Codable, CaseIterable {
-        case email = "email"
-        case auth0 = "auth0"
-    }
     public enum DeviceType: String, Codable, CaseIterable {
         case android = "android"
         case ios = "ios"
     }
-    /** Type of login  like email/mobile/sso */
-    public var loginType: LoginType
+    /** A unique identifier for your user */
+    public var userId: String
+    /** The auth0 access token */
+    public var accessToken: String
     /** User ID based on loginType */
     public var email: String
     /** A profile picture URL */
@@ -36,9 +34,12 @@ public struct LoginInput: Codable, JSONEncodable, Hashable {
     public var deviceType: DeviceType?
     /** FCM regsitration token. Optional. */
     public var fcmToken: String?
+    /** the device APNS token */
+    public var apnsToken: String?
 
-    public init(loginType: LoginType, email: String, picture: String? = nil, name: String? = nil, nickname: String? = nil, deviceId: String, deviceType: DeviceType? = nil, fcmToken: String? = nil) {
-        self.loginType = loginType
+    public init(userId: String, accessToken: String, email: String, picture: String? = nil, name: String? = nil, nickname: String? = nil, deviceId: String, deviceType: DeviceType? = nil, fcmToken: String? = nil, apnsToken: String? = nil) {
+        self.userId = userId
+        self.accessToken = accessToken
         self.email = email
         self.picture = picture
         self.name = name
@@ -46,10 +47,12 @@ public struct LoginInput: Codable, JSONEncodable, Hashable {
         self.deviceId = deviceId
         self.deviceType = deviceType
         self.fcmToken = fcmToken
+        self.apnsToken = apnsToken
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
-        case loginType
+        case userId
+        case accessToken
         case email
         case picture
         case name
@@ -57,13 +60,15 @@ public struct LoginInput: Codable, JSONEncodable, Hashable {
         case deviceId
         case deviceType
         case fcmToken
+        case apnsToken
     }
 
     // Encodable protocol methods
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(loginType, forKey: .loginType)
+        try container.encode(userId, forKey: .userId)
+        try container.encode(accessToken, forKey: .accessToken)
         try container.encode(email, forKey: .email)
         try container.encodeIfPresent(picture, forKey: .picture)
         try container.encodeIfPresent(name, forKey: .name)
@@ -71,6 +76,7 @@ public struct LoginInput: Codable, JSONEncodable, Hashable {
         try container.encode(deviceId, forKey: .deviceId)
         try container.encodeIfPresent(deviceType, forKey: .deviceType)
         try container.encodeIfPresent(fcmToken, forKey: .fcmToken)
+        try container.encodeIfPresent(apnsToken, forKey: .apnsToken)
     }
 }
 

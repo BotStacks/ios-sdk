@@ -13,48 +13,6 @@ import AnyCodable
 open class AuthAPI {
 
     /**
-     Verify User information
-     
-     - parameter auth0LoginInput: (body)  
-     - returns: UserInfo
-     */
-    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    open class func auth0Login(auth0LoginInput: Auth0LoginInput) async throws -> UserInfo {
-        return try await auth0LoginWithRequestBuilder(auth0LoginInput: auth0LoginInput).execute().body
-    }
-
-    /**
-     Verify User information
-     - POST /auth/auth0/login
-     - verify user information, device information
-     - API Key:
-       - type: apiKey X-Device-ID (HEADER)
-       - name: DeviceId
-     - API Key:
-       - type: apiKey X-API-Key (HEADER)
-       - name: ApiKeyAuth
-     - parameter auth0LoginInput: (body)  
-     - returns: RequestBuilder<UserInfo> 
-     */
-    open class func auth0LoginWithRequestBuilder(auth0LoginInput: Auth0LoginInput) -> RequestBuilder<UserInfo> {
-        let localVariablePath = "/auth/auth0/login"
-        let localVariableURLString = InAppChatAPI.basePath + localVariablePath
-        let localVariableParameters = JSONEncodingHelper.encodingParameters(forEncodableObject: auth0LoginInput)
-
-        let localVariableUrlComponents = URLComponents(string: localVariableURLString)
-
-        let localVariableNillableHeaders: [String: Any?] = [
-            :
-        ]
-
-        let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
-
-        let localVariableRequestBuilder: RequestBuilder<UserInfo>.Type = InAppChatAPI.requestBuilderFactory.getBuilder()
-
-        return localVariableRequestBuilder.init(method: "POST", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true)
-    }
-
-    /**
      Change Password
      
      - parameter loginPasswordInput: (body)  
@@ -92,6 +50,48 @@ open class AuthAPI {
         let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
 
         let localVariableRequestBuilder: RequestBuilder<Void>.Type = InAppChatAPI.requestBuilderFactory.getNonDecodableBuilder()
+
+        return localVariableRequestBuilder.init(method: "POST", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true)
+    }
+
+    /**
+     Login to InAppChat as a user on your Application.
+     
+     - parameter loginInput: (body)  
+     - returns: Auth
+     */
+    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+    open class func login(loginInput: LoginInput) async throws -> Auth {
+        return try await loginWithRequestBuilder(loginInput: loginInput).execute().body
+    }
+
+    /**
+     Login to InAppChat as a user on your Application.
+     - POST /auth/login
+     - Login to InAppChat as a user on your Application. This will updated the User's profile info in InAppChat. InAppChat will verify the authenticity of the credentials provided by calling the configured backend function of your server.
+     - API Key:
+       - type: apiKey X-Device-ID (HEADER)
+       - name: DeviceId
+     - API Key:
+       - type: apiKey X-API-Key (HEADER)
+       - name: ApiKeyAuth
+     - parameter loginInput: (body)  
+     - returns: RequestBuilder<Auth> 
+     */
+    open class func loginWithRequestBuilder(loginInput: LoginInput) -> RequestBuilder<Auth> {
+        let localVariablePath = "/auth/login"
+        let localVariableURLString = InAppChatAPI.basePath + localVariablePath
+        let localVariableParameters = JSONEncodingHelper.encodingParameters(forEncodableObject: loginInput)
+
+        let localVariableUrlComponents = URLComponents(string: localVariableURLString)
+
+        let localVariableNillableHeaders: [String: Any?] = [
+            :
+        ]
+
+        let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
+
+        let localVariableRequestBuilder: RequestBuilder<Auth>.Type = InAppChatAPI.requestBuilderFactory.getBuilder()
 
         return localVariableRequestBuilder.init(method: "POST", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true)
     }

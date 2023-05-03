@@ -59,7 +59,7 @@ public class InAppChat: ObservableObject {
 
   @Published var loggingIn = false
   public func auth0Login(
-    accessToken: String, refreshToken: String?, expiresIn: Date, email: String, picture: String?,
+    accessToken: String, userId: String, email: String, picture: String?,
     name: String?,
     nickname: String?
   ) async throws {
@@ -68,8 +68,8 @@ public class InAppChat: ObservableObject {
       loggingIn = true
     }
     do {
-      let _ = try await api.auth0Login(
-        accessToken: accessToken, refreshToken: refreshToken, expiresIn: expiresIn, email: email,
+      let _ = try await api.login(
+        accessToken: accessToken, userId: userId, email: email,
         picture: picture, name: name, nickname: nickname)
     } catch let err {
       Monitoring.error(err)
