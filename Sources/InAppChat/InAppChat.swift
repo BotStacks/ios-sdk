@@ -3,7 +3,8 @@ import Foundation
 import SwiftyJSON
 
 let assets =
-  Bundle.main.url(forResource: "InAppChat", withExtension: "bundle").flatMap({ Bundle(url: $0) })
+Bundle.allBundles.compactMap({$0.url(forResource: "InAppChat", withExtension: "bundle").flatMap({Bundle(url: $0)})}).first
+?? Bundle(for: InAppChat.self).url(forResource: "InAppChat", withExtension: "bundle").flatMap({Bundle(url: $0)})
   ?? Bundle.main
 
 public class InAppChat: ObservableObject {
