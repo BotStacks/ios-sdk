@@ -16,6 +16,7 @@
 		DDC36735CE0E3095A94BE40B /* Pods_InAppChat_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF6FC7AE54E30D6C1B1EC5C4 /* Pods_InAppChat_Example.framework */; };
 		DEB070A1AA0B20C84CA32AF3 /* Pods_InAppChat_ExampleTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F8CDDC28936A00719BD1AAD /* Pods_InAppChat_ExampleTests.framework */; };
 		FB2381722A03009900D239E2 /* Auth0.plist in Resources */ = {isa = PBXBuildFile; fileRef = FB2381712A03009900D239E2 /* Auth0.plist */; };
+		FB4FA42F2A04126200EEC2CE /* Splash.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB4FA42E2A04126200EEC2CE /* Splash.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +55,7 @@
 		B8FA1FAA29848126008BF431 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		D06EB6C736CDA000993BA43D /* Pods-InAppChat-Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InAppChat-Example.release.xcconfig"; path = "Target Support Files/Pods-InAppChat-Example/Pods-InAppChat-Example.release.xcconfig"; sourceTree = "<group>"; };
 		FB2381712A03009900D239E2 /* Auth0.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Auth0.plist; sourceTree = "<group>"; };
+		FB4FA42E2A04126200EEC2CE /* Splash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Splash.swift; sourceTree = "<group>"; };
 		FF6FC7AE54E30D6C1B1EC5C4 /* Pods_InAppChat_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InAppChat_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -136,6 +138,7 @@
 				B827EAC1298092440018B848 /* InAppChat_Example.entitlements */,
 				B89D2BBE298AE2E200F6C6CE /* Preview Content */,
 				FB2381712A03009900D239E2 /* Auth0.plist */,
+				FB4FA42E2A04126200EEC2CE /* Splash.swift */,
 			);
 			path = "InAppChat-Example";
 			sourceTree = "<group>";
@@ -234,7 +237,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1420;
-				LastUpgradeCheck = 1420;
+				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					B827EAB7298092430018B848 = {
 						CreatedOnToolsVersion = 14.2;
@@ -399,6 +402,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B827EABE298092430018B848 /* ContentView.swift in Sources */,
+				FB4FA42F2A04126200EEC2CE /* Splash.swift in Sources */,
 				B827EABC298092430018B848 /* InAppChat_ExampleApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -469,6 +473,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -527,6 +532,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -555,6 +561,7 @@
 				CODE_SIGN_ENTITLEMENTS = "InAppChat-Example/InAppChat_Example.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"InAppChat-Example/Preview Content\"";
 				DEVELOPMENT_TEAM = WVZBR7DU5M;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -579,7 +586,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.inappchat.InAppChat-Example";
+				PRODUCT_BUNDLE_IDENTIFIER = io.inappchat.sample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
@@ -599,6 +606,7 @@
 				CODE_SIGN_ENTITLEMENTS = "InAppChat-Example/InAppChat_Example.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"InAppChat-Example/Preview Content\"";
 				DEVELOPMENT_TEAM = WVZBR7DU5M;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -623,7 +631,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.inappchat.InAppChat-Example";
+				PRODUCT_BUNDLE_IDENTIFIER = io.inappchat.sample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
@@ -641,6 +649,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = WVZBR7DU5M;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
@@ -665,6 +674,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = WVZBR7DU5M;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
@@ -687,6 +697,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = WVZBR7DU5M;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
@@ -709,6 +720,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = WVZBR7DU5M;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.2;

@@ -1,5 +1,7 @@
 # InAppChat iOS
 
+[![CodeFactor](https://www.codefactor.io/repository/github/ripbullnetworks/inappchat-ios/badge)](https://www.codefactor.io/repository/github/ripbullnetworks/inappchat-ios) ![Cocoapods](https://img.shields.io/cocoapods/v/InAppChat?style=flat-square) ![GitHub issues](https://img.shields.io/github/issues/RipBullNetworks/inappchat-ios) ![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ripbullnetworks/inappchat-ios)
+
 Delightful chat for your iOS apps
 
 ## Overview
