@@ -10,7 +10,6 @@ public struct Profile: View {
   public init(id: String) {
     self.id = id
     _user = State(initialValue: User.get(id))
-    print("USer Item Count Is", user?.sharedMedia.items)
   }
 
   public var body: some View {
@@ -24,14 +23,14 @@ public struct Profile: View {
         SpinnerList()
       }
     }.edgesIgnoringSafeArea(.all)
-      
+
   }
 }
 
 public struct UserProfile: View {
   @ObservedObject var user: User
   @Environment(\.iacTheme) var theme
-  
+
   public var body: some View {
     VStack {
       VStack {
@@ -47,7 +46,7 @@ public struct UserProfile: View {
           .cornerRadius(30.0)
           .background(theme.colors.softBackground)
       }
-      
+
       if !user.isCurrent {
         Divider()
           .foregroundColor(theme.colors.softBackground)
@@ -70,7 +69,7 @@ public struct UserProfile: View {
           }
         }.padding(.leading, 16.0)
       }
-      
+
       Spacer().height(24.0)
       Divider().foregroundColor(theme.colors.caption)
       if !user.isCurrent {
