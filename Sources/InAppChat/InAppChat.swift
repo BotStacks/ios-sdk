@@ -24,6 +24,7 @@ public class InAppChat: ObservableObject {
   public init(namespace: String, apiKey: String) {
     self.namespace = namespace
     self.apiKey = apiKey
+    Monitoring.start()
   }
 
   public func load() async throws -> JSON {
