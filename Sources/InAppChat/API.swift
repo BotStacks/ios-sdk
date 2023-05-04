@@ -440,11 +440,11 @@ class Api {
   }
 
   func registerPushToken(_ token: String) async throws {
-    try await UserAPI.updateMe(updateUserInput: .init(apnsToken: token))
+      let _ = User.get(try await UserAPI.updateMe(updateUserInput: .init(apnsToken: token)))
   }
 
   func registerFCMToken(_ token: String) async throws {
-    try await UserAPI.updateMe(updateUserInput: .init(fcmToken: token))
+      let _ = try await UserAPI.updateMe(updateUserInput: .init(fcmToken: token))
   }
 
   func start(_ id: String) async throws -> User {

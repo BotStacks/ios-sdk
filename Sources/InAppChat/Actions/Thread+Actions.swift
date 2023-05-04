@@ -16,7 +16,6 @@ extension Thread {
       status: .sending
     )
     self.sending.insert(m, at: 0)
-    let mentions = mentionsArray(text)
     Task.detached {
       do {
         let newMessage = try await api.send(

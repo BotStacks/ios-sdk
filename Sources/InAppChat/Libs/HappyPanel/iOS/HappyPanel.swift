@@ -46,7 +46,7 @@ struct HappyPanel: View {
     ZStack {
       MainContent()
         .offset(y: offsetY)
-        .animation(.spring())
+        .animation(.spring(), value: UUID())
         .gesture(panelDragGesture)
         .onChange(of: sharedState.selectedEmoji) { value in
           if let value = value {
@@ -69,7 +69,7 @@ struct HappyPanel: View {
     Color.black.opacity(0.7)
       .edgesIgnoringSafeArea(.all)
       .opacity(isOpen ? 1 : 0)
-      .animation(.easeIn)
+      .animation(.easeIn, value: UUID())
       .onTapGesture {
         resetViews()
       }

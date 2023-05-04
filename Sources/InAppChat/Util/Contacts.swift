@@ -33,7 +33,6 @@ func requestContactsPermission() async throws -> Bool {
 }
 
 func fetchContacts() -> [String] {
-  let store = CNContactStore()
   var contacts = [String]()
 
   let keys: [Any] = [

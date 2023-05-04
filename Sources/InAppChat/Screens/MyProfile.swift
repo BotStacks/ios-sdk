@@ -10,7 +10,6 @@ public struct MyProfile: View {
 
   public init(onBack: (() -> Void)? = nil) {
     self.onBack = onBack
-    print("User Current Avatar", User.current?.avatar)
   }
 
   public var body: some View {

@@ -79,11 +79,11 @@ struct PathEnvironment: EnvironmentKey {
 
 extension EnvironmentValues {
   /// The current relative path of the closest `Route`.
-  internal(set) var relativePath: String {
+  var relativePath: String {
     get { self[RelativeRouteEnvironment.self] }
     set { self[RelativeRouteEnvironment.self] = newValue }
   }
-  internal(set) var path: String {
+  var path: String {
     get { self[PathEnvironment.self] }
     set { self[PathEnvironment.self] = newValue }
   }

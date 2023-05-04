@@ -220,7 +220,7 @@ public final class Message: ObservableObject, Identifiable {
   }
 
   var summary: String {
-    return "\(user.username ?? ""): \(msg)"
+    return "\(user.username): \(msg)"
   }
 
   var reacting = false

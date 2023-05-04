@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 public extension Color {
-  public func new() -> Color {
+  func new() -> Color {
     return Color(self.cgColor!)
   }
 }

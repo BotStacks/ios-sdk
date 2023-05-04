@@ -40,3 +40,4 @@ InAppChat.podspec
 Package.swift
 project.yml
 .gitignore
+URLSessionImplementations.swift

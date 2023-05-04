@@ -170,7 +170,6 @@ class SpeechRecognizer: ObservableObject {
   private func recognitionHandler(result: SFSpeechRecognitionResult?, error: Error?) {
     let receivedFinalResult = result?.isFinal ?? false
     let receivedError = error != nil
-    print("Receveied final result", receivedError, error)
     if receivedFinalResult || receivedError {
       audioEngine?.stop()
       audioEngine?.inputNode.removeTap(onBus: 0)
