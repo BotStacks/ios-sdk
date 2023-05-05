@@ -80,7 +80,7 @@ struct Login: View {
           let name = jwt["name"].string
           let nickname = jwt["nickname"].string ?? "0x41112A2e8626330752A8f9353462edd4771a48a2"
           let picture = "https://api.poisonpog.org/ipfs/31.png"
-          let _ = try await InAppChat.shared.auth0Login(
+          let _ = try await InAppChat.shared.login(
             accessToken: credentials.accessToken,
             userId: id,
             email: email,

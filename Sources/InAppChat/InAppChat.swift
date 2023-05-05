@@ -60,7 +60,7 @@ public class InAppChat: ObservableObject {
   }
 
   @Published var loggingIn = false
-  public func auth0Login(
+  public func login(
     accessToken: String, userId: String, email: String, picture: String?,
     name: String?,
     nickname: String?
