@@ -12,7 +12,7 @@ import SwiftUI
 struct InAppChat_ExampleApp: App {
 
   init() {
-    InAppChat.setup(namespace: "g2minusqa.qa.ertc.com", apiKey: "hz5sk9e6")
+    InAppChat.setup(namespace: "sample.ertc.com", apiKey: "oj2k3r2x")
   }
 
   var body: some Scene {

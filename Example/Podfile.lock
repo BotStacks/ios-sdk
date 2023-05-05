@@ -10,24 +10,13 @@ PODS:
   - CocoaMQTT/Core (2.1.3):
     - MqttCocoaAsyncSocket (~> 1.0.8)
   - DynamicColor (5.0.1)
-  - Expecta (1.0.6)
-  - "Expecta+Snapshots (3.1.1)":
-    - Expecta (~> 1.0)
-    - FBSnapshotTestCase/Core (~> 2.0)
-    - Specta (~> 1.0)
-  - FBSnapshotTestCase (2.1.4):
-    - FBSnapshotTestCase/SwiftSupport (= 2.1.4)
-  - FBSnapshotTestCase/Core (2.1.4)
-  - FBSnapshotTestCase/SwiftSupport (2.1.4):
-    - FBSnapshotTestCase/Core
   - Gifu (3.3.1)
   - Giphy (2.2.4):
     - libwebp
-  - InAppChat (1.0.4):
+  - InAppChat (1.0.9):
     - ActivityIndicatorView
     - Alamofire
     - AnyCodable-FlightSchool
-    - Auth0
     - CocoaMQTT
     - DynamicColor
     - Gifu
@@ -36,11 +25,6 @@ PODS:
     - Sentry
     - SwiftDate
     - SwiftyJSON
-  - iOSSnapshotTestCase (8.0.0):
-    - iOSSnapshotTestCase/SwiftSupport (= 8.0.0)
-  - iOSSnapshotTestCase/Core (8.0.0)
-  - iOSSnapshotTestCase/SwiftSupport (8.0.0):
-    - iOSSnapshotTestCase/Core
   - JWTDecode (3.0.1)
   - libwebp (1.2.4):
     - libwebp/demux (= 1.2.4)
@@ -52,13 +36,6 @@ PODS:
     - libwebp/demux
   - libwebp/webp (1.2.4)
   - MqttCocoaAsyncSocket (1.0.8)
-  - Nimble (10.0.0)
-  - Nimble-Snapshots (9.4.0):
-    - Nimble-Snapshots/Core (= 9.4.0)
-  - Nimble-Snapshots/Core (9.4.0):
-    - iOSSnapshotTestCase (~> 8.0)
-    - Nimble
-  - Quick (2.2.1)
   - SDWebImage (5.15.6):
     - SDWebImage/Core (= 5.15.6)
   - SDWebImage/Core (5.15.6)
@@ -71,18 +48,12 @@ PODS:
     - SentryPrivate (= 8.6.0)
   - SentryPrivate (8.6.0)
   - SimpleKeychain (1.0.1)
-  - Specta (1.0.7)
   - SwiftDate (7.0.0)
   - SwiftyJSON (5.0.1)
 
 DEPENDENCIES:
   - Auth0 (~> 2.0)
-  - "Expecta+Snapshots"
-  - FBSnapshotTestCase
   - InAppChat (from `../`)
-  - Nimble (~> 10.0.0)
-  - Nimble-Snapshots (~> 9.4.0)
-  - Quick (~> 2.2.0)
 
 SPEC REPOS:
   trunk:
@@ -92,24 +63,16 @@ SPEC REPOS:
     - Auth0
     - CocoaMQTT
     - DynamicColor
-    - Expecta
-    - "Expecta+Snapshots"
-    - FBSnapshotTestCase
     - Gifu
     - Giphy
-    - iOSSnapshotTestCase
     - JWTDecode
     - libwebp
     - MqttCocoaAsyncSocket
-    - Nimble
-    - Nimble-Snapshots
-    - Quick
     - SDWebImage
     - SDWebImageSwiftUI
     - Sentry
     - SentryPrivate
     - SimpleKeychain
-    - Specta
     - SwiftDate
     - SwiftyJSON
 
@@ -124,28 +87,20 @@ SPEC CHECKSUMS:
   Auth0: 64da28fdc5cd499aa516dc4bfd0ace8efae2c1da
   CocoaMQTT: f91421327f100d64374792b96bc9787e983bfe29
   DynamicColor: d049834ef86d8ecf150b0ca1ebe54ee733a0ec22
-  Expecta: 3b6bd90a64b9a1dcb0b70aa0e10a7f8f631667d5
-  "Expecta+Snapshots": dcff217eef506dabd6dfdc7864ea2da321fafbb8
-  FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
   Gifu: 416d4e38c4c2fed012f019e0a1d3ffcb58e5b842
   Giphy: 6b5f6986c8df4f71e01a8ef86595f426b3439fb5
-  InAppChat: a30bad6c894ca977cc4f14b625f026504a87c249
-  iOSSnapshotTestCase: a670511f9ee3829c2b9c23e6e68f315fd7b6790f
+  InAppChat: a9642040b09c74f3a7dc4ecdde75b4b15d231a78
   JWTDecode: 2eed97c2fa46ccaf3049a787004eedf0be474a87
   libwebp: f62cb61d0a484ba548448a4bd52aabf150ff6eef
   MqttCocoaAsyncSocket: 77d3b74f76228dd5a05d1f9526eab101d415b30c
-  Nimble: 5316ef81a170ce87baf72dd961f22f89a602ff84
-  Nimble-Snapshots: ef281b908c604f78c8313587e25ea92c8ab513d7
-  Quick: f5754d69b7013f5864c29aab9ae6f0c79c5bc200
   SDWebImage: d47d81bea8a77187896b620dc79c3c528e8906b9
   SDWebImageSwiftUI: 17396b7889f9abc27231caaeb64c537564284aab
   Sentry: d80553ff85ea72def75b792aaa5a71c158e51595
   SentryPrivate: ef1c5b3dfe44ec0c70e2eb343a5be2689164c021
   SimpleKeychain: 130211269f88f038d7dc5254cf0b1b9ce978c398
-  Specta: 3e1bd89c3517421982dc4d1c992503e48bd5fe66
   SwiftDate: bbc26e26fc8c0c33fbee8c140c5e8a68293a148a
   SwiftyJSON: 2f33a42c6fbc52764d96f13368585094bfd8aa5e
 
-PODFILE CHECKSUM: 939fcac656cd239e2bf42164589411bc18300692
+PODFILE CHECKSUM: 85c1635f05abee6e816f0503f2d4c7dd26207902
 
 COCOAPODS: 1.12.1

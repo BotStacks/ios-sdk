@@ -33,22 +33,24 @@ struct Splash<Content>: View where Content: View {
         .aspectRatio(contentMode: .fit)
       ZStack {
         VStack {
-          Image("g2minus")
-          Text("End-to-end encrypted messenger\nbuilt on ethereum")
+            Image("inappchat-icon").size(120.0)
+            Image("inappchat-text").frame(width: 150.0)
+          
+          Text("Elegant, ")
             .multilineTextAlignment(.center)
             .foregroundColor(.white)
-          if app.loading {
+          if !app.loaded {
             Spinner().size(60.0)
           }
-        }.padding(.bottom, app.loading ? 0.0 : 60.0)
+        }.padding(.bottom, !app.loaded ? 0.0 : 60.0)
       }.grow()
       if let content = content {
         content()
       }
     }
-    .onChange(of: app.loading) { newValue in
-      if !newValue {
-        navigator.navigate(app.loggedIn ? "/chats" : "/login", replace: true)
+    .onChange(of: !app.loaded) { newValue in
+      if newValue {
+          navigator.navigate(app.isUserLoggedIn ? "/chats" : "/login", replace: true)
       }
     }
   }

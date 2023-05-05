@@ -15,7 +15,16 @@ struct ContentView: View {
   }
 
   var body: some View {
-    InAppChatUI()
+      InAppChatUI {
+          IACMainRoutes(initialPath: "/splash") {
+            Route("splash") {
+              Splash()
+            }
+            Route("login") {
+              Login()
+            }
+          }
+      }
   }
 }
 
