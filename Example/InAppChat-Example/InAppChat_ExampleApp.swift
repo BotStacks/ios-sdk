@@ -7,6 +7,7 @@
 
 import InAppChat
 import SwiftUI
+import Firebase
 
 @main
 struct InAppChat_ExampleApp: App {
@@ -39,4 +40,10 @@ class AppDelegate: NSObject, UIApplicationDelegate {
       print("Device Token: \(token)")
         InAppChat.registerPushToken(token)
     }
+    
+    func application(_ application: UIApplication,
+                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+       FirebaseApp.configure()
+       return true
+     }
 }
