@@ -497,7 +497,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "InAppChat-Example/InAppChat_Example.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"InAppChat-Example/Preview Content\"";
 				DEVELOPMENT_TEAM = WVZBR7DU5M;
@@ -505,6 +505,13 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "InAppChat-Example/Info.plist";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Upload photos and videos to InAppChat chat";
+				INFOPLIST_KEY_NSContactsUsageDescription = "Find your friends on InAppChat with your contact book";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Share your location in InAppChat chat";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Share your location in InAppChat chat";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Upload video to InAppChat chat";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Upload photos, videos and files to InAppChat chat";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Use speech recognition to send messages on InAppChat";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -542,7 +549,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "InAppChat-Example/InAppChat_Example.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"InAppChat-Example/Preview Content\"";
 				DEVELOPMENT_TEAM = WVZBR7DU5M;
@@ -550,6 +557,13 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "InAppChat-Example/Info.plist";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Upload photos and videos to InAppChat chat";
+				INFOPLIST_KEY_NSContactsUsageDescription = "Find your friends on InAppChat with your contact book";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Share your location in InAppChat chat";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Share your location in InAppChat chat";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Upload video to InAppChat chat";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Upload photos, videos and files to InAppChat chat";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Use speech recognition to send messages on InAppChat";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
