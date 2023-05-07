@@ -33,7 +33,6 @@ public class InAppChat: ObservableObject {
     didStartLoading = true
     let tenant = try await api.fetchTenant()
     try await Chats.current.loadAsync()
-    loaded = true
     let cfg = tenant["config"]
     self.config = cfg
     let chatServer = cfg["serverDetails"]["chatServer"]
@@ -47,6 +46,9 @@ public class InAppChat: ObservableObject {
       Socket.shared.port = UInt16(port)
     }
     Socket.shared.apiKey = mqttServer["apiKey"].string
+      await MainActor.run {
+          self.loaded = true
+      }
     return cfg
   }
 
@@ -74,6 +76,7 @@ public class InAppChat: ObservableObject {
         accessToken: accessToken, userId: userId, email: email,
         picture: picture, name: name, nickname: nickname)
     } catch let err {
+        print("Error logging in ", err)
       Monitoring.error(err)
     }
     await MainActor.run {
@@ -120,12 +123,12 @@ public class InAppChat: ObservableObject {
   }
 
   public static private(set) var shared: InAppChat!
-  static func registerPushToken(_ data: Data) {
+  public static func registerPushToken(_ data: Data) {
     let token = data.map { String(format: "%02.2hhx", $0) }.joined()
     registerPushToken(token)
   }
 
-  static func registerPushToken(_ token: String) {
+  public static func registerPushToken(_ token: String) {
     Chats.current.pushToken = token
     if shared?.isUserLoggedIn != true { return }
     Task {
@@ -137,7 +140,7 @@ public class InAppChat: ObservableObject {
     }
   }
 
-  static func registerFCMToken(_ token: String) {
+  public static func registerFCMToken(_ token: String) {
     Chats.current.fcmToken = token
     if shared?.isUserLoggedIn != true { return }
     Task {

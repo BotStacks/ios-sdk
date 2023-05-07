@@ -33,10 +33,13 @@ struct Splash<Content>: View where Content: View {
         .aspectRatio(contentMode: .fit)
       ZStack {
         VStack {
-            Image("inappchat-icon").size(120.0)
-            Image("inappchat-text").frame(width: 150.0)
+            Image("inappchat-icon")
+                .resizable().aspectRatio(contentMode: .fit).size(130.0)
+            Image("inappchat-text").resizable().frame(width: 225.0, height: 28.0)
+                .tint(Color.white)
+                .foregroundColor(Color.white)
           
-          Text("Elegant, ")
+          Text("Simple and elegant chat services")
             .multilineTextAlignment(.center)
             .foregroundColor(.white)
           if !app.loaded {
@@ -48,11 +51,15 @@ struct Splash<Content>: View where Content: View {
         content()
       }
     }
-    .onChange(of: !app.loaded) { newValue in
+    .onChange(of: app.loaded) { newValue in
       if newValue {
           navigator.navigate(app.isUserLoggedIn ? "/chats" : "/login", replace: true)
+          if (app.isUserLoggedIn) {
+              UIApplication.shared
+                  .registerForRemoteNotifications()
+          }
       }
-    }
+    }.preferredColorScheme(.dark)
   }
 }
 

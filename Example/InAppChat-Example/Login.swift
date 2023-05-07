@@ -10,6 +10,7 @@ import Foundation
 import InAppChat
 import SwiftUI
 import JWTDecode
+import UserNotifications
 
 struct Login: View {
 
@@ -24,10 +25,10 @@ struct Login: View {
   var body: some View {
     Splash {
       VStack {
-        Spacer()
+          Spacer()
           if loggingIn {
             Spinner().size(60.0)
-        }
+          }
           Button {
               print("Start Auth0")
             Auth0
@@ -37,6 +38,18 @@ struct Login: View {
                 case .success(let credentials):
                   print("Obtained credentials: \(credentials)")
                   login(credentials: credentials) {
+                      if (InAppChat.shared.isUserLoggedIn) {
+                          UNUserNotificationCenter.current()
+                              //2
+                              .requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
+                                //3
+                                print("Permission granted: \(granted)")
+                                  DispatchQueue.main.async {
+                                      UIApplication.shared.registerForRemoteNotifications()
+                                  }
+                              }
+                          navigator.navigate("chats", replaceAll: true)
+                      }
                   }
                 case .failure(let error):
                   print("Failed with: \(error)")
@@ -46,13 +59,13 @@ struct Login: View {
               HStack {
                 HStack {
                   Text("Login")
-                    .foregroundColor(Color(hex: 0x171717))
+                        .foregroundColor(Color.white)
                     .textCase(.uppercase)
                     .font(.title2)
                 }
                 .padding(.all, 16.0)
                 .frame(maxWidth: .infinity)
-                .background(Color(hex: loggingIn ? 0x2B2B2B : 0x92C748))
+                .background(Color(hex: loggingIn ? 0x165a72 : 0x2596be))
                 .cornerRadius(32.0)
                 
               }.frame(maxWidth: .infinity)
