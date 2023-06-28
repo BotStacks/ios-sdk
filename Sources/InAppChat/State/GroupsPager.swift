@@ -7,9 +7,9 @@
 
 import Foundation
 
-public class GroupsPager: Pager<Thread> {
+public class GroupsPager: Pager<Chat> {
 
-  override public func load(skip: Int, limit: Int) async throws -> [Thread] {
+  override public func load(skip: Int, limit: Int) async throws -> [Chat] {
     return try await api.getJoinedGroupThreads(skip: skip, limit: limit)
   }
 }

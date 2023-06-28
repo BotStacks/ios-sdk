@@ -1,0 +1,27 @@
+{
+  "schemaNamespace": "gql",
+  "options": {
+    "cocoapodsCompatibleImportStatements": true
+  },
+  "input": {
+    "operationSearchPaths": ["**/*.graphql"],
+    "schemaSearchPaths": ["**/*.graphqls"]
+  },
+  "output": {
+    "testMocks": {
+      "none": {}
+    },
+    "schemaTypes": {
+      "path": "./Sources/InAppChat/GQL",
+      "moduleType": {
+        "embeddedInTarget": {
+          "name": "InAppChat",
+          "accessModifier": "public"
+        }
+      }
+    },
+    "operations": {
+      "inSchemaModule": {}
+    }
+  }
+}

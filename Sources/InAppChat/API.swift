@@ -1,7 +1,33 @@
 import Alamofire
+import Apollo
 import CryptoKit
 import Foundation
 import SwiftyJSON
+
+let servers = (
+  prod: (
+    host: "chat.inappchat.io",
+    ssl: true
+  ),
+  dev: (host: "chat.dev.inappchat.io", ssl: true),
+  local: (
+    host: "localhost:3000",
+    ssl: false
+  )
+)
+
+let env = "prod"
+
+func chatServer() -> (host: String, ssl: Bool) {
+  switch env {
+  case "local":
+    return servers.local
+  case "dev":
+    return servers.dev
+  default:
+    return servers.prod
+  }
+}
 
 extension String {
   var sha256: String {
@@ -17,106 +43,119 @@ struct APIError: Error {
   }
 }
 
-let provisioningServerProd = "https://prov.ripbullertc.com/v1/tenants/get-tenant-details/"
-let provisioningServerDev = "https://prov-dev.inappchat.io/v1/tenants/get-tenant-details/"
-let provisioningServerQA = "https://prov-dev.ripbullertc.com/v1/tenants/get-tenant-details/"
-
-let env = "prod"
-
-func provisioningServer() -> String {
-  switch env {
-  case "qa":
-    return provisioningServerQA
-  case "dev":
-    return provisioningServerDev
-  default:
-    return provisioningServerProd
-  }
-}
-
-class Api {
+class Api: InterceptorProvider, ApolloInterceptor {
+  var id: String = UUID().uuidString
+  
+  var client: ApolloClient?
 
   let deviceId: String
   var cfg: JSON!
-  var server: String = "https://chat.inappchat.io/" {
-    didSet {
-      InAppChatAPI.basePath = server + "v3"
-    }
-  }
 
   var authToken: String? = UserDefaults.standard.string(forKey: "iac-auth-token")
   {
     didSet {
       UserDefaults.standard.set(authToken, forKey: "iac-auth-token")
-      if let token = authToken {
-        InAppChatAPI.customHeaders["Authorization"] = "Bearer \(token)"
-      } else {
-        InAppChatAPI.customHeaders["Authorization"] = nil
+      self.client = makeClient()
+    }
+  }
+
+  var websocketUrl: String {
+    let server = chatServer()
+    let ext = server.ssl ? "wss" : "ws"
+    return "\(ext)://\(server)/graphql"
+  }
+
+  var apiUrl: String {
+    let server = chatServer()
+    let ext = server.ssl ? "https" : "http"
+    return "\(ext)://\(server)/graphql"
+  }
+
+  var websocketTransport: WebSocketTransport? {
+    guard let authToken = authToken else {
+      return nil
+    }
+    let url = URL(string: websocketUrl)!
+    let webSocketClient = WebSocket(url: url, protocol: .graphql_transport_ws)
+    let authPayload = ["authToken": authToken]
+    
+    return WebSocketTransport(websocket: webSocketClient, connectingPayload: authPayload)
+  }
+
+  func subscribe() {
+    if let client = client && authToken != nil {
+      let sub = client.subscribe(subscription: CoreSubscription()) { [weak self] result in
+        guard let self = self else {
+          return
+        }
+        switch result {
+        case .success(let graphQLResult):
+          
+        case .failure(let error):
+          self.appAlert = .errors(errors: [error])
+        }
       }
+      subscriptions.append(sub)
+    }
+  };
+
+  func makeClient() -> ApolloClient {
+    let store = ApolloStore()
+    let apiTransport = RequestChainNetworkTransport(
+      interceptorProvider: self, endpointURL: URL(string: self.apiUrl)!)
+    var networkTransport: NetworkTransport = apiTransport
+    if let socket = websocketTransport {
+      networkTransport = SplitNetworkTransport(
+        uploadingNetworkTransport: apiTransport, webSocketNetworkTransport: socket)
+    }
+    return ApolloClient(networkTransport: networkTransport, store: store)
+  }
+
+  func interceptAsync<Operation>(
+    chain: RequestChain, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?,
+    completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void
+  ) where Operation: GraphQLOperation {
+    if let token = self.authToken {
+      request.addHeader(name: "Authorization", value: "Bearer \(token)")
+    }
+    if let apiKey = InAppChat.shared.apiKey {
+      request.addHeader(name: "X-API-Key", value: apiKey)
+      request.addHeader(name: "X-Device-ID", value: deviceId)
     }
   }
 
-  var refreshToken: String? = UserDefaults.standard.string(forKey: "iac-refresh-token")
-  {
-    didSet {
-      UserDefaults.standard.set(refreshToken, forKey: "iac-refresh-token")
-    }
-  }
-
-  var tokenExpiresAt: Date? = UserDefaults.standard.date(forKey: "iac-expires-in")
-  {
-    didSet {
-      UserDefaults.standard.set(tokenExpiresAt, forKey: "iac-expires-in")
-    }
+  func interceptors<Operation>(for operation: Operation) -> [ApolloInterceptor]
+  where Operation: GraphQLOperation {
+    return [
+      self,
+      MaxRetryInterceptor(),
+      NetworkFetchInterceptor(client: self.client),
+      ResponseCodeInterceptor(),
+      MultipartResponseParsingInterceptor(),
+      JSONResponseParsingInterceptor(),
+      AutomaticPersistedQueryInterceptor(),
+    ]
   }
 
   init() {
+    super.init(store: ApolloStore())
     if let deviceId = UserDefaults.standard.string(forKey: "iac-device-id") {
       self.deviceId = deviceId
     } else {
       self.deviceId = UUID().uuidString
       UserDefaults.standard.set(deviceId, forKey: "iac-device-id")
     }
-    InAppChatAPI.basePath = server + "v3"
-    setHeaders()
+    self.client = makeClient()
   }
-
-  func setHeaders() {
-    InAppChatAPI.customHeaders = [
-      "X-Device-ID": deviceId
-    ]
-    if let apiKey = InAppChat.shared?.apiKey {
-      InAppChatAPI.customHeaders["X-API-Key"] = apiKey
-    }
-    if let token = authToken {
-      InAppChatAPI.customHeaders["Authorization"] = "Bearer \(token)"
-    }
-  }
-
-  func headers() -> HTTPHeaders {
-    let ts = Date().timeIntervalSince1970
-    let signature = "\(InAppChat.shared.apiKey)~\(Bundle.main.bundleIdentifier!)~\(ts)".sha256
-    return [
-      "X-API-Key": InAppChat.shared.apiKey,
-      "X-Request-Signature": signature,
-      "X-nonce": String(ts),
-      "DeviceId": deviceId,
-      "X-Device-ID": deviceId,
-    ]
-  }
-
-  func fetchTenant() async throws -> JSON {
-    let req = AF.request(
-      provisioningServer() + InAppChat.shared.namespace, method: .get, headers: headers())
-    print(req.cURLDescription())
-    let cfg = JSON(try await req.serializingData().value)["result"]
-    self.cfg = cfg
-    return cfg
-  }
-
-  func fetchMessages(_ thread: Thread, pageSize: Int, currentMessageId: String? = nil) async throws
+  
+  func fetchMessages(_ thread: Thread, pageSize: Int = 20, offset: Int = 0, search: String? = nil) async throws
     -> [Message]
   {
+    if let client = client {
+      client.fetch(query: ListMessagesQuery(chat: thread.id, count: pageSize, offset: offset, search: search))
+    } else {
+      return []
+    }
     let msgs = try await ChatAPI.getMessages(
       tid: thread.id, direction: .past, pageSize: pageSize, inReplyTo: currentMessageId)
     return msgs.map(Message.get)
@@ -140,7 +179,7 @@ class Api {
     try await updateMessageStatus(message, status: .delivered)
   }
 
-  func updateMessageStatus(_ message: Message, status: MessageStatus) async throws {
+  func updateMessageStatus(_ message: Message, status: Message.Status) async throws {
     try await ChatAPI.updateMessage(
       mid: message.id, updateMessageInput: .init(status: status)
     )
@@ -188,70 +227,70 @@ class Api {
     return Message.get(res.message!)
   }
 
-  func update(group: Group, image: URL) async throws -> Group {
-    let g = try await GroupAPI.updateGroup(
-      gid: group.id, updateGroupInput: UpdateGroupInput(profilePic: image))
-    return Group.get(g)
+  func update(group: Chat, image: URL) async throws -> Chat {
+    let g = try await ChatAPI.updateChat(
+      gid: group.id, updateChatInput: UpdateChatInput(profilePic: image))
+    return Chat.get(g)
   }
 
-  func update(group: Group, name: String?, description: String?, image: URL?, _private: Bool?)
-    async throws -> Group
+  func update(group: Chat, name: String?, description: String?, image: URL?, _private: Bool?)
+    async throws -> Chat
   {
-    let input = UpdateGroupInput(
+    let input = UpdateChatInput(
       name: name, groupType: _private != nil ? _private == true ? ._private : ._public : nil,
       description: description, profilePic: image)
-    let g = try await GroupAPI.updateGroup(gid: group.id, updateGroupInput: input)
-    return Group.get(g)
+    let g = try await ChatAPI.updateChat(gid: group.id, updateChatInput: input)
+    return Chat.get(g)
   }
 
-  func createGroup(name: String, description: String?, image: URL?, private _private: Bool)
+  func createChat(name: String, description: String?, image: URL?, private _private: Bool)
     async throws
-    -> Group
+    -> Chat
   {
-    let g = try await GroupAPI.createGroup(
+    let g = try await ChatAPI.createChat(
       name: name, participants: [User.current!.id], groupType: _private ? ._private : ._public,
       description: description, profilePic: image)
-    return Group.get(g)
+    return Chat.get(g)
   }
 
-  func delete(group: Group) async throws {
-    _ = try await GroupAPI.deleteGroup(gid: group.id)
+  func delete(group: Chat) async throws {
+    _ = try await ChatAPI.deleteChat(gid: group.id)
   }
 
-  func add(participant: User, to group: Group) async throws {
-    try await GroupAPI.addParticipant(gid: group.id, uid: participant.id)
+  func add(participant: User, to group: Chat) async throws {
+    try await ChatAPI.addParticipant(gid: group.id, uid: participant.id)
   }
 
-  func remove(participant: User, from group: Group) async throws {
-    try await GroupAPI.removeParticipant(gid: group.id, uid: participant.id)
+  func remove(participant: User, from group: Chat) async throws {
+    try await ChatAPI.removeParticipant(gid: group.id, uid: participant.id)
   }
 
-  func join(group: Group) async throws {
+  func join(group: Chat) async throws {
     try await add(participant: User.current!, to: group)
   }
 
-  func leave(group: Group) async throws {
+  func leave(group: Chat) async throws {
     try await remove(participant: User.current!, from: group)
   }
 
-  func getGroup(_ id: String) async throws -> Group {
-    let g = try await GroupAPI.getGroup(gid: id)
-    return Group.get(g)
+  func getChat(_ id: String) async throws -> Chat {
+    let g = try await ChatAPI.getChat(gid: id)
+    return Chat.get(g)
   }
 
-  func dismiss(group: Group, admin: User) async throws {
+  func dismiss(group: Chat, admin: User) async throws {
     try await manage(group: group, admin: admin, isPromote: false)
   }
 
-  func promote(group: Group, admin: User) async throws {
+  func promote(group: Chat, admin: User) async throws {
     try await manage(group: group, admin: admin, isPromote: true)
   }
 
-  func manage(group: Group, admin: User, isPromote: Bool) async throws {
+  func manage(group: Chat, admin: User, isPromote: Bool) async throws {
     if isPromote {
-      _ = try await GroupAPI.groupAddAdmin(uid: group.id, gid: admin.id)
+      _ = try await ChatAPI.groupAddAdmin(uid: group.id, gid: admin.id)
     } else {
-      _ = try await GroupAPI.groupDismissAdmin(uid: group.id, gid: admin.id)
+      _ = try await ChatAPI.groupDismissAdmin(uid: group.id, gid: admin.id)
     }
   }
 
@@ -281,19 +320,19 @@ class Api {
   }
 
   func getInvites() async throws -> [Invite] {
-    return try await GroupAPI.getInvites()
+    return try await ChatAPI.getInvites()
   }
 
-  func dismissInvites(for group: Group) async throws {
-    try await GroupAPI.dismissGroupInvite(gid: group.id)
+  func dismissInvites(for group: Chat) async throws {
+    try await ChatAPI.dismissChatInvite(gid: group.id)
   }
 
-  func invite(users: [User], to group: Group) async throws {
-    try await GroupAPI.inviteUser(gid: group.id, requestBody: users.map(\.id))
+  func invite(users: [User], to group: Chat) async throws {
+    try await ChatAPI.inviteUser(gid: group.id, requestBody: users.map(\.id))
   }
 
-  func accept(invite toGroup: Group) async throws -> Thread {
-    let t = try await GroupAPI.acceptGroupInvite(gid: toGroup.id)
+  func accept(invite toChat: Chat) async throws -> Thread {
+    let t = try await ChatAPI.acceptChatInvite(gid: toChat.id)
     return Thread.get(t)
   }
 
@@ -310,17 +349,16 @@ class Api {
   }
 
   func onUser(_ user: User) async throws {
-      await MainActor.run {
-          Chats.current.user = user
-          Chats.current.currentUserID = user.id
-        User.current = user
-      }
-      do {
-          try await Chats.current.loadAsync()
-        Socket.shared.connect()
-      } catch let err {
-        Monitoring.error(err)
-      }
+    await MainActor.run {
+      Chats.current.user = user
+      Chats.current.currentUserID = user.id
+      User.current = user
+    }
+    do {
+      try await Chats.current.loadAsync()
+    } catch let err {
+      Monitoring.error(err)
+    }
   }
 
   func onToken(accessToken: String, refreshToken: String?, tokenExpiresAt: Date) {
@@ -329,19 +367,21 @@ class Api {
     self.tokenExpiresAt = tokenExpiresAt
   }
 
-    func login(accessToken: String,
-                    userId: String,
-                    email: String,
-                    picture: String?,
-                    name: String?,
-                    nickname: String?) async throws -> User {
+  func login(
+    accessToken: String,
+    userId: String,
+    email: String,
+    picture: String?,
+    name: String?,
+    nickname: String?
+  ) async throws -> User {
     let res = try await AuthAPI.login(
       loginInput: .init(
         userId: userId,
         accessToken: accessToken, email: email, picture: picture, name: name,
         nickname: nickname, deviceId: deviceId, deviceType: .ios))
-        try await onLogin(res)
-        return User.get(res.user)
+    try await onLogin(res)
+    return User.get(res.user)
   }
 
   public func nftLogin(
@@ -380,16 +420,16 @@ class Api {
     }
   }
 
-  func updateSetting(notifications: NotificationSettings.AllowFrom) async throws {
+  func updateSetting(notifications: Settings.Notifications) async throws {
     _ = try await UserAPI.updateMe(
       updateUserInput: .init(notificationSettings: .init(allowFrom: notifications)))
   }
 
-  func update(availability: AvailabilityStatus) async throws {
+  func update(availability: Gql.OnlineStatus) async throws {
     _ = try await UserAPI.updateMe(updateUserInput: .init(availabilityStatus: availability))
   }
 
-  func update(thread: String, notifications: NotificationSettings.AllowFrom) async throws {
+  func update(thread: String, notifications: Settings.Notifications) async throws {
     _ = try await ThreadAPI.updateThread(
       tid: thread, updateThreadInput: .init(notificationSettings: .init(allowFrom: notifications)))
   }
@@ -404,14 +444,14 @@ class Api {
       Thread.get)
   }
 
-  func getJoinedGroupThreads(skip: Int = 0, limit: Int = 20) async throws -> [Thread] {
+  func getJoinedChatThreads(skip: Int = 0, limit: Int = 20) async throws -> [Thread] {
     return try await ThreadAPI.getThreads(skip: skip, limit: limit, threadType: .group).map(
       Thread.get)
 
   }
 
-  func getGroups(skip: Int = 0, limit: Int = 20) async throws -> [Group] {
-    return try await GroupAPI.getGroups(limit: limit, skip: skip, joined: .no).map(Group.get)
+  func getChats(skip: Int = 0, limit: Int = 20) async throws -> [Chat] {
+    return try await ChatAPI.getChats(limit: limit, skip: skip, joined: .no).map(Chat.get)
   }
 
   func getReplyThreads(skip: Int = 0, limit: Int = 20) async throws -> [Message] {
@@ -426,8 +466,8 @@ class Api {
     return try await Message.get(ChatAPI.getMessage(mid: message))
   }
 
-  func getThread(forGroup id: String) async throws -> Thread {
-    return try await Thread.get(ThreadAPI.getGroupThread(gid: id))
+  func getThread(forChat id: String) async throws -> Thread {
+    return try await Thread.get(ThreadAPI.getChatThread(gid: id))
   }
 
   func getThread(forUser id: String) async throws -> Thread {
@@ -440,11 +480,11 @@ class Api {
   }
 
   func registerPushToken(_ token: String) async throws {
-      let _ = User.get(try await UserAPI.updateMe(updateUserInput: .init(apnsToken: token)))
+    let _ = User.get(try await UserAPI.updateMe(updateUserInput: .init(apnsToken: token)))
   }
 
   func registerFCMToken(_ token: String) async throws {
-      let _ = try await UserAPI.updateMe(updateUserInput: .init(fcmToken: token))
+    let _ = try await UserAPI.updateMe(updateUserInput: .init(fcmToken: token))
   }
 
   func start(_ id: String) async throws -> User {
@@ -453,6 +493,44 @@ class Api {
     return user
   }
 
+  func uploadFile(file: File) async throws -> String {
+    var multipart = MultipartRequest()
+    multipart.add(
+      key: "file",
+      fileName: file.name,
+      fileMimeType: url.mimeType(),
+      fileData: Data(contentsOf: file.url)
+    )
+    
+    /// Create a regular HTTP URL request & use multipart
+    let server = chatServer()
+    let url = URL(string: "http\(server.ssl ? "s" : "")://\(server.host)/misc/upload")!
+    var request = URLRequest(url: url)
+    request.httpMethod = "POST"
+    request.setValue(multipart.httpContentTypeHeadeValue, forHTTPHeaderField: "Content-Type")
+    request.httpBody = multipart.httpBody
+    
+    /// Fire the request using URL sesson or anything else...
+    let (data, response) = try await URLSession.shared.data(for: request)
+    
+    let json = try JSONSerialization.jsonObject(with: data, options: nil)
+    if let url = json["url"] as String {
+      return url
+    } else {
+      throw APIError(msg: "Unknown upload response \(String(data: data, encoding: .utf8))")
+    }
+  }
+}
+
+extension URL {
+  public func mimeType() -> String {
+    if let mimeType = UTType(filenameExtension: self.pathExtension)?.preferredMIMEType {
+      return mimeType
+    }
+    else {
+      return "application/octet-stream"
+    }
+  }
 }
 
 let api = Api()
@@ -464,5 +542,22 @@ extension UserDefaults {
 
   func date(forKey key: String) -> Date? {
     return self.value(forKey: key) as? Date
+  }
+}
+
+extension ApolloClient {
+  public func fetchAsync<Query: GraphQLQuery>(query: Query,
+                                         cachePolicy: CachePolicy = .default,
+                                         contextIdentifier: UUID? = nil,
+                                         queue: DispatchQueue = .main,
+                                         resultHandler: GraphQLResultHandler<Query.Data>? = nil) -> Cancellable {
+    return withCheckedContinuation<Query.Data> { cont in
+      self.networkTransport.send(operation: query,
+                                 cachePolicy: cachePolicy,
+                                 contextIdentifier: contextIdentifier,
+                                 callbackQueue: queue) { result in
+      
+      }
+    }
   }
 }

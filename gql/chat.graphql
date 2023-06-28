@@ -1,0 +1,21 @@
+query ListGroups($count: Int, $offset: Int) {
+  groups(count: $count, offset: $offset) {
+    ...FChat
+  }
+}
+
+mutation CreateGroup($input: CreateGroupInput!) {
+  createGroup(input: $input) {
+    ...FChat
+  }
+}
+
+query GetChat($id: ID!) {
+  chat(id: $id) {
+    ...FChat
+  }
+}
+
+mutation markChatRead($id: ID!) {
+  markChatRead(chat: $id)
+}

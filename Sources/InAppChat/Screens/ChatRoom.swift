@@ -33,10 +33,10 @@ public struct ChatRoom: View {
   @State var messageForEmojiKeyboard: Message? = nil
   @State var selectMedia: Media? = nil
 
-  @ObservedObject var thread: Thread
+  @ObservedObject var chat: Chat
   let message: Message?
-  public init(thread: Thread, message: Message?) {
-    self._thread = ObservedObject(initialValue: thread)
+  public init(chat: Chat, message: Message?) {
+    self._chat = ObservedObject(initialValue: chat)
     self.message = message
   }
 
@@ -104,7 +104,7 @@ public struct ChatRoom: View {
       }
       ActionItem(image: AssetImage("map-pin"), text: "Send Location", divider: true) {
         media = false
-        self.thread.sendLocation(inReplyTo: message)
+        self.chat.sendLocation(inReplyTo: message)
       }
       ActionItem(image: AssetImage("address-book"), text: "Share Contact", divider: true) {
         media = false
@@ -139,12 +139,12 @@ public struct ChatRoom: View {
       case .contact:
         return AnyView(
           ContactPicker {
-            thread.send(contact: $0, inReplyTo: message)
+            chat.send(contact: $0, inReplyTo: message)
           })
       case .file:
         return AnyView(
           DocumentPicker {
-            thread.send(file: $0, inReplyTo: message)
+            chat.send(file: $0, inReplyTo: message)
           }
         )
       case .gif:
@@ -168,19 +168,19 @@ public struct ChatRoom: View {
       MessageList(thread: thread, onLongPress: { messageForAction = $0 })
       Header(
         title: "",
-        onMenu: thread.group != nil
+        onMenu: chat.group != nil
           ? {
             menu = true
           } : nil
       ) {
         HStack {
-          Avatar(url: thread.image, size: 35, group: thread.group != nil)
+          Avatar(url: chat.image, size: 35, group: chat.group != nil)
           VStack(alignment: .leading, spacing: 0) {
-            Text(thread.name)
+            Text(chat.name)
               .lineLimit(1)
               .font(theme.fonts.title2)
               .foregroundColor(theme.colors.text)
-            if let group = thread.group {
+            if let group = chat.group {
               GroupCount(count: group.participants.count)
             }
           }
@@ -202,7 +202,7 @@ public struct ChatRoom: View {
     .sheet(isPresented: $selectMedia.mappedToBool()) {
       pickers
     }.sheet(isPresented: $menu) {
-      if let group = thread.group {
+      if let group = chat.group {
         GroupDrawer(group)
       }
     }
@@ -210,13 +210,13 @@ public struct ChatRoom: View {
 
   func onVideo(_ url: URL) {
     print("On Video", url.absoluteString)
-    thread.send(
+    chat.send(
       attachment: .init(url: url.absoluteString, kind: .video, type: nil),
       inReplyTo: self.message)
   }
 
   func onImage(_ url: URL) {
-    thread.send(
+    chat.send(
       attachment: .init(url: url.absoluteString, kind: .image, type: nil),
       inReplyTo: message)
   }

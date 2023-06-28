@@ -1,23 +1,25 @@
 PODS:
   - ActivityIndicatorView (1.1.1)
-  - Alamofire (5.6.4)
+  - Alamofire (5.7.1)
   - AnyCodable-FlightSchool (0.6.7)
-  - Auth0 (2.3.2):
-    - JWTDecode (~> 3.0)
-    - SimpleKeychain (~> 1.0)
-  - CocoaMQTT (2.1.3):
-    - CocoaMQTT/Core (= 2.1.3)
-  - CocoaMQTT/Core (2.1.3):
-    - MqttCocoaAsyncSocket (~> 1.0.8)
+  - Apollo (1.3.0):
+    - Apollo/Core (= 1.3.0)
+  - Apollo/Core (1.3.0)
+  - Apollo/WebSocket (1.3.0):
+    - Apollo/Core
+  - Auth0 (2.4.0):
+    - JWTDecode (~> 3.1)
+    - SimpleKeychain (~> 1.1)
   - DynamicColor (5.0.1)
   - Gifu (3.3.1)
-  - Giphy (2.2.4):
+  - Giphy (2.2.6):
     - libwebp
-  - InAppChat (1.0.9):
+  - InAppChat (1.0.11):
     - ActivityIndicatorView
     - Alamofire
     - AnyCodable-FlightSchool
-    - CocoaMQTT
+    - Apollo
+    - Apollo/WebSocket
     - DynamicColor
     - Gifu
     - Giphy
@@ -25,7 +27,7 @@ PODS:
     - Sentry
     - SwiftDate
     - SwiftyJSON
-  - JWTDecode (3.0.1)
+  - JWTDecode (3.1.0)
   - libwebp (1.2.4):
     - libwebp/demux (= 1.2.4)
     - libwebp/mux (= 1.2.4)
@@ -35,19 +37,18 @@ PODS:
   - libwebp/mux (1.2.4):
     - libwebp/demux
   - libwebp/webp (1.2.4)
-  - MqttCocoaAsyncSocket (1.0.8)
-  - SDWebImage (5.15.6):
-    - SDWebImage/Core (= 5.15.6)
-  - SDWebImage/Core (5.15.6)
+  - SDWebImage (5.16.0):
+    - SDWebImage/Core (= 5.16.0)
+  - SDWebImage/Core (5.16.0)
   - SDWebImageSwiftUI (2.2.3):
     - SDWebImage (~> 5.10)
-  - Sentry (8.6.0):
-    - Sentry/Core (= 8.6.0)
-    - SentryPrivate (= 8.6.0)
-  - Sentry/Core (8.6.0):
-    - SentryPrivate (= 8.6.0)
-  - SentryPrivate (8.6.0)
-  - SimpleKeychain (1.0.1)
+  - Sentry (8.8.0):
+    - Sentry/Core (= 8.8.0)
+    - SentryPrivate (= 8.8.0)
+  - Sentry/Core (8.8.0):
+    - SentryPrivate (= 8.8.0)
+  - SentryPrivate (8.8.0)
+  - SimpleKeychain (1.1.0)
   - SwiftDate (7.0.0)
   - SwiftyJSON (5.0.1)
 
@@ -60,14 +61,13 @@ SPEC REPOS:
     - ActivityIndicatorView
     - Alamofire
     - AnyCodable-FlightSchool
+    - Apollo
     - Auth0
-    - CocoaMQTT
     - DynamicColor
     - Gifu
     - Giphy
     - JWTDecode
     - libwebp
-    - MqttCocoaAsyncSocket
     - SDWebImage
     - SDWebImageSwiftUI
     - Sentry
@@ -82,22 +82,21 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   ActivityIndicatorView: f14ac8e200a344fe992577807998b0c8562bd964
-  Alamofire: 4e95d97098eacb88856099c4fc79b526a299e48c
+  Alamofire: 0123a34370cb170936ae79a8df46cc62b2edeb88
   AnyCodable-FlightSchool: 261cbe76757802b17d471b9059b21e6fa5edf57b
-  Auth0: 64da28fdc5cd499aa516dc4bfd0ace8efae2c1da
-  CocoaMQTT: f91421327f100d64374792b96bc9787e983bfe29
+  Apollo: 61f1a7fdbd4736ab8db0067a307d0768dea7d7c9
+  Auth0: 7c454e679f19d160f1f32bf1e9fa095db19f8769
   DynamicColor: d049834ef86d8ecf150b0ca1ebe54ee733a0ec22
   Gifu: 416d4e38c4c2fed012f019e0a1d3ffcb58e5b842
-  Giphy: 6b5f6986c8df4f71e01a8ef86595f426b3439fb5
-  InAppChat: a9642040b09c74f3a7dc4ecdde75b4b15d231a78
-  JWTDecode: 2eed97c2fa46ccaf3049a787004eedf0be474a87
+  Giphy: f64bff5937fbc4987b6a26c8ef625501c68a1e97
+  InAppChat: 7b0c978054b5e15ade8820dc53d626d9ca5afe81
+  JWTDecode: 3eaab1e06b6f4dcbdd6716aff09ba4c2104ca8b7
   libwebp: f62cb61d0a484ba548448a4bd52aabf150ff6eef
-  MqttCocoaAsyncSocket: 77d3b74f76228dd5a05d1f9526eab101d415b30c
-  SDWebImage: d47d81bea8a77187896b620dc79c3c528e8906b9
+  SDWebImage: 2aea163b50bfcb569a2726b6a754c54a4506fcf6
   SDWebImageSwiftUI: 17396b7889f9abc27231caaeb64c537564284aab
-  Sentry: d80553ff85ea72def75b792aaa5a71c158e51595
-  SentryPrivate: ef1c5b3dfe44ec0c70e2eb343a5be2689164c021
-  SimpleKeychain: 130211269f88f038d7dc5254cf0b1b9ce978c398
+  Sentry: 927dfb29d18a14d924229a59cc2ad149f43349f2
+  SentryPrivate: 4350d865f898224ab9fa02b37d6ee7fbb623f47e
+  SimpleKeychain: f8707c8e97b38c6a6e687b17732afc9bcef06439
   SwiftDate: bbc26e26fc8c0c33fbee8c140c5e8a68293a148a
   SwiftyJSON: 2f33a42c6fbc52764d96f13368585094bfd8aa5e
 

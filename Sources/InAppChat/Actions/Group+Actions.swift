@@ -1,6 +1,6 @@
 import Foundation
 
-extension Group {
+extension Chat {
 
   func dismissInvites() {
     if self.invites.isEmpty {
@@ -23,10 +23,13 @@ extension Group {
   func join() {
     if joining { return }
     joining = true
-    participants.append(
-      Participant(
-        appUserId: User.current!.email, eRTCUserId: User.current!.id, role: .user,
-        joinedAtDate: Date()))
+    members.append(
+      Member(
+        chat_id: self.id,
+        user_id: User.current!.id, role: .member,
+        createdAt: Date()
+      )
+    )
     Task {
       do {
         if self.invites.isEmpty {

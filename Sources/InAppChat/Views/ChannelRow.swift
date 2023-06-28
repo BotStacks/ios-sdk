@@ -1,19 +1,19 @@
 import Foundation
 import SwiftUI
 
-func groupInvitesText(group: Group) -> String {
-  return "**\(group.invites.map({$0}).usernames)** invited you to join!"
+func chatInvitesText(chat: Chat) -> String {
+  return "**\(chat.invites.map({$0}).usernames)** invited you to join!"
 }
 
 public struct ChannelRow: View {
 
-  @ObservedObject var group: Group
+  @ObservedObject var chat: Chat
   @Environment(\.iacTheme) var theme
 
   public var body: some View {
-    if group.isMember || !group._private {
+    if chat.isMember || !chat._private {
       return AnyView(
-        NavLink(to: group.path) {
+        NavLink(to: chat.path) {
           row
         })
     } else {
@@ -24,7 +24,7 @@ public struct ChannelRow: View {
   public var row: some View {
     VStack {
       VStack {
-        if group.hasInvite {
+        if chat.hasInvite {
           ZStack {
             LinearGradient(
               colors: [
@@ -36,13 +36,13 @@ public struct ChannelRow: View {
             )
             HStack {
               Text(
-                .init(groupInvitesText(group: group))
+                .init(chatInvitesText(chat: chat))
               ).foregroundColor(.white)
                 .font(theme.fonts.body)
                 .multilineTextAlignment(.leading)
               Spacer()
               Button {
-                group.dismissInvites()
+                chat.dismissInvites()
               } label: {
                 ZStack {
                   Image(systemName: "xmark")
@@ -56,33 +56,33 @@ public struct ChannelRow: View {
         }
 
         ZStack(alignment: .bottomTrailing) {
-          NavLink(to: "/group/\(group.id)") {
+          NavLink(to: "/chat/\(chat.id)") {
             HStack {
-              if let image = group.image {
+              if let image = chat.image {
                 GifImageView(url: image)
                   .size(87)
                   .cornerRadius(15.0)
               } else {
-                GroupPlaceholder()
+                chatPlaceholder()
                   .size(87)
                   .cornerRadius(15.0)
               }
 
               VStack(alignment: .leading, spacing: 0) {
                 HStack(alignment: .center) {
-                  Text(group.name)
+                  Text(chat.name)
                     .lineLimit(1)
                     .font(theme.fonts.title3)
-                  PrivacyPill(_private: group._private)
+                  PrivacyPill(_private: chat._private)
                 }
-                Text(group.description ?? "")
+                Text(chat.description ?? "")
                   .lineLimit(2)
                   .font(theme.fonts.body)
                   .foregroundColor(theme.colors.caption)
                   .multilineTextAlignment(.leading)
                 Spacer(minLength: 0)
                 HStack {
-                  GroupCount(count: group.participants.count)
+                  chatCount(count: chat.participants.count)
                   Spacer()
                 }
               }.padding(.leading, 13.0)
@@ -90,18 +90,18 @@ public struct ChannelRow: View {
           }.growX()
             .padding(8.0)
             .height(103.0)
-          if !group._private || group.isMember || group.hasInvite {
+          if !chat._private || chat.isMember || chat.hasInvite {
             Button {
-              if group.isMember {
-                group.leave()
+              if chat.isMember {
+                chat.leave()
               } else {
-                group.join()
+                chat.join()
               }
             } label: {
               Image(systemName: "plus.circle.fill")
                 .resizable()
                 .foregroundColor(
-                  group.isMember ? theme.colors.caption : theme.colors.primary
+                  chat.isMember ? theme.colors.caption : theme.colors.primary
                 )
                 .size(24)
             }.padding(8)

@@ -15,10 +15,10 @@ public struct Search: View {
 
   @FocusState var focus
   @State var text = ""
-  var thread: Thread?
+  var chat: Chat?
 
   public init(id: String? = nil) {
-    self.thread = id.flatMap { Thread.get($0) }
+    self.chat = id.flatMap { Chat.get($0) }
   }
 
   public var body: some View {

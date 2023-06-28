@@ -10,8 +10,16 @@ public class Chats: ObservableObject {
   }
   @Published var user: User? = nil
 
-  let groups = GroupsPager()
-  let users = UsersPager()
+  @Published var memberships: [Member] = []
+  
+  var dms: [Chat] {
+    return self.memberships.filter { it.chat.kind == Gql.ChatType.directMessage && it.isMember }
+  }
+  
+  var groups: [Chat] {
+    return self.memberships.filter { it.chat.kind == Gql.ChatType.group && it.isMember }
+  }
+  
   let messages = ThreadsPager()
   let favorites = Favorites()
   let settings = Settings()

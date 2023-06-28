@@ -8,16 +8,22 @@
 import Foundation
 
 public class Settings: ObservableObject {
+  
+  public enum Notifications: String {
+    case all = "all"
+    case mentions = "mentions"
+    case none = "none"
+  }
 
-  @Published var notifications = NotificationSettings.AllowFrom(
+  @Published var notifications = Notifications.init(
     rawValue: UserDefaults.standard.string(forKey: "iac.notifications") ?? "all")!
 
-  @Published var availability = AvailabilityStatus(
-    rawValue: UserDefaults.standard.string(forKey: "iac.availability") ?? "online")
+  @Published var availability = Gql.OnlineStatus(
+    rawValue: UserDefaults.standard.string(forKey: "iac.availability") ?? "Online")
 
   @Published var blocked: [String] = UserDefaults.standard.stringArray(forKey: "iac.blocked") ?? []
 
-  public func setNotification(_ setting: NotificationSettings.AllowFrom, isSync: Bool = false) {
+  public func setNotification(_ setting: Settings.Notifications, isSync: Bool = false) {
     self.notifications = setting
     UserDefaults.standard.setValue(setting.rawValue, forKey: "iac.notifications")
     if isSync { return }
@@ -30,7 +36,7 @@ public class Settings: ObservableObject {
     }
   }
 
-  public func setAvailability(_ availability: AvailabilityStatus, isSync: Bool = false) {
+  public func setAvailability(_ availability: Gql.OnlineStatus, isSync: Bool = false) {
     self.availability = availability
     UserDefaults.standard.set(availability.rawValue, forKey: "iac.availability")
     if isSync {

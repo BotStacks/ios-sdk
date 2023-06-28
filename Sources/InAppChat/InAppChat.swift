@@ -17,7 +17,7 @@ public class InAppChat: ObservableObject {
   @Published public var loaded: Bool = false
   @Published public var isUserLoggedIn: Bool = false
   @Published public var appMeta: [String: Any] = [:]
-  public var config: JSON? = nil
+  
   var user: User? {
     return Chats.current.user
   }
@@ -28,28 +28,10 @@ public class InAppChat: ObservableObject {
     Monitoring.start()
   }
 
-  public func load() async throws -> JSON {
+  public func load() async throws {
     guard !didStartLoading else { return [:] }
     didStartLoading = true
-    let tenant = try await api.fetchTenant()
     try await Chats.current.loadAsync()
-    let cfg = tenant["config"]
-    self.config = cfg
-    let chatServer = cfg["serverDetails"]["chatServer"]
-    api.server = chatServer["url"].stringValue
-    InAppChatAPI.customHeaders["X-API-Key"] = chatServer["apiKey"].stringValue
-    InAppChatAPI.customHeaders["X-Device-Id"] = api.deviceId
-    let mqttServer = cfg["serverDetails"]["mqttServer"]
-    let mqttUrl = URL(string: mqttServer["url"].stringValue)!
-    Socket.shared.host = mqttUrl.host!
-    if let port = mqttUrl.port {
-      Socket.shared.port = UInt16(port)
-    }
-    Socket.shared.apiKey = mqttServer["apiKey"].string
-      await MainActor.run {
-          self.loaded = true
-      }
-    return cfg
   }
 
   public static func setup(namespace: String, apiKey: String, delayLoad: Bool = false) {
@@ -112,7 +94,6 @@ public class InAppChat: ObservableObject {
     Chats.current.currentUserID = nil
     Chats.current = Chats()
     User.current = nil
-    Socket.shared.disconnect()
     Task.detached {
       do {
         try await api.logout()

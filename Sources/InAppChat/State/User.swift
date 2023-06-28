@@ -4,21 +4,18 @@ import SwiftyJSON
 
 public final class User: ObservableObject, Identifiable {
 
-  public var usernameFb: String {
-    return !username.isEmpty ? username : displayName ?? email
-  }
 
   public var displayNameFb: String {
-    return (displayName ?? (!username.isEmpty ? username : email))
+    return displayName ?? username
   }
 
   public let id: String
-  @Published public var email: String
   @Published public var username: String
   @Published public var displayName: String?
+  @Published public var description: String?
   @Published public var avatar: String?
   @Published public var lastSeen: Date?
-  @Published public var status: AvailabilityStatus = .offline
+  @Published public var status: Gql.OnlineStatus = .offline
   @Published public var blocked: Bool = false
   @Published public var statusMessage: String?
   @Published var haveContact: Bool = false
@@ -37,18 +34,19 @@ public final class User: ObservableObject, Identifiable {
 
   public init(
     id: String,
-    email: String,
     username: String,
     displayName: String? = nil,
+    description: String? = nil,
     avatar: String? = nil,
     lastSeen: Date? = nil,
-    status: AvailabilityStatus = .offline,
+    status: Gql.OnlineStatus = .offline,
     blocked: Bool = false
   ) {
     self.id = id
     self.email = email
     self.username = username
     self.displayName = displayName
+    self.description = description
     self.avatar = avatar
     self.lastSeen = lastSeen
     self.status = status
@@ -66,58 +64,28 @@ public final class User: ObservableObject, Identifiable {
 
   var blocking = false
 
-  init(_ user: APIUser) {
+  init(_ user: Gql.FUser) {
+    self.init(
+      id: user.id,
+      username: user.username,
+      lastSeen: user.last_seen.toDate()!.date,
+      description: user.description,
+      avatar: user.image,
+      blocked: Chat.current.settings.blocked.contains(user.id)
+    )
     self.id = user.eRTCUserId
-    self.email = user.appUserId
-    self.username = user.name ?? ""
-    self.lastSeen = user.loginTimeStamp.map { Date(milliseconds: $0) }
+    self.username = user.username
+    self.displayName = user.display_name
+    self.lastSeen = user.last_seen.toDate()!.date
+    self.image = user.image
+    self.status = user.status
     self.blocked = Chats.current.settings.blocked.contains(user.eRTCUserId)
     self.update(user)
     Chats.current.cache.user[id] = self
     fetch()
   }
 
-  func update(_ user: APIUser) {
-    if email.isEmpty {
-      self.email = user.appUserId
-    }
-    if let username = user.name {
-      self.username = username
-    }
-    if let avatar = user.profilePic ?? user.profilePicThumb {
-      self.avatar = avatar
-    }
-    if let lastSeen = user.loginTimeStamp {
-      self.lastSeen = Date(milliseconds: lastSeen)
-    }
-    if let statusMessage = user.profileStatus {
-      self.statusMessage = statusMessage
-    }
-    if let status = user.availabilityStatus {
-      self.status = status
-    }
-  }
-
-  func fetch() {
-    let id = self.id
-    Task.detached {
-      do {
-        let _ = try await api.get(user: id)
-      } catch let err {
-        Monitoring.error(err)
-      }
-    }
-  }
-
-  static func get(_ participant: Participant) -> User {
-    if let user = get(participant.eRTCUserId) {
-      return user
-    }
-    let user = User(id: participant.eRTCUserId, email: participant.appUserId, username: "")
-    return user
-  }
-
-  static func get(_ user: APIUser) -> User {
+  static func get(_ user: Gql.FUser) -> User {
     if let u = get(user.eRTCUserId) {
       u.update(user)
       return u
@@ -127,14 +95,6 @@ public final class User: ObservableObject, Identifiable {
 
   static func get(_ id: String) -> User? {
     return Chats.current.cache.user[id]
-  }
-
-  static func fetched(_ id: String) -> User {
-    if let user = get(id) {
-      return user
-    }
-    let user = User(id: id, email: "", username: "")
-    return user
   }
 }
 

@@ -1,0 +1,16 @@
+mutation JoinChat($id: ID!) {
+  join(chat: $id) {
+    role
+    created_at
+    updated_at
+    last_read_at
+  }
+}
+
+mutation LeaveChat($id: ID!) {
+  leave(chat: $id)
+}
+
+mutation RejectInvite($id: ID!) {
+  rejectInvite(chat: $id)
+}

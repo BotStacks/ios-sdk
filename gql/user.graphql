@@ -1,0 +1,40 @@
+query GetMe {
+  me {
+    ...FUser
+    blocks
+    blocked_by
+    devices {
+      ...FDevice
+    }
+  }
+
+  memberships {
+    ...FMember
+    last_read_at
+    chat {
+      ...FChat
+    }
+  }
+}
+
+query GetUser($id: ID!) {
+  user(id: $id) {
+    ...FUser
+  }
+}
+
+mutation ReadMessages($header: String!) {
+  read(header: $header)
+}
+
+query ListUsers($count: Int, $offset: Int) {
+  users(count: $count, offset: $offset) {
+    ...FUser
+  }
+}
+
+mutation DM($user: ID!) {
+  dm(user: $user) {
+    ...FChat
+  }
+}

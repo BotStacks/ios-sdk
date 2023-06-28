@@ -180,5 +180,4 @@ public class Theme {
   }
 
   public static let `default`: Theme = Theme()
-
 }

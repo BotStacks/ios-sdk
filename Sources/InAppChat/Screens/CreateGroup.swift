@@ -10,20 +10,20 @@ import SwiftUI
 
 class CreateGroupState: ObservableObject {
 
-  @Published var group: Group? = nil
+  @Published var chat: Chat? = nil
   @Published var image: URL? = nil
   @Published var name: String = ""
   @Published var description: String = ""
   @Published var _private = false
-  @Published var users: [Participant] = []
+  @Published var members: [Member] = []
 
-  func apply(_ group: Group) {
-    self.group = group
-    self.image = group.image.flatMap({ URL(string: $0) })
-    self.name = group.name
-    self.description = group.description ?? ""
-    self._private = group._private
-    self.users = group.participants
+  func apply(_ chat: Chat) {
+    self.chat = chat
+    self.image = chat.image.flatMap({ URL(string: $0) })
+    self.name = chat.name
+    self.description = chat.description ?? ""
+    self._private = chat._private
+    self.users = chat.members
   }
 
   func commit() async {

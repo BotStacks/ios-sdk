@@ -10,9 +10,7 @@ import Foundation
 class Caches: ObservableObject {
   @Published var user: [String: User] = [:]
   @Published var messages: [String: Message] = [:]
-  @Published var groups: [String: Group] = [:]
-  @Published var threads: [String: Thread] = [:]
-  @Published var threadsByUID: [String: Thread] = [:]
-  @Published var threadsByGroup: [String: Thread] = [:]
-  var threadFetches = Set<String>()
+  @Published var chats: [String: Chat] = [:]
+  @Published var chatsByUID: [String: Chat] = [:]
+  var chatFetches = Set<String>()
 }

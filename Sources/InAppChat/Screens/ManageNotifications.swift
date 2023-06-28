@@ -37,10 +37,10 @@ public struct ManageNotifications: View {
         Option(title: "Mentions Only", selected: settings.notifications == .mentions)
       }
       Button {
-        settings.setNotification(._none)
+        settings.setNotification(.none)
         print("new notificaitons", settings.notifications)
       } label: {
-          Option(title: "None", selected: settings.notifications == NotificationSettings.AllowFrom._none)
+        Option(title: "None", selected: settings.notifications == .none)
       }
       Spacer()
       Button {

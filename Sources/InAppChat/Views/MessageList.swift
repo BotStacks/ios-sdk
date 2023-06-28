@@ -11,7 +11,7 @@ import SwiftUI
 public struct MessageList: View {
 
   @Environment(\.geometry) var geometry
-  @ObservedObject var thread: Thread
+  @ObservedObject var chat: Chat
   let onLongPress: (Message) -> Void
 
   public var body: some View {
@@ -44,7 +44,7 @@ public struct RepliesList: View {
 
   @Environment(\.geometry) var geometry
   @Environment(\.iacTheme) var theme
-  @ObservedObject var thread: Thread
+  @ObservedObject var chat: Chat
   @ObservedObject var message: Message
   @ObservedObject var replies: RepliesPager
   let onLongPress: (Message) -> Void

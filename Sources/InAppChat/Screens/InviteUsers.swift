@@ -15,14 +15,14 @@ public struct InviteUsers: View {
   @Environment(\.iacTheme) var theme
   @EnvironmentObject var navigator: Navigator
 
-  let group: Group?
+  let chat: Chat?
   let state = CreateGroupState.current
 
   @State var selected: [User] = []
   @State var creating = false
 
-  public init(groupID: String? = nil) {
-    self.group = groupID.flatMap({ Group.get($0) })
+  public init(chatID: String? = nil) {
+    self.chat = chatID.flatMap({ Chat.get($0) })
   }
 
   public var body: some View {

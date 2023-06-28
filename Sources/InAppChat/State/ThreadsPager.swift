@@ -12,8 +12,8 @@ public class ThreadsPager: Pager<Message> {
   public override func load(skip: Int, limit: Int) async throws -> [Message] {
     let messages = try await api.getReplyThreads(skip: skip, limit: limit)
     return try await messages.concurrentMap { message in
-      if message.thread == nil {
-        let _ = try await api.get(thread: message.threadID)
+      if message.chat == nil {
+        let _ = try await api.get(chat: message.chatID)
       }
       return message
     }

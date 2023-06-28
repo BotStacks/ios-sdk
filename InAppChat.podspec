@@ -31,8 +31,8 @@ Pod::Spec.new do |s|
   s.dependency        "SwiftyJSON"
   s.dependency        "Alamofire"
   s.dependency        "Giphy"
-  s.dependency        "CocoaMQTT"
   s.dependency        "Gifu"
   s.dependency        'Sentry'
-
+  s.dependency        'Apollo'
+  s.dependency        'Apollo/WebSocket'
 end

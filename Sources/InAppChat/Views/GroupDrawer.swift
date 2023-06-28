@@ -15,13 +15,13 @@ public struct GroupDrawer: View {
   @EnvironmentObject var navigator: Navigator
   @Environment(\.dismiss) var dismiss
 
-  @ObservedObject var group: Group
+  @ObservedObject var chat: Chat
 
   @State var delete = false
   @State var leave = false
 
-  public init(_ group: Group) {
-    self.group = group
+  public init(_ chat: Chat) {
+    self.chat = chat
   }
 
   public var body: some View {
@@ -30,17 +30,17 @@ public struct GroupDrawer: View {
         VStack(alignment: .leading, spacing: 0) {
           VStack(spacing: 0) {
             Spacer().height(24)
-            if let image = group.image {
+            if let image = chat.image {
               GifImageView(url: try! image.asURL())
                 .circle(70, .clear)
             } else {
               GroupPlaceholder().size(70)
             }
             Spacer().height(12)
-            Text(group.name)
+            Text(chat.name)
               .font(theme.fonts.title2)
               .foregroundColor(theme.colors.text)
-            Text(group.description ?? "")
+            Text(chat.description ?? "")
               .font(theme.fonts.body)
               .foregroundColor(theme.colors.caption)
             Spacer().height(26)
@@ -57,13 +57,13 @@ public struct GroupDrawer: View {
               .resizable()
               .size(16)
               .foregroundColor(theme.colors.caption)
-            Text("\(group.participants.count)")
+            Text("\(chat.participants.count)")
               .font(theme.fonts.caption)
               .foregroundColor(theme.colors.caption)
           }.padding(.leading, 16)
           List {
             header("Admin")
-            ForEach(group.admins) { user in
+            ForEach(chat.admins) { user in
               Button {
                 dismiss()
                 navigator.navigate(user.path)
@@ -72,7 +72,7 @@ public struct GroupDrawer: View {
               }
             }
             header("members - online")
-            ForEach(group.onlineNotAdminUsers) { user in
+            ForEach(chat.onlineNotAdminUsers) { user in
               Button {
                 dismiss()
                 navigator.navigate(user.path)
@@ -81,7 +81,7 @@ public struct GroupDrawer: View {
               }
             }
             header("members")
-            ForEach(group.offlineUsers) { user in
+            ForEach(chat.offlineUsers) { user in
               Button {
                 dismiss()
                 navigator.navigate(user.path)
@@ -94,10 +94,10 @@ public struct GroupDrawer: View {
             .listItemTint(.clear)
         }
         HStack(spacing: 4) {
-          if group.isAdmin {
+          if chat.isAdmin {
             Button {
               dismiss()
-              navigator.navigate(group.editPath)
+              navigator.navigate(chat.editPath)
             } label: {
               ZStack {
                 VStack(spacing: 0) {
@@ -114,7 +114,7 @@ public struct GroupDrawer: View {
           }
           Button {
             dismiss()
-            navigator.navigate(group.invitePath)
+            navigator.navigate(chat.invitePath)
           } label: {
             ZStack {
               VStack(spacing: 0) {
@@ -129,7 +129,7 @@ public struct GroupDrawer: View {
             }.size(60)
           }
           Button {
-            if group.isAdmin {
+            if chat.isAdmin {
               self.delete = true
             } else {
               self.leave = true
@@ -141,7 +141,7 @@ public struct GroupDrawer: View {
                   .resizable()
                   .size(24)
                   .foregroundColor(theme.colors.border)
-                Text(group.isAdmin ? "Delete" : "Leave")
+                Text(chat.isAdmin ? "Delete" : "Leave")
                   .font(theme.fonts.mini)
                   .foregroundColor(theme.colors.border)
               }
@@ -153,16 +153,16 @@ public struct GroupDrawer: View {
           .cornerRadius(16)
       }
     }.confirmationDialog("Are you sure you want to leave this channel?", isPresented: $leave) {
-      Button("Leave \(group.name)?", role: .destructive) {
+      Button("Leave \(chat.name)?", role: .destructive) {
         dismiss()
-        group.leave()
+        chat.leave()
         navigator.goBack()
       }
     }.confirmationDialog("Are you sure you want to delete this channel?", isPresented: $delete) {
-      Button("Delete \(group.name)?", role: .destructive) {
+      Button("Delete \(chat.name)?", role: .destructive) {
         Task.detached {
           do {
-            try await group.delete()
+            try await chat.delete()
             await MainActor.run {
               self.dismiss()
               self.navigator.goBack()

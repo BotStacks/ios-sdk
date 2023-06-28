@@ -28,7 +28,7 @@ public struct MessageInput: View {
   let replyingTo: Message?
   let onMedia: () -> Void
 
-  @ObservedObject var thread: Thread
+  @ObservedObject var chat: Chat
 
   init(thread: Thread, replyingTo: Message?, onMedia: @escaping () -> Void) {
     self._thread = ObservedObject(initialValue: thread)

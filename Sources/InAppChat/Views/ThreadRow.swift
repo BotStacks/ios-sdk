@@ -12,59 +12,59 @@ private let formatter = RelativeDateTimeFormatter()
 
 public struct ThreadRow: View {
 
-  @StateObject var thread: Thread
+  @StateObject var chat: Chat
   @Environment(\.iacTheme) var theme
 
   public var body: some View {
-    NavLink(to: thread.path) {
+    NavLink(to: chat.path) {
       HStack(alignment: .center, spacing: 0.0) {
         ZStack {
           Circle().fill(
-            thread.isUnread
+            chat.isUnread
               ? theme.colors.unread
               : theme
                 .colors
                 .softBackground
           )
-          if thread.isUnread {
+          if chat.isUnread {
             Circle().inset(by: 2.0)
               .fill(theme.colors.softBackground)
           }
           Avatar(
-            url: thread.user?.avatar ?? thread.group?.image,
+            url: chat.displayImage,
             size: 46.0
           )
         }.size(60.0)
         VStack(alignment: .leading, spacing: 0.0) {
           HStack {
-            Text(thread.user?.displayName ?? thread.user?.username ?? thread.group?.name ?? "")
+            Text(chat.user?.displayName ?? chat.user?.username ?? chat.group?.name ?? "")
               .font(theme.fonts.title3)
               .truncationMode(.tail)
               .foregroundColor(theme.colors.text)
               .lineLimit(1)
-            if let group = thread.group {
+            if let group = chat.group {
               PrivacyPill(_private: group._private)
             }
           }
           HStack {
-            if thread.latest?.status == .seen {
+            if chat.latest?.status == .seen {
               Image(systemName: "checkmark.circle.fill")
                 .resizable()
                 .foregroundColor(theme.colors.primary)
                 .size(12.0)
             }
             Text(
-              thread.latest?.summary ?? "No messages yet"
+              chat.latestMessage?.summary ?? "No messages yet"
             ).lineLimit(1)
               .foregroundColor(
-                thread.isUnread ? theme.colors.text : theme.colors.caption
+                chat.isUnread ? theme.colors.text : theme.colors.caption
               )
               .font(theme.fonts.body)
           }
         }.padding(.leading, 14.0)
         Spacer(minLength: 18.0)
         VStack(alignment: .trailing) {
-          if let message = thread.latest {
+          if let message = chat.latest {
             Text(
               message.createdAt >= Date() - 3.hours
               ? message.createdAt.toRelative(since: nil, dateTimeStyle: .numeric, unitsStyle: .short)
@@ -76,8 +76,8 @@ public struct ThreadRow: View {
             .foregroundColor(theme.colors.caption)
             .font(theme.fonts.body)
           }
-          if thread.isUnread {
-            Badge(count: thread.unreadCount)
+          if chat.isUnread {
+            Badge(count: chat.unreadCount)
           }
         }
       }

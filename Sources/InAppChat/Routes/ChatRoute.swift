@@ -10,32 +10,29 @@ import SwiftUI
 
 public struct ChatRoute: View {
   let uid: String?
-  let gid: String?
+  let cid: String?
   let mid: String?
   @State var user: User? = nil
-  @State var group: Group? = nil
+  @State var chat: Chat? = nil
   @State var message: Message? = nil
-  @State var thread: Thread? = nil
   @State var failed = false
 
-  public init(uid: String? = nil, gid: String? = nil, mid: String? = nil) {
+  public init(uid: String? = nil, cid: String? = nil, mid: String? = nil) {
     self.uid = uid
-    self.gid = gid
+    self.cid = cid
     self.mid = mid
     if let uid = uid {
       _user = State(initialValue: User.get(uid))
-      let t = Thread.get(uid: uid)
-      _thread = State(initialValue: t)
+      let t = Chat.get(uid: uid)
+      _chat = State(initialValue: t)
       if t == nil {
         fetchUser(_user.wrappedValue?.email ?? uid)
       }
     }
-    if let gid = gid {
-      let g = Group.get(gid)
-      _group = State(initialValue: g)
-      let t = Thread.get(group: gid)
-      _thread = State(initialValue: t)
-      if g == nil || t == nil {
+    if let cid = cid {
+      let c = Chat.get(cid)
+      _chat = State(initialValue: c)
+      if c == nil {
         fetchGroup(gid)
       }
     }

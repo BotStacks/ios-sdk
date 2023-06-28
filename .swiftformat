@@ -39,7 +39,3 @@
 --trimwhitespace always
 --wraparguments preserve
 --wrapcollections preserve
-
-# rules
-
---enable isEmpty

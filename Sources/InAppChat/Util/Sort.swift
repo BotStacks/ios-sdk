@@ -7,37 +7,26 @@
 
 import Foundation
 
-func sortThreads(a: Thread, b: Thread) -> Bool {
-  if let al = a.latest, let bl = b.latest {
+func sortThreads(a: Chat, b: Chat) -> Bool {
+  if let al = a.latestMessage, let bl = b.latestMessage {
     return al.createdAt > bl.createdAt
-  } else if a.latest != nil {
+  } else if a.latestMessage != nil {
     return true
-  } else if b.latest != nil {
+  } else if b.latestMessage != nil {
     return false
   } else {
     return a.name > b.name
   }
 }
 
-func sortNetworkThreads(a: Thread, b: Thread) -> Bool {
-  if let ag = a.group, let bg = b.group {
-    if ag.hasInvite && !bg.hasInvite {
-      return true
-    }
-    if bg.hasInvite {
-      return false
-    }
-    return ag.participants.count > bg.participants.count
-  }
-  if let al = a.latest, let bl = b.latest {
-    return al.createdAt > bl.createdAt
-  } else if a.latest != nil {
+func sortNetworkThreads(a: Chat, b: Chat) -> Bool {
+  if a.hasInvite && !b.hasInvite {
     return true
-  } else if b.latest != nil {
-    return false
-  } else {
-    return a.name > b.name
   }
+  if b.hasInvite {
+    return false
+  }
+  return a.members.count > b.members.count
 }
 
 func sortMessages(a: Message, b: Message) -> Bool {
