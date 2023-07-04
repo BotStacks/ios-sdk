@@ -26,7 +26,7 @@ public struct ChatRoute: View {
       let t = Chat.get(uid: uid)
       _chat = State(initialValue: t)
       if t == nil {
-        fetchUser(_user.wrappedValue?.email ?? uid)
+        fetchUser(_user.wrappedValue?.id ?? uid)
       }
     }
     if let cid = cid {

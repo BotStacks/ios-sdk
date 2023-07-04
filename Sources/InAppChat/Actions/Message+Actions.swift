@@ -1,22 +1,7 @@
 extension Message {
 
-  func decr(_ reaction: String) {
-    if let i = self.reactions?.firstIndex(where: { $0.emojiCode == reaction }) {
-      let r = self.reactions![i]
-      let users = r.users.filter({ $0 != User.current!.id })
-      if !users.isEmpty {
-        self.reactions![i] = Reaction(emojiCode: reaction, count: users.count, users: users)
-      } else {
-        self.reactions?.remove(at: i)
-      }
-    }
-  }
-
   func markRead() {
-    if user.isCurrent == true {
-      return
-    }
-    if self.thread?.group != nil {
+    if self.chat.isDM != nil {
       return
     }
     if self.status != .seen {

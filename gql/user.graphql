@@ -3,6 +3,7 @@ query GetMe {
     ...FUser
     blocks
     blocked_by
+    notification_settings
     devices {
       ...FDevice
     }
@@ -37,4 +38,16 @@ mutation DM($user: ID!) {
   dm(user: $user) {
     ...FChat
   }
+}
+
+mutation Block($user: ID!) {
+  block(user: $user)
+}
+
+mutation Unblock($user: ID!) {
+  unblock(user: $user)
+}
+
+mutation UpdateProfile($input: UpdateProfileInput!) {
+  updateProfile(input: $input)
 }

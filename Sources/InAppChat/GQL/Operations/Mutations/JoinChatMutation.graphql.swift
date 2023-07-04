@@ -39,7 +39,6 @@ public extension Gql {
       ] }
 
       /// Joins a Chat. Always succeeds if that Chat is public and the user hasn't been Kicked.
-      /// If the Chat is private, success only occurs if the User has been invited.
       public var join: Join? { __data["join"] }
 
       /// Join

@@ -15,11 +15,11 @@ public final class Member: ObservableObject, Identifiable {
   @Published public var role: Gql.MemberRole
 
   var user: User {
-    return User.get(user_id)
+    return User.get(user_id)!
   }
 
   var chat: Chat {
-    return Chat.get(chat_id)
+    return Chat.get(chat_id)!
   }
 
   init(chat_id: String, user_id: String, created_at: Date, role: Gql.MemberRole) {
@@ -29,12 +29,14 @@ public final class Member: ObservableObject, Identifiable {
     self.role = role
     self.created_at = created_at
   }
+  
+  static func fromGql(_ member: Gql.FMember) -> Member {
+    let _ = User.get(member.user)
+    return Member(chat_id: member.chat_id, user_id: member.user.id, created_at: member.created_at.toDate()!.date, role: member.role)
+  }
 
   static func fromGql(_ members: [Gql.FMember]) -> [Member] {
-    return members.map {
-      let _ = User.get($0.user)
-      return Member(chat_id: $0.chat_id, user_id: $0.user.id, created_at: $0.created_at.toDate()!.date, role: $0.role)
-    }
+    return members.map(Member.fromGql)
   }
 
   var isMember: Bool {

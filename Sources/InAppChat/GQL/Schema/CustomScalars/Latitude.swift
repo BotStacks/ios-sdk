@@ -15,20 +15,6 @@ public extension Gql {
   /// The output value is always in decimal format (53.471).
   ///
   /// The maximum decimal degrees' precision is 8. See Decimal Degrees Precision(opens in a new tab) for more information.
-  typealias Latitude = Float
+  typealias Latitude = String
 
-}
-
-extension Float: CustomScalarType {
-  public init (_jsonValue value: JSONValue) throws {
-    guard let val = value as? Float else {
-      throw JSONDecodingError.couldNotConvert(value: value, to: Foundation.UUID.self)
-    }
-    
-    self = val
-  }
-  
-  public var _jsonValue: JSONValue {
-    self
-  }
 }

@@ -10,6 +10,14 @@ mutation CreateGroup($input: CreateGroupInput!) {
   }
 }
 
+mutation UpdateGroup($input: UpdateGroupInput!) {
+  updateGroup(input: $input)
+}
+
+mutation DeleteGroup($id: ID!) {
+  deleteGroup(id: $id)
+}
+
 query GetChat($id: ID!) {
   chat(id: $id) {
     ...FChat
@@ -18,4 +26,21 @@ query GetChat($id: ID!) {
 
 mutation markChatRead($id: ID!) {
   markChatRead(chat: $id)
+}
+
+query GetInvites {
+  invites {
+    created_at
+    updated_at
+    user {
+      ...FUser
+    }
+    chat {
+      ...FChat
+    }
+  }
+}
+
+mutation SetNotificationSetting($chat: ID!, $setting: NotificationSetting!) {
+  setNotificationSetting(chat: $chat, setting: $setting)
 }

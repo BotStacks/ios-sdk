@@ -123,10 +123,14 @@ public class Chats: ObservableObject {
       return 0
     }
   }
+  
+  var users: [User] {
+    return dms.compactMap { $0.friend}
+  }
 
   var phoneContacts: [User] = [] {
     didSet {
-      contacts.items = Set(phoneContacts).union(Set(users.items.compactMap(\.user))).sorted(by: {
+      contacts.items = Set(phoneContacts).union(Set(users)).sorted(by: {
         $0.displayNameFb > $1.displayNameFb
       })
     }

@@ -26,6 +26,7 @@ public extension Gql {
           __typename
           ...FMessage
         }
+        notification_setting
       }
       """ }
 
@@ -47,6 +48,7 @@ public extension Gql {
       .field("unread_count", Int.self),
       .field("members", [Member].self),
       .field("last_message", Last_message?.self),
+      .field("notification_setting", GraphQLEnum<Gql.NotificationSetting>?.self),
     ] }
 
     /// The ID of this Chat
@@ -73,6 +75,8 @@ public extension Gql {
     public var members: [Member] { __data["members"] }
     /// The most recent message sent to this chat if unencrypted
     public var last_message: Last_message? { __data["last_message"] }
+    /// The current user's notification settings for this chat
+    public var notification_setting: GraphQLEnum<Gql.NotificationSetting>? { __data["notification_setting"] }
 
     /// Member
     ///

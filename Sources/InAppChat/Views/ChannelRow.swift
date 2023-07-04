@@ -63,7 +63,7 @@ public struct ChannelRow: View {
                   .size(87)
                   .cornerRadius(15.0)
               } else {
-                chatPlaceholder()
+                GroupPlaceholder()
                   .size(87)
                   .cornerRadius(15.0)
               }
@@ -82,7 +82,7 @@ public struct ChannelRow: View {
                   .multilineTextAlignment(.leading)
                 Spacer(minLength: 0)
                 HStack {
-                  chatCount(count: chat.participants.count)
+                  ChatCount(count: chat.participants.count)
                   Spacer()
                 }
               }.padding(.leading, 13.0)

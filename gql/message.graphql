@@ -27,3 +27,13 @@ mutation Unfavorite($message: ID!) {
 mutation React($id: ID!, $reaction: String) {
   react(id: $id, reaction: $reaction)
 }
+
+mutation UpdateMessage($input: UpdateMessageInput!) {
+  updateMessage(input: $input) {
+    ...FMessage
+  }
+}
+
+mutation DeleteMessage($id: ID!) {
+  removeMessage(id: $id)
+}

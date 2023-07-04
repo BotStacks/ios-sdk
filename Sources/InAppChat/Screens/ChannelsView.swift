@@ -27,8 +27,8 @@ public struct ChannelsView: View {
               cta: CTA(icon: nil, text: "Create A Channel", to: "/group/new")
             )
           }
-        ) { group in
-          ChannelRow(group: group)
+        ) { chat in
+          ChannelRow(chat: chat)
         }.onChange(of: scrollToTop) { newValue in
           if let id = chats.network.items.first?.id {
             withAnimation {

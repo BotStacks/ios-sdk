@@ -34,3 +34,33 @@ func removeReaction(reactions: inout Reactions, index: UInt, uid: String) {
   }
 }
 
+func findUserReactionIndex(_ reactions:Reactions, _ uid: String) -> UInt {
+  return reactions.first(where: {$0.uids.contains(uid)})
+}
+
+enum Change: String {
+  case add = "add"
+  case delete = "delete"
+  case change = "change"
+}
+
+func react(
+  uid: String,
+  reaction: String,
+  reactions: Reactions
+) -> Change {
+  let index = findUserReactionIndex(reactions, uid);
+  if (index > -1) {
+    if (reaction === reactions[index][0]) {
+      removeReaction(reactions, index, uid);
+      return Change.delete;
+    } else {
+      removeReaction(reactions, index, uid);
+      addReaction(reactions, uid, reaction);
+      return Change.change;
+    }
+  } else {
+    addReaction(reactions, uid, reaction);
+    return Change.add;
+  }
+}

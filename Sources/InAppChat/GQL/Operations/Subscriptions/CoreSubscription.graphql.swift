@@ -463,6 +463,8 @@ public extension Gql {
               public var members: [Member] { __data["members"] }
               /// The most recent message sent to this chat if unencrypted
               public var last_message: Last_message? { __data["last_message"] }
+              /// The current user's notification settings for this chat
+              public var notification_setting: GraphQLEnum<Gql.NotificationSetting>? { __data["notification_setting"] }
 
               public struct Fragments: FragmentContainer {
                 public let __data: DataDict

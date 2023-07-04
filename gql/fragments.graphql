@@ -26,6 +26,7 @@ fragment FChat on Chat {
   last_message {
     ...FMessage
   }
+  notification_setting
 }
 
 fragment FMessage on Message {

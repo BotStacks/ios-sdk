@@ -149,6 +149,9 @@ type Chat {
   """The name of the group chat"""
   name: String
 
+  """The current user's notification settings for this chat"""
+  notification_setting: NotificationSetting
+
   """The number of unread messages for the current User in this Chat"""
   unread_count: Int!
 
@@ -455,6 +458,15 @@ input InitialEncryptedMessageInput {
   spk: String!
 }
 
+"""A user invite to a chat room"""
+type Invite {
+  chat: Chat!
+  created_at: DateTime!
+  invitee: User!
+  updated_at: DateTime!
+  user: User!
+}
+
 type InviteEvent {
   by: User!
   to: Chat!
@@ -633,6 +645,17 @@ type Message {
   user: User!
 }
 
+input ModMemberInput {
+  """The Chat to modify"""
+  chat: ID!
+
+  """The new Role of the User"""
+  role: MemberRole
+
+  """The User to modify"""
+  user: ID!
+}
+
 type Mutation {
   """Blocks a User for the current User"""
   block(user: ID!): Boolean
@@ -641,7 +664,10 @@ type Mutation {
   createGroup(input: CreateGroupInput!): Chat
 
   """Delete a group Chat"""
-  deleteGroup(id: String): Boolean
+  deleteGroup(id: ID!): Boolean
+
+  """Rejects a Chat invite for the current User"""
+  dismissInvites(chat: ID): Boolean
 
   """Start a directmessage Chat with a User"""
   dm(user: ID!): Chat
@@ -656,11 +682,11 @@ type Mutation {
   flag(input: CreateFlagInput!): Flag!
 
   """Invites a User to a Chat"""
-  invite(chat: ID, user: ID): Member!
+  invite(chat: ID!, user: ID!): Member!
+  inviteMany(chat: ID!, users: [ID!]!): [Member!]!
 
   """
   Joins a Chat. Always succeeds if that Chat is public and the user hasn't been Kicked.
-  If the Chat is private, success only occurs if the User has been invited.
   """
   join(chat: ID!): Member
 
@@ -676,6 +702,9 @@ type Mutation {
   """Marks a Chat as read now for the current User"""
   markChatRead(chat: ID!): Boolean
 
+  """Mod a user Role in a Chat"""
+  modMember(input: ModMemberInput!): Boolean
+
   """
   React to a Message as the current User. If no reaction is passed, the reaction for the current User is removed.
   """
@@ -689,14 +718,11 @@ type Mutation {
   """Registers a push token for a device"""
   registerPush(fcm: Boolean, kind: DeviceType!, token: String!): Boolean
 
-  """Rejects a Chat invite for the current User"""
-  rejectInvite(chat: ID): Boolean
-
   """Delete a Flag"""
   removeFlag(id: String!): Flag
 
   """Delete a Message if priveledged"""
-  removeMessage(id: String!): Boolean
+  removeMessage(id: ID!): Boolean
 
   """A content review for a Flag"""
   reviewFlag(input: ReviewFlagInput!): Flag!
@@ -706,6 +732,9 @@ type Mutation {
 
   """Send a message to a Chat"""
   sendMessage(input: SendMessageInput): Message!
+
+  """Set the notification setting for the current User in this chat"""
+  setNotificationSetting(chat: ID!, setting: NotificationSetting!): Boolean!
 
   """Unblocks a User for the current User"""
   unblock(user: ID!): Boolean
@@ -723,7 +752,19 @@ type Mutation {
   updateMessage(input: UpdateMessageInput!): Message!
 
   """Updates the current User's profile"""
-  updateProfile(input: UpdateProfileInput!): User!
+  updateProfile(input: UpdateProfileInput!): Boolean!
+}
+
+"""Notification setting for a user, can be set per chat"""
+enum NotificationSetting {
+  """Allow all notifications, mentions and dms"""
+  all
+
+  """Allow only mention notifictions"""
+  mentions
+
+  """No notifications"""
+  none
 }
 
 """A User's online status in this Chat silo"""
@@ -778,6 +819,9 @@ type Query {
 
   """The Device's inbox of Messages"""
   inbox: [EncryptedMessage!]!
+
+  """The current user's invites"""
+  invites: [Invite!]!
 
   """The current User"""
   me: User
@@ -938,6 +982,9 @@ input UpdateProfileInput {
   """The User's desired new image"""
   image: String
 
+  """Notifications"""
+  notification_setting: NotificationSetting
+
   """The User's desired new online status"""
   status: OnlineStatus
 
@@ -976,6 +1023,9 @@ type User {
 
   """Last seen date of the user"""
   last_seen: DateTime!
+
+  """Network notification settings for this user"""
+  notification_settings: NotificationSetting!
 
   """The Role of this User in their Chat silo"""
   role: TenantUserRole!

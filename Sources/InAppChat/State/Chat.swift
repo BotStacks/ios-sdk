@@ -68,6 +68,14 @@ public final class Chat: Pager<Message>, Identifiable {
     return unreadCount > 0
   }
   
+  var isDM: Bool {
+    return self.kind == Gql.ChatType.directMessage
+  }
+  
+  var isGroup: Bool {
+    return self.kind == Gql.ChatType.group
+  }
+  
   override public func load(skip: Int, limit: Int) async -> [Message] {
     do {
       let items = try await api.fetchMessages(
