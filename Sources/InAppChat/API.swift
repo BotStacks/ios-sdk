@@ -422,18 +422,16 @@ class Api: InterceptorProvider, ApolloInterceptor {
     _ = try await client?.fetchAsync(query: Gql.UnblockMutation(user: user))
   }
 
-  func updateSetting(notifications: Settings.Notifications) async throws {
-    _ = try await UserAPI.updateMe(
-      updateUserInput: .init(notificationSettings: .init(allowFrom: notifications)))
+  func updateSetting(notifications: NotificationSetting) async throws {
+    _ = try await client?.fetchAsync(query: Gql.UpdateProfileInput(notification_settings: notifications))
   }
 
-  func update(availability: Gql.OnlineStatus) async throws {
-    _ = try await UserAPI.updateMe(updateUserInput: .init(availabilityStatus: availability))
+  func update(availability: OnlineStatus) async throws {
+    _ = try await client?.fetchAsync(query: Gql.UpdateProfileInput(status: notifications))
   }
 
-  func update(thread: String, notifications: Settings.Notifications) async throws {
-    _ = try await ThreadAPI.updateThread(
-      tid: thread, updateThreadInput: .init(notificationSettings: .init(allowFrom: notifications)))
+  func update(chat: String, notifications: NotificationSetting) async throws {
+    _ = try await client?.fetchAsync(query: Gql.SetNotificationSettingMutation(chat: chat, setting: notifications))
   }
 
   func get(contacts: [String]) async throws -> [User] {
