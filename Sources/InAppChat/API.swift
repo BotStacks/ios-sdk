@@ -265,15 +265,6 @@ class Api: InterceptorProvider, ApolloInterceptor {
     try await self.client?.fetchAsync(query: Gql.LeaveChatMutation(id: group))
   }
 
-  func getChat(_ id: String) async throws -> Chat {
-    let res = try await self.client?.fetchAsync(query: Gql.GetChatQuery(id: id))
-    if let fchat = res.chat {
-      return Chat.get(fchat)
-    } else {
-      throw APIError(msg: "Chat not found")
-    }
-  }
-
   func dismiss(group: String, admin: String) async throws {
     try await manage(gdroup: group, admin: admin, isPromote: false)
   }
@@ -434,31 +425,15 @@ class Api: InterceptorProvider, ApolloInterceptor {
     _ = try await client?.fetchAsync(query: Gql.SetNotificationSettingMutation(chat: chat, setting: notifications))
   }
 
-  func get(contacts: [String]) async throws -> [User] {
-    let users = try await UserAPI.syncContacts(syncContactsInput: .init(contacts: contacts))
-    return users.map(User.get)
-  }
-
-  func getJoinedUserThreads(skip: Int = 0, limit: Int = 20) async throws -> [Thread] {
-    return try await ThreadAPI.getThreads(skip: skip, limit: limit, threadType: .single).map(
-      Thread.get)
-  }
-
-  func getJoinedChatThreads(skip: Int = 0, limit: Int = 20) async throws -> [Thread] {
-    return try await ThreadAPI.getThreads(skip: skip, limit: limit, threadType: .group).map(
-      Thread.get)
-
-  }
-
-  func getChats(skip: Int = 0, limit: Int = 20) async throws -> [Chat] {
-    return try await ChatAPI.getChats(limit: limit, skip: skip, joined: .no).map(Chat.get)
+  func get(contacts: [String]) async throws {
+    let _ = try await client?.fetchAsync(query: Gql.SyncContactsMutation(numbers: contacts))
   }
 
   func getReplyThreads(skip: Int = 0, limit: Int = 20) async throws -> [Message] {
     return try await ChatAPI.getReplyThreads(limit: limit, skip: skip).map(Message.get)
   }
 
-  func get(thread: String) async throws -> Thread {
+  func get(chat: String) async throws -> Thread {
     return try await Thread.get(ThreadAPI.getThread(tid: thread))
   }
 
