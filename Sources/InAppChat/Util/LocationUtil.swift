@@ -89,7 +89,7 @@ public class LocationUtil: NSObject, CLLocationManagerDelegate {
     if let loc = locations.first {
       c?.resume(returning: (latitude: loc.coordinate.latitude, longitude: loc.coordinate.longitude))
     } else {
-      c?.resume(throwing: APIError(msg: "No location received"))
+      c?.resume(throwing: APIError(msg: "No location received", critical: false))
     }
     c = nil
   }

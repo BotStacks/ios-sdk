@@ -26,7 +26,7 @@ public class RepliesPager: Pager<Message> {
   }
 
   override public func load(skip: Int, limit: Int) async throws -> [Message] {
-    return try await api.getReplies(for: message, skip: skip, limit: limit)
+    return try await api.getReplies(for: message.id, skip: skip, limit: limit)
   }
 
 }

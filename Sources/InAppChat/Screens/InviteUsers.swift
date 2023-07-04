@@ -65,24 +65,24 @@ public struct InviteUsers: View {
             }.circle(50, theme.inverted.softBackground)
           }
           Button {
-            if let group = group {
-              group.invite(users: selected)
+            if let chat = chat {
+              chat.invite(users: selected)
               navigator.goBack()
             } else if !creating, let state = state {
               self.creating = true
               Task.detached {
                 do {
-                  let group = try await api.createGroup(
+                  let chat = try await api.createChat(
                     name: state.name,
                     description: state.description,
                     image: state.image,
                     private: state._private
                   )
-                  await group.invite(users: self.selected)
+                  await chat.invite(users: self.selected)
                   await MainActor.run {
                     CreateGroupState.current = nil
                     navigator.goBack(total: 2)
-                    navigator.navigate(group.path)
+                    navigator.navigate(chat.path)
                   }
                 } catch let err {
                   Monitoring.error(err)
@@ -95,12 +95,12 @@ public struct InviteUsers: View {
           } label: {
             ZStack {
               HStack {
-                if group?.inviting == true || creating {
+                if chat?.inviting == true || creating {
                   Spinner()
                     .size(30)
                     .foregroundColor(.white)
                 }
-                Text(group != nil ? "Send Invites" : "Create My Channel")
+                Text(chat != nil ? "Send Invites" : "Create My Channel")
                   .font(theme.fonts.headline)
                   .foregroundColor(theme.colors.background)
               }

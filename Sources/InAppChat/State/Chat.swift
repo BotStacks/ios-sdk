@@ -35,11 +35,18 @@ public final class Chat: Pager<Message>, Identifiable {
   public var offlineUsers: [User] {
     return participants.filter { $0.role != .admin }.map(\.user).filter { $0.status == .offline }
   }
+  
+  var membership: Member? {
+    return self.members.first(where: {$0.user_id == User.current?.id})
+  }
 
   @Published public var _private: Bool
 
   var isMember: Bool {
-    return participants.map(\.user).contains(User.current!)
+    if let membership = self.membership {
+      return membership.isMember
+    }
+    return false
   }
 
   @Published var invites: Set<User>
@@ -106,6 +113,11 @@ public final class Chat: Pager<Message>, Identifiable {
   }
 
   @Published var invited: [User] = []
+  
+  var isInvited: Bool {
+    return !self.invites.isEmpty || self.membership?.role == MemberRole.invited
+  }
+  
 
   public init(
     id: String,

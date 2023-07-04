@@ -18,7 +18,7 @@ public struct MyProfile: View {
       VStack(alignment: .center) {
         Avatar(url: User.current?.avatar, size: 150.0)
         Text(
-          .init(User.current?.username ?? User.current?.displayName ?? User.current?.email ?? "")
+          .init(User.current?.displayNameFb ?? "")
         )
         .foregroundColor(theme.colors.text)
         .frame(maxWidth: 150.0)

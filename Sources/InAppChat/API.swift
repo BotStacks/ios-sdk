@@ -189,7 +189,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
     }
   }
   
-  func send(input: Gql.SendMessageInput) async throws -> {
+  func send(input: Gql.SendMessageInput) async throws -> Message {
     let send = try await client?.fetchAsync(query: Gql.SendMessageMutation(input: input))
     return Message.get(send.sendMessage)
   }
@@ -223,7 +223,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
     return try await self.send(input: Gql.SendMessageInput(chat: chat, attachments: [attachment]))
   }
   
-  func updateGroup(input: Gql.UpdateGroupInput) async throws -> Boolean {
+  func updateGroup(input: Gql.UpdateGroupInput) async throws -> Bool {
     let res = try await self.client?.fetchAsync(query: Gql.UpdateGroupMutation(
       input: input
     ))
@@ -466,15 +466,16 @@ class Api: InterceptorProvider, ApolloInterceptor {
   }
 
   func registerPushToken(_ token: String) async throws {
-    let _ = User.get(try await UserAPI.updateMe(updateUserInput: .init(apnsToken: token)))
+    let _ = try await client?.performAsync(mutation: Gql.RegisterPushMutation(token: token, kind: Gql.DeviceType.ios, fcm: false))
   }
 
   func registerFCMToken(_ token: String) async throws {
-    let _ = try await UserAPI.updateMe(updateUserInput: .init(fcmToken: token))
+    let _ = try await client?.performAsync(mutation: Gql.RegisterPushMutation(token: token, kind: Gql.DeviceType.ios, fcm: true))
   }
 
   func start(_ id: String) async throws -> User {
-    let user = try await User.get(UserAPI.getUser(uid: id))
+    let res = try await client?.fetchAsync(query: Gql.GetMeQuery())
+    let user = User.get(res.me)
     User.current = user
     return user
   }
@@ -507,18 +508,6 @@ class Api: InterceptorProvider, ApolloInterceptor {
     }
   }
 }
-
-extension URL {
-  public func mimeType() -> String {
-    if let mimeType = UTType(filenameExtension: self.pathExtension)?.preferredMIMEType {
-      return mimeType
-    }
-    else {
-      return "application/octet-stream"
-    }
-  }
-}
-
 let api = Api(store: ApolloStore())
 
 extension UserDefaults {
@@ -528,27 +517,5 @@ extension UserDefaults {
 
   func date(forKey key: String) -> Date? {
     return self.value(forKey: key) as? Date
-  }
-}
-
-extension ApolloClient {
-  public func fetchAsync<Query: GraphQLQuery>(query: Query,
-                                         cachePolicy: CachePolicy = .default,
-                                         contextIdentifier: UUID? = nil,
-                                              queue: DispatchQueue = .main) async -> Query.Data {
-    return withCheckedContinuation<Query.Data> { cont in
-      self.networkTransport.send(operation: query,
-                                 cachePolicy: cachePolicy,
-                                 contextIdentifier: contextIdentifier,
-                                 callbackQueue: queue) { result in
-        switch (result) {
-        case .success(let result):
-          cont.with(result.data)
-          break
-        case .failure(let err):
-          cont.resume(with: err)
-        }
-      }
-    }
   }
 }

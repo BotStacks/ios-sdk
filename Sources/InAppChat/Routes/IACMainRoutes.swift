@@ -24,10 +24,9 @@ public struct IACMainRoutes<Routes>: View where Routes: View {
     return AnyView(
       Router(initialPath: initialPath) {
         ViewLog()
-        SwiftUI.Group {
           AnyView(
-            Route("group/:id") { info in
-              ChatRoute(gid: info.parameters["id"] ?? "")
+            Route("chat/:id") { info in
+              ChatRoute(cid: info.parameters["id"] ?? "")
             })
           AnyView(
             Route("user/:id/chat") { info in
@@ -65,8 +64,6 @@ public struct IACMainRoutes<Routes>: View where Routes: View {
             Route("channels") {
               Tabs("/channels")
             })
-        }
-        SwiftUI.Group {
           AnyView(
             Route("groups/new/invite") {
               InviteUsers()
@@ -91,7 +88,6 @@ public struct IACMainRoutes<Routes>: View where Routes: View {
             Route("group/:id/edit") { info in
               CreateGroup(info.parameters["id"])
             })
-        }
         routes()
       })
   }

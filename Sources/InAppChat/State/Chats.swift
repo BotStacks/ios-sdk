@@ -58,7 +58,7 @@ public class Chats: ObservableObject {
 
   public func loadAsync() async throws {
     if let id = currentUserID {
-      let user = try await api.start(id)
+      let user = try await api.start()
       print("loaded current user")
       await MainActor.run {
         self.user = user

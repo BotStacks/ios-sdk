@@ -57,7 +57,7 @@ public struct GroupDrawer: View {
               .resizable()
               .size(16)
               .foregroundColor(theme.colors.caption)
-            Text("\(chat.participants.count)")
+            Text("\(chat.members.count)")
               .font(theme.fonts.caption)
               .foregroundColor(theme.colors.caption)
           }.padding(.leading, 16)

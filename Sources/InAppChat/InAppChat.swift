@@ -29,7 +29,7 @@ public class InAppChat: ObservableObject {
   }
 
   public func load() async throws {
-    guard !didStartLoading else { return [:] }
+    guard !didStartLoading else { return }
     didStartLoading = true
     try await Chats.current.loadAsync()
   }

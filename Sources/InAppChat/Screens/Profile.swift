@@ -14,7 +14,7 @@ public struct Profile: View {
 
   public var body: some View {
     ScrollView {
-      Header(title: user?.usernameFb ?? "") {
+      Header(title: user?.username ?? "") {
         Avatar(url: user?.avatar)
       }
       if let user = user {
@@ -78,7 +78,7 @@ public struct UserProfile: View {
         } label: {
           Row(
             icon: user.blocked ? "lock-simple-open-fill" : "lock-fill",
-            text: "\(user.blocked ? "Unblock" : "Block") \(user.usernameFb)",
+            text: "\(user.blocked ? "Unblock" : "Block") \(user.username)",
             iconPrimary: user.blocked,
             destructive: !user.blocked
           )

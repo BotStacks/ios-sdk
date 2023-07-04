@@ -7,7 +7,9 @@
 
 import Foundation
 
-public final class Member: ObservableObject, Identifiable {
+public typealias MemberRole = Gql.MemberRole
+
+public final class Member: ObservableObject {
 
   public let chat_id: String
   public let user_id: String
@@ -23,7 +25,6 @@ public final class Member: ObservableObject, Identifiable {
   }
 
   init(chat_id: String, user_id: String, created_at: Date, role: Gql.MemberRole) {
-    self.id = id
     self.chat_id = chat_id
     self.user_id = user_id
     self.role = role
@@ -32,7 +33,7 @@ public final class Member: ObservableObject, Identifiable {
   
   static func fromGql(_ member: Gql.FMember) -> Member {
     let _ = User.get(member.user)
-    return Member(chat_id: member.chat_id, user_id: member.user.id, created_at: member.created_at.toDate()!.date, role: member.role)
+    return Member(chat_id: member.chat_id, user_id: member.user.id, created_at: member.created_at.toDate()!.date, role: member.role.value())
   }
 
   static func fromGql(_ members: [Gql.FMember]) -> [Member] {
@@ -42,7 +43,9 @@ public final class Member: ObservableObject, Identifiable {
   var isMember: Bool {
     switch self.role {
     case .admin:
+      fallthrough
     case .member:
+      fallthrough
     case .owner:
       return true
     default:
@@ -50,4 +53,10 @@ public final class Member: ObservableObject, Identifiable {
     }
   }
 
+}
+
+extension Member: Equatable {
+  public static func == (lhs: Member, rhs: Member) -> Bool {
+    return lhs.user_id == rhs.user_id && lhs.chat_id == rhs.chat_id
+  }
 }

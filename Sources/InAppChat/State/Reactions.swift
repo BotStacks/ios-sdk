@@ -14,12 +14,12 @@ func parseReactions(reactions: String?) -> Reactions? {
     return nil
   }
   return reactions.split(separator: ";").compactMap { reaction in
-    let [head, tail] = reaction.split(separator: ":")
+    let (head, tail) = reaction.split(separator: ":")
     return (reaction: head, uids: tail.split(","))
   }
 }
 
-func addReaction(reactions: inout Reactions, uid: String, reaction: String) {
+func addReaction(_ reactions: inout Reactions, _ uid: String, _ reaction: String) {
   if var r = reactions.first(where: {$0.reaction == reaction}) {
     r.uids.append(uid)
   } else {
@@ -27,15 +27,15 @@ func addReaction(reactions: inout Reactions, uid: String, reaction: String) {
   }
 }
 
-func removeReaction(reactions: inout Reactions, index: UInt, uid: String) {
-  reactions[index].uids = reactions[index].uids.filter { $0 !== uid }
+func removeReaction(_ reactions: inout Reactions, _ index: Int, _ uid: String) {
+  reactions[index].uids = reactions[index].uids.filter { $0 != uid }
   if reactions[index].uids.isEmpty {
     reactions.remove(at: index)
   }
 }
 
-func findUserReactionIndex(_ reactions:Reactions, _ uid: String) -> UInt {
-  return reactions.first(where: {$0.uids.contains(uid)})
+func findUserReactionIndex(_ reactions:Reactions, _ uid: String) -> Int? {
+  return reactions.firstIndex(where: {$0.uids.contains(uid)})
 }
 
 enum Change: String {
@@ -47,20 +47,20 @@ enum Change: String {
 func react(
   uid: String,
   reaction: String,
-  reactions: Reactions
+  reactions: inout Reactions
 ) -> Change {
   let index = findUserReactionIndex(reactions, uid);
-  if (index > -1) {
-    if (reaction === reactions[index][0]) {
-      removeReaction(reactions, index, uid);
+  if let index = index {
+    if (reaction == reactions[index].reaction) {
+      removeReaction(&reactions, index, uid);
       return Change.delete;
     } else {
-      removeReaction(reactions, index, uid);
-      addReaction(reactions, uid, reaction);
+      removeReaction(&reactions, index, uid);
+      addReaction(&reactions, uid, reaction);
       return Change.change;
     }
   } else {
-    addReaction(reactions, uid, reaction);
+    addReaction(&reactions, uid, reaction);
     return Change.add;
   }
 }

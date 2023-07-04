@@ -10,7 +10,7 @@ extension Chat {
     self.invites = []
     Task.detached {
       do {
-        _ = try await api.dismissInvites(for: self)
+        _ = try await api.dismissInvites(for: self.id)
       } catch let err {
         Monitoring.error(err)
         publish {
@@ -21,26 +21,28 @@ extension Chat {
   }
 
   func join() {
+    if _private && !isInvited {
+      return
+    }
     if joining { return }
     joining = true
-    members.append(
-      Member(
-        chat_id: self.id,
-        user_id: User.current!.id, role: .member,
-        createdAt: Date()
-      )
+    let m = Member(
+      chat_id: self.id,
+      user_id: User.current!.id,
+      created_at: Date(),
+      role: MemberRole.member
     )
+    members.append(m)
     Task {
       do {
-        if self.invites.isEmpty {
-          _ = try await api.join(group: self)
-        } else {
-          _ = try await api.accept(invite: self)
+        let membership = try await api.join(group: self.id)
+        await MainActor.run {
+          Chats.current.memberships.append(m)
         }
       } catch let err {
         Monitoring.error(err)
         await MainActor.run {
-          self.participants.removeAll(where: { $0.eRTCUserId == User.current!.id })
+          self.members.removeAll(where: { $0.user_id == User.current!.id })
         }
       }
       await MainActor.run {
@@ -58,24 +60,20 @@ extension Chat {
   }
 
   func asyncLeave() async {
-    guard let me = self.participants.first(where: { $0.eRTCUserId == User.current?.id }) else {
+    guard let me = self.membership, self.isMember else {
       return
     }
     await MainActor.run {
-      self.participants.remove(element: me)
+      self.members.remove(element: me)
+      Chats.current.memberships.remove(element: me)
     }
     do {
-      _ = try await api.join(group: self)
-      await MainActor.run {
-        if let thread = Thread.get(group: self.id) {
-          Chats.current.groups.items.removeAll(where: { $0.id == thread.id })
-        }
-        print("left group")
-      }
+      _ = try await api.leave(group: self.id)
     } catch let err {
       Monitoring.error(err)
       await MainActor.run {
-        self.participants.append(me)
+        self.members.append(me)
+        Chats.current.memberships.append(me)
       }
     }
     await MainActor.run {
@@ -113,7 +111,7 @@ extension Chat {
     }
     do {
       _ = try await api.update(
-        group: self,
+        group: self.id,
         name: name,
         description: description,
         image: image,
@@ -134,13 +132,16 @@ extension Chat {
   }
 
   func delete() async throws {
-    try await api.delete(group: self)
-    Chats.current.cache.groups.removeValue(forKey: self.id)
-    if let thread = Thread.get(group: self.id) {
-      Chats.current.cache.threadsByGroup.removeValue(forKey: self.id)
-      Chats.current.cache.threads.removeValue(forKey: thread.id)
-      Chats.current.groups.items.removeAll(where: { thread.id == $0.id })
-      Chats.current.network.items.removeAll(where: { thread.id == $0.id })
+    try await api.delete(group: self.id)
+    await MainActor.run {
+      Chats.current.cache.chats.removeValue(forKey: self.id)
+      if let m = self.membership {
+        Chats.current.memberships.remove(element: m)
+      }
+      if self.isDM, let friend = self.friend {
+        Chats.current.cache.chatsByUID.removeValue(forKey: friend.id)
+      }
+      Chats.current.network.items.removeAll(where: {self.id == $0.id})
     }
   }
 
@@ -149,7 +150,7 @@ extension Chat {
     inviting = true
     Task.detached {
       do {
-        _ = try await api.invite(users: users, to: self)
+        _ = try await api.invite(users: users.map(\.id), to: self.id)
       } catch let err {
         Monitoring.error(err)
       }
