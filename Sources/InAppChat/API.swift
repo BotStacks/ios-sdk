@@ -430,24 +430,34 @@ class Api: InterceptorProvider, ApolloInterceptor {
   }
 
   func getReplyThreads(skip: Int = 0, limit: Int = 20) async throws -> [Message] {
-    return try await ChatAPI.getReplyThreads(limit: limit, skip: skip).map(Message.get)
+//    return try await ChatAPI.getReplyThreads(limit: limit, skip: skip).map(Message.get)
   }
 
-  func get(chat: String) async throws -> Thread {
-    return try await Thread.get(ThreadAPI.getThread(tid: thread))
+  func get(chat: String) async throws -> Chat {
+    let res = try await self.client?.fetchAsync(query: Gql.GetChatQuery(id: id))
+    if let fchat = res.chat {
+      return Chat.get(fchat)
+    } else {
+      throw APIError(msg: "Chat not found", critical: false)
+    }
   }
 
   func get(message: String) async throws -> Message {
-    return try await Message.get(ChatAPI.getMessage(mid: message))
+    let res = try await self.client?.fetchAsync(query: Gql.GetMessageQuery(id: message))
+    if let fmessage = res.message {
+      return Message.get(fmessage)
+    } else {
+      throw APIError(msg: "Message not found", critical: false)
+    }
   }
-
-  func getThread(forChat id: String) async throws -> Thread {
-    return try await Thread.get(ThreadAPI.getChatThread(gid: id))
-  }
-
-  func getThread(forUser id: String) async throws -> Thread {
-    let t = try await ThreadAPI.createThread(uid: id)
-    return Thread.get(t)
+  
+  func dm(user: String) async throws -> Chat {
+    let res = try await self.client?.fetchAsync(query: Gql.DMMutation(user: user))
+    if let dm = res.dm {
+      return Chat.get(dm)
+    } else {
+      throw APIError(msg: "Unable to dm user", critical: true)
+    }
   }
 
   func getReplies(for message: Message, skip: Int = 0, limit: Int = 20) async throws -> [Message] {
