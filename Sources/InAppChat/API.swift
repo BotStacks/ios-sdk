@@ -460,8 +460,9 @@ class Api: InterceptorProvider, ApolloInterceptor {
     }
   }
 
-  func getReplies(for message: Message, skip: Int = 0, limit: Int = 20) async throws -> [Message] {
-    return try await ChatAPI.getReplies(mid: message.id, skip: skip, limit: limit).map(Message.get)
+  func getReplies(for message: String, skip: Int = 0, limit: Int = 20) async throws -> [Message] {
+    let res = try await self.client?.fetchAsync(query: Gql.ListRepliesQuery(message: message, skip: skip, limit: limit))
+    return res.replies.map(Message.get)
   }
 
   func registerPushToken(_ token: String) async throws {
