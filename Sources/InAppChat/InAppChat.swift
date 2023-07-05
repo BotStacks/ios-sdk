@@ -38,13 +38,20 @@ public class InAppChat: ObservableObject {
     guard !didStartLoading else { return }
     didStartLoading = true
     try await Chats.current.loadAsync()
+    await MainActor.run {
+      self.loaded = true
+    }
   }
 
   public static func setup(namespace: String, apiKey: String, delayLoad: Bool = false) {
     InAppChat.shared = InAppChat(namespace: namespace, apiKey: apiKey)
     if !delayLoad {
       Task {
-        try await InAppChat.shared.load()
+        do {
+          try await InAppChat.shared.load()
+        } catch let err {
+          Monitoring.error(err)
+        }
       }
     }
   }

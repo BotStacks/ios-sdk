@@ -16,7 +16,7 @@ let servers = (
   )
 )
 
-let env = "prod"
+let env = "dev"
 
 func chatServer() -> (host: String, ssl: Bool) {
   switch env {
@@ -70,7 +70,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
   var apiUrl: String {
     let server = chatServer()
     let ext = server.ssl ? "https" : "http"
-    return "\(ext)://\(server)/graphql"
+    return "\(ext)://\(server.host)/graphql"
   }
 
   var websocketTransport: WebSocketTransport? {
@@ -96,17 +96,11 @@ class Api: InterceptorProvider, ApolloInterceptor {
 
   func subscribe() {
     if let client = client, authToken != nil {
-      let sub = client.sub(subscription: Gql.CoreSubscription()) { [weak self] data in
-        guard let self = self else {
-          return
-        }
+      let sub = client.sub(subscription: Gql.CoreSubscription()) { data in
         Chats.current.onCoreEvent(data.core)
       }
       subscriptions.append(sub)
-      let subme = client.sub(subscription: Gql.MeSubscription()) { [weak self] data in
-        guard let self = self else {
-          return
-        }
+      let subme = client.sub(subscription: Gql.MeSubscription()) { data in
         Chats.current.onMeEvent(data.me)
       }
       subscriptions.append(subme)
@@ -122,9 +116,9 @@ class Api: InterceptorProvider, ApolloInterceptor {
 
   func makeClient() -> ApolloClient {
     unsubscribe()
-    let store = ApolloStore()
     let apiTransport = RequestChainNetworkTransport(
       interceptorProvider: self, endpointURL: URL(string: self.apiUrl)!)
+    
     var networkTransport: NetworkTransport = apiTransport
     if let socket = websocketTransport {
       networkTransport = SplitNetworkTransport(
@@ -144,6 +138,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
     }
     request.addHeader(name: "X-API-Key", value: InAppChat.shared.apiKey)
     request.addHeader(name: "X-Device-ID", value: deviceId)
+    chain.proceedAsync(request: request, response: response, interceptor: self, completion: completion)
   }
 
   func interceptors<Operation>(for operation: Operation) -> [ApolloInterceptor]
@@ -151,11 +146,14 @@ class Api: InterceptorProvider, ApolloInterceptor {
     return [
       self,
       MaxRetryInterceptor(),
+      CacheReadInterceptor(store: self.store),
+      RequestLoggingInterceptor(),
       NetworkFetchInterceptor(client: URLSessionClient()),
       ResponseCodeInterceptor(),
       MultipartResponseParsingInterceptor(),
       JSONResponseParsingInterceptor(),
       AutomaticPersistedQueryInterceptor(),
+      CacheWriteInterceptor(store: self.store)
     ]
   }
 
@@ -378,15 +376,17 @@ class Api: InterceptorProvider, ApolloInterceptor {
     picture: String?,
     display_name: String?
   ) async throws -> User {
+    
     let res = try await self.client.performAsync(
-      mutation: Gql.LoginMutation(
-        input: Gql.LoginInput(
-          access_token: accessToken.gqlSomeOrNone, device: .none,
-          display_name: display_name.gqlSomeOrNone, email: .none, image: picture.gqlSomeOrNone, user_id: userId,
-          username: username
-        )
+        mutation: Gql.LoginMutation(
+          input: Gql.LoginInput(
+            access_token: accessToken.gqlSomeOrNone, device: .none,
+            display_name: display_name.gqlSomeOrNone, email: .none, image: picture.gqlSomeOrNone, user_id: userId,
+            username: username
+          )
+        ),
+        publishResultToStore: false
       )
-    )
     if let login = res.login {
       let user = User.get(.init(_dataDict: login.user.__data))
       try await onLogin(login.token, user: user)
