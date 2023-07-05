@@ -11,10 +11,10 @@ public typealias MemberRole = Gql.MemberRole
 
 public final class Member: ObservableObject {
 
-  public let chat_id: String
-  public let user_id: String
-  public let created_at: Date
-  @Published public var role: Gql.MemberRole
+   let chat_id: String
+   let user_id: String
+   let created_at: Date
+  @Published  var role: Gql.MemberRole
 
   var user: User {
     return User.get(user_id)!
@@ -30,10 +30,11 @@ public final class Member: ObservableObject {
     self.role = role
     self.created_at = created_at
   }
+
   
   static func fromGql(_ member: Gql.FMember) -> Member {
-    let _ = User.get(member.user)
-    return Member(chat_id: member.chat_id, user_id: member.user.id, created_at: member.created_at.toDate()!.date, role: member.role.value())
+    let _ = User.get(.init(_dataDict: member.user.__data))
+    return Member(chat_id: member.chat_id, user_id: member.user.id, created_at: member.created_at, role: try! member.role.value())
   }
 
   static func fromGql(_ members: [Gql.FMember]) -> [Member] {
@@ -56,7 +57,7 @@ public final class Member: ObservableObject {
 }
 
 extension Member: Equatable {
-  public static func == (lhs: Member, rhs: Member) -> Bool {
+   public static func == (lhs: Member, rhs: Member) -> Bool {
     return lhs.user_id == rhs.user_id && lhs.chat_id == rhs.chat_id
   }
 }

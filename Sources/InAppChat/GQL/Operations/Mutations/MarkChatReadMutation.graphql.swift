@@ -29,11 +29,11 @@ public extension Gql {
 
       public static var __parentType: Apollo.ParentType { Gql.Objects.Mutation }
       public static var __selections: [Apollo.Selection] { [
-        .field("markChatRead", Bool?.self, arguments: ["chat": .variable("id")]),
+        .field("markChatRead", Bool.self, arguments: ["chat": .variable("id")]),
       ] }
 
       /// Marks a Chat as read now for the current User
-      public var markChatRead: Bool? { __data["markChatRead"] }
+      public var markChatRead: Bool { __data["markChatRead"] }
     }
   }
 

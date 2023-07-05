@@ -37,14 +37,14 @@ public extension Gql {
 
       public static var __parentType: Apollo.ParentType { Gql.Objects.Mutation }
       public static var __selections: [Apollo.Selection] { [
-        .field("react", Bool?.self, arguments: [
+        .field("react", Bool.self, arguments: [
           "id": .variable("id"),
           "reaction": .variable("reaction")
         ]),
       ] }
 
       /// React to a Message as the current User. If no reaction is passed, the reaction for the current User is removed.
-      public var react: Bool? { __data["react"] }
+      public var react: Bool { __data["react"] }
     }
   }
 

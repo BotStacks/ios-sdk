@@ -30,7 +30,7 @@ func ctaForList(_ list: Chats.List) -> CTA {
 public struct ChatsView: View {
 
   @State var list: Chats.List = .groups
-  let chats = Chats.current
+  @ObservedObject var chats = Chats.current
 
   @Environment(\.iacTheme) var theme
   @Environment(\.geometry) var geometry
@@ -84,7 +84,7 @@ public struct ChatsView: View {
             header: header,
             empty: empty
           ) {
-            ThreadRow(thread: $0)
+            ThreadRow(chat: $0)
           }
         }
         

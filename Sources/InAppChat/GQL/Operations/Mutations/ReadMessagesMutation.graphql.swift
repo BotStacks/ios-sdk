@@ -29,11 +29,11 @@ public extension Gql {
 
       public static var __parentType: Apollo.ParentType { Gql.Objects.Mutation }
       public static var __selections: [Apollo.Selection] { [
-        .field("read", Bool?.self, arguments: ["header": .variable("header")]),
+        .field("read", Bool.self, arguments: ["header": .variable("header")]),
       ] }
 
       /// Consume all Messages for the current Device up to a given Message header
-      public var read: Bool? { __data["read"] }
+      public var read: Bool { __data["read"] }
     }
   }
 

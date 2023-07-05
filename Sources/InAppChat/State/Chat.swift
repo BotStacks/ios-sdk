@@ -12,35 +12,35 @@ public final class Chat: Pager<Message>, Identifiable {
   public let id: String
   public let kind: Gql.ChatType
 
-  @Published public var name: String
-  @Published public var description: String?
-  @Published public var image: String?
-  @Published public var members: [Member]
-  @Published public var latestMessage: Message? = nil
-  @Published public var unreadCount: Int = 0
-  @Published public var typingUsers: [String] = []
-  @Published public var sending: [Message] = []
-  @Published public var failed: [Message] = []
+  @Published  var name: String?
+  @Published  var description: String?
+  @Published  var image: String?
+  @Published  var members: [Member]
+  @Published  var latestMessage: Message? = nil
+  @Published  var unreadCount: Int = 0
+  @Published  var typingUsers: [String] = []
+  @Published  var sending: [Message] = []
+  @Published  var failed: [Message] = []
 
-  public var admins: [User] {
-    return participants.filter({ $0.role == .admin }).map(\.user)
+   var admins: [User] {
+    return members.filter({ $0.role == .admin }).map(\.user)
   }
 
-  public var onlineNotAdminUsers: [User] {
-    return participants.filter { $0.role != .admin }.map { $0.user }.filter {
+   var onlineNotAdminUsers: [User] {
+    return members.filter { $0.role != .admin }.map { $0.user }.filter {
       $0.status != .offline
     }
   }
 
-  public var offlineUsers: [User] {
-    return participants.filter { $0.role != .admin }.map(\.user).filter { $0.status == .offline }
+   var offlineUsers: [User] {
+    return members.filter { $0.role != .admin }.map(\.user).filter { $0.status == .offline }
   }
   
   var membership: Member? {
     return self.members.first(where: {$0.user_id == User.current?.id})
   }
 
-  @Published public var _private: Bool
+  @Published  var _private: Bool
 
   var isMember: Bool {
     if let membership = self.membership {
@@ -56,7 +56,7 @@ public final class Chat: Pager<Message>, Identifiable {
   }
 
   var isAdmin: Bool {
-    return members.contains(where: { $0.id == User.current?.id && $0.role === Gql.MemberRole.admin })
+    return self.membership?.role == .admin
   }
   
   var friend: User? {
@@ -64,7 +64,7 @@ public final class Chat: Pager<Message>, Identifiable {
   }
   
   var displayName: String {
-    return self.name ?? self.friend?.usernameFb ?? ""
+    return self.name ?? self.friend?.displayNameFb ?? ""
   }
   
   var displayImage: String? {
@@ -83,10 +83,14 @@ public final class Chat: Pager<Message>, Identifiable {
     return self.kind == Gql.ChatType.group
   }
   
+  var activeMembers: [Member] {
+    return members.filter({ $0.isMember})
+  }
+  
   override public func load(skip: Int, limit: Int) async -> [Message] {
     do {
       let items = try await api.fetchMessages(
-        self, pageSize: limit, currentMessageId: skip == 0 ? nil : self.items.last?.id)
+        self.id, skip: skip, limit: limit)
       return items
     } catch let err {
       Monitoring.error(err)
@@ -119,9 +123,9 @@ public final class Chat: Pager<Message>, Identifiable {
   }
   
 
-  public init(
+   init(
     id: String,
-    name: String,
+    name: String?,
     description: String? = nil,
     image: String? = nil,
     kind: Gql.ChatType,
@@ -141,22 +145,23 @@ public final class Chat: Pager<Message>, Identifiable {
     self.latestMessage = latestMessage
     self._private = _private
     self.invites = Set(invites)
+    super.init()
     Chats.current.cache.chats[id] = self
     if (kind == Gql.ChatType.directMessage), let friend = self.friend {
       Chats.current.cache.chatsByUID[friend.id] = self
     }
   }
 
-  public convenience init(_ chat: Gql.FChat) {
+   convenience init(_ chat: Gql.FChat) {
     self.init(id: chat.id,
               name: chat.name,
               description: chat.description,
               image: chat.image,
-              kind: chat.kind,
-              members: Member.fromGql(chat.members),
+              kind: try! chat.kind.value(),
               unreadCount: chat.unread_count,
-              latestMessage: chat.last_message.map {Message.get($0)},
-              _private: chat.private
+              latestMessage: chat.last_message.map({Message.get(.init(_dataDict: $0.__data))}),
+              members: Member.fromGql(chat.members.map({.init(_dataDict: $0.__data)})),
+              _private: chat._private
     )
   }
 
@@ -164,10 +169,10 @@ public final class Chat: Pager<Message>, Identifiable {
     self.image = chat.image
     self.description = chat.description
     self.name = chat.name
-    self._private = chat.chatType == ._private
-    self.members = Member.fromGql(chat.members)
+    self._private = chat._private
+    self.members = Member.fromGql(chat.members.map({.init(_dataDict: $0.__data)}))
     if let latestMessage = chat.last_message {
-      self.latestMessage = Message.get(latestMessage)
+      self.latestMessage = Message.get(.init(_dataDict: latestMessage.__data))
     }
   }
 
@@ -176,19 +181,19 @@ public final class Chat: Pager<Message>, Identifiable {
   @Published var inviting = false
 
   static func get(_ chat: Gql.FChat) -> Chat {
-    if let g = Chats.current.cache.chats[chat.chatId] {
+    if let g = Chats.current.cache.chats[chat.id] {
       g.update(chat)
       return g
     }
-    return chat(chat)
+    return Chat(chat)
   }
 
   static func get(_ id: String) -> Chat? {
     return Chats.current.cache.chats[id]
   }
   
-  static func get(uid: String) -> Thread? {
-    return Chats.current.cache.threadsByUID[uid]
+  static func get(uid: String) -> Chat? {
+    return Chats.current.cache.chatsByUID[uid]
   }
   
   static func fetch(id: String) {
@@ -204,3 +209,6 @@ public final class Chat: Pager<Message>, Identifiable {
     }
   }
 }
+
+
+

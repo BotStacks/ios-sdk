@@ -59,17 +59,19 @@ func fetchContacts() -> [String] {
 var contactCache: [String: CNContact] = [:]
 
 extension CNContact {
-  func toAppContact() -> Data {
-    return try! CNContactVCardSerialization.data(with: [self])
+  func toAppContact() -> String {
+    return String(data: try! CNContactVCardSerialization.data(with: [self]), encoding: .utf8)!
   }
   
   static func fromVCard(_ data: String) -> CNContact? {
     if let cached = contactCache[data] {
       return cached
     }
-    let contact = CNContactVCardSerialization.contacts(with: data.data(using: .utf8)).first
-    cached[data] = contact
-    return contact
+    if let contact = try? CNContactVCardSerialization.contacts(with: data.data(using: .utf8)!).first {
+      contactCache[data] = contact
+      return contact
+    }
+    return nil
   }
 }
 
@@ -85,23 +87,23 @@ extension CNContact {
     return self.phoneNumbers.map({ (type: $0.label.map({CNLabeledValue<NSString>.localizedString(forLabel: $0)}) ?? "", number: $0.value.stringValue) })
   }
   
-  var emails: [(type: String, number: String)] {
-    return self.emailAddresses.map({ Email(type: $0.label.map({CNLabeledValue<NSString>.localizedString(forLabel: $0)}) ?? "", email: $0.value as String) })
+  var emails: [(type: String, email: String)] {
+    return self.emailAddresses.map({ (type: $0.label.map({CNLabeledValue<NSString>.localizedString(forLabel: $0)}) ?? "", email: $0.value as String) })
   }
   
   var markdown: String {
     return """
       \(displayName)
-      \(numbers?.map({"[\(($0.type ?? "").isEmpty ? "" : "\($0.type!): ")\($0.number)](tel:\($0.number))"}).join("\n") ?? "")
-      \(emails?.map({"[\(($0.type ?? "").isEmpty ? "" : "\($0.type!): ")\($0.email)](mailto:\($0.email))"}).join("\n") ?? "")
+      \(numbers.map({"[\(($0.type).isEmpty ? "" : "\($0.type): ")\($0.number)](tel:\($0.number))"}).join("\n") )
+      \(emails.map({"[\(($0.type).isEmpty ? "" : "\($0.type): ")\($0.email)](mailto:\($0.email))"}).join("\n") )
       """
   }
 }
 
 extension Gql.FMessage.Attachment {
   var contact: CNContact? {
-    if self.type == .contact {
-      return self.data.map { CNContact.fromVCard($0)}
+    if self.type.value == .vcard {
+      return self.data.flatMap { CNContact.fromVCard($0)}
     }
     return nil
   }

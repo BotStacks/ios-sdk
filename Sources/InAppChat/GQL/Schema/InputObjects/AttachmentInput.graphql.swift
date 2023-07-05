@@ -17,6 +17,7 @@ public extension Gql {
       data: GraphQLNullable<String> = nil,
       duration: GraphQLNullable<Int> = nil,
       height: GraphQLNullable<Int> = nil,
+      id: ID,
       latitude: GraphQLNullable<Latitude> = nil,
       longitude: GraphQLNullable<Longitude> = nil,
       mime: GraphQLNullable<String> = nil,
@@ -29,6 +30,7 @@ public extension Gql {
         "data": data,
         "duration": duration,
         "height": height,
+        "id": id,
         "latitude": latitude,
         "longitude": longitude,
         "mime": mime,
@@ -60,6 +62,12 @@ public extension Gql {
     public var height: GraphQLNullable<Int> {
       get { __data["height"] }
       set { __data["height"] = newValue }
+    }
+
+    /// The ID of the attachment
+    public var id: ID {
+      get { __data["id"] }
+      set { __data["id"] = newValue }
     }
 
     /// The latitude of the location

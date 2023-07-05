@@ -29,11 +29,11 @@ public extension Gql {
 
       public static var __parentType: Apollo.ParentType { Gql.Objects.Mutation }
       public static var __selections: [Apollo.Selection] { [
-        .field("modMember", Bool?.self, arguments: ["input": .variable("input")]),
+        .field("modMember", Bool.self, arguments: ["input": .variable("input")]),
       ] }
 
       /// Mod a user Role in a Chat
-      public var modMember: Bool? { __data["modMember"] }
+      public var modMember: Bool { __data["modMember"] }
     }
   }
 

@@ -41,7 +41,7 @@ public extension Gql {
 
       public static var __parentType: Apollo.ParentType { Gql.Objects.Mutation }
       public static var __selections: [Apollo.Selection] { [
-        .field("registerPush", Bool?.self, arguments: [
+        .field("registerPush", Bool.self, arguments: [
           "token": .variable("token"),
           "kind": .variable("kind"),
           "fcm": .variable("fcm")
@@ -49,7 +49,7 @@ public extension Gql {
       ] }
 
       /// Registers a push token for a device
-      public var registerPush: Bool? { __data["registerPush"] }
+      public var registerPush: Bool { __data["registerPush"] }
     }
   }
 

@@ -15,6 +15,6 @@ public extension Gql {
   /// The output value is always in decimal format (53.471).
   ///
   /// The maximum decimal degrees' precision is 8. See Decimal Degrees Precision for more information.
-  typealias Longitude = String
+  typealias Longitude = Double
 
 }

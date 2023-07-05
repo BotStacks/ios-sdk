@@ -29,11 +29,11 @@ public extension Gql {
 
       public static var __parentType: Apollo.ParentType { Gql.Objects.Mutation }
       public static var __selections: [Apollo.Selection] { [
-        .field("dismissInvites", Bool?.self, arguments: ["chat": .variable("chat")]),
+        .field("dismissInvites", Bool.self, arguments: ["chat": .variable("chat")]),
       ] }
 
       /// Rejects a Chat invite for the current User
-      public var dismissInvites: Bool? { __data["dismissInvites"] }
+      public var dismissInvites: Bool { __data["dismissInvites"] }
     }
   }
 

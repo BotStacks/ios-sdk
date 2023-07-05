@@ -19,7 +19,7 @@ public extension Gql {
       email: GraphQLNullable<String> = nil,
       image: GraphQLNullable<String> = nil,
       user_id: ID,
-      username: GraphQLNullable<String> = nil
+      username: String
     ) {
       __data = InputDict([
         "access_token": access_token,
@@ -70,7 +70,7 @@ public extension Gql {
     }
 
     /// The username of the User
-    public var username: GraphQLNullable<String> {
+    public var username: String {
       get { __data["username"] }
       set { __data["username"] = newValue }
     }

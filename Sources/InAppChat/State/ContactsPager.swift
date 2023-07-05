@@ -37,8 +37,7 @@ public class ContactsPager: Pager<User> {
   }
 
   override public func load(skip: Int, limit: Int) async throws -> [User] {
-    let contacts = haveContactsPermission() ? fetchContacts() : []
-    return try await api.get(contacts: contacts)
+    return try await api.listUsers(skip: skip, limit: limit)
   }
 
 }

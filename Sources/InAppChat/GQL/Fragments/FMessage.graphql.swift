@@ -23,6 +23,7 @@ public extension Gql {
         }
         attachments {
           __typename
+          id
           type
           url
           data
@@ -119,7 +120,7 @@ public extension Gql {
       public var description: String? { __data["description"] }
       /// The image associated with the User
       public var image: String? { __data["image"] }
-      /// Whether or not this user is an AI bot or
+      /// Whether or not this user is an AI bot
       public var is_bot: Bool? { __data["is_bot"] }
       /// The online status of this user
       public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }
@@ -176,6 +177,7 @@ public extension Gql {
       public static var __parentType: Apollo.ParentType { Gql.Objects.Attachment }
       public static var __selections: [Apollo.Selection] { [
         .field("__typename", String.self),
+        .field("id", Gql.ID.self),
         .field("type", GraphQLEnum<Gql.AttachmentType>.self),
         .field("url", String.self),
         .field("data", String?.self),
@@ -188,6 +190,8 @@ public extension Gql {
         .field("longitude", Gql.Longitude?.self),
       ] }
 
+      /// The ID of the Attachment
+      public var id: Gql.ID { __data["id"] }
       /// The type of the Attachment
       public var type: GraphQLEnum<Gql.AttachmentType> { __data["type"] }
       /// The url of the file or 'data' if an arbitrary object

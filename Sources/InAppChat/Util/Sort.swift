@@ -15,7 +15,7 @@ func sortThreads(a: Chat, b: Chat) -> Bool {
   } else if b.latestMessage != nil {
     return false
   } else {
-    return a.name > b.name
+    return a.displayName > b.displayName
   }
 }
 
@@ -26,7 +26,7 @@ func sortNetworkThreads(a: Chat, b: Chat) -> Bool {
   if b.hasInvite {
     return false
   }
-  return a.members.count > b.members.count
+  return a.activeMembers.count > b.activeMembers.count
 }
 
 func sortMessages(a: Message, b: Message) -> Bool {

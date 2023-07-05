@@ -29,11 +29,11 @@ public extension Gql {
 
       public static var __parentType: Apollo.ParentType { Gql.Objects.Mutation }
       public static var __selections: [Apollo.Selection] { [
-        .field("favorite", Bool?.self, arguments: ["id": .variable("message")]),
+        .field("favorite", Bool.self, arguments: ["id": .variable("message")]),
       ] }
 
       /// Favorite a Message as the current User
-      public var favorite: Bool? { __data["favorite"] }
+      public var favorite: Bool { __data["favorite"] }
     }
   }
 

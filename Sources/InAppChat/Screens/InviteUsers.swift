@@ -16,7 +16,7 @@ public struct InviteUsers: View {
   @EnvironmentObject var navigator: Navigator
 
   let chat: Chat?
-  let state = CreateGroupState.current
+  let state = CreateChatState.current
 
   @State var selected: [User] = []
   @State var creating = false
@@ -80,7 +80,7 @@ public struct InviteUsers: View {
                   )
                   await chat.invite(users: self.selected)
                   await MainActor.run {
-                    CreateGroupState.current = nil
+                    CreateChatState.current = nil
                     navigator.goBack(total: 2)
                     navigator.navigate(chat.path)
                   }

@@ -32,8 +32,8 @@ public final class Message: ObservableObject, Identifiable {
     }
   }
   
-  var chat: Chat? {
-    return Chat.get(chatID)
+  var chat: Chat {
+    return Chat.get(chatID)!
   }
   
   @Published public var attachments: [Gql.FMessage.Attachment]?

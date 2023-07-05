@@ -1,5 +1,5 @@
 //
-//  CreateGroup.swift
+//  Createchat.swift
 //  InAppChat
 //
 //  Created by Zaid Daghestani on 2/9/23.
@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-class CreateGroupState: ObservableObject {
+class CreateChatState: ObservableObject {
 
   @Published var chat: Chat? = nil
   @Published var image: URL? = nil
@@ -19,33 +19,33 @@ class CreateGroupState: ObservableObject {
 
   func apply(_ chat: Chat) {
     self.chat = chat
-    self.image = chat.image.flatMap({ URL(string: $0) })
-    self.name = chat.name
+    self.image = chat.displayImage.flatMap({ URL(string: $0) })
+    self.name = chat.displayName
     self.description = chat.description ?? ""
     self._private = chat._private
-    self.users = chat.members
+    self.members = chat.members
   }
 
   func commit() async {
-    await self.group?.update(
-      name: name != group?.name ? name : nil,
-      description: group?.description != description ? description : nil,
-      image: group?.image != image?.absoluteString ? image : nil,
-      _private: group?._private != _private ? _private : nil
+    await self.chat?.update(
+      name: name != chat?.name ? name : nil,
+      description: chat?.description != description ? description : nil,
+      image: chat?.image != image?.absoluteString ? image : nil,
+      _private: chat?._private != _private ? _private : nil
     )
   }
 
-  static var current: CreateGroupState? = nil
+  static var current: CreateChatState? = nil
 
-  static func currentOrNew() -> CreateGroupState {
+  static func currentOrNew() -> CreateChatState {
     if current == nil {
-      current = CreateGroupState()
+      current = CreateChatState()
     }
     return current!
   }
 }
 
-public struct CreateGroup: View {
+public struct CreateChat: View {
 
   @Environment(\.iacTheme) var theme
   @EnvironmentObject var navigator: Navigator
@@ -58,12 +58,12 @@ public struct CreateGroup: View {
 
   @FocusState private var focus: Field?
 
-  @ObservedObject var state = CreateGroupState.currentOrNew()
+  @ObservedObject var state = CreateChatState.currentOrNew()
   @State var pickImage = false
 
-  public init(_ groupID: String? = nil) {
-    if let groupID = groupID, let group = Group.get(groupID) {
-      state.apply(group)
+  public init(_ chatID: String? = nil) {
+    if let chatID = chatID, let chat = Chat.get(chatID) {
+      state.apply(chat)
     }
   }
 
@@ -77,7 +77,7 @@ public struct CreateGroup: View {
         title: "Create Channel",
         onBack: {
           navigator.goBack()
-          CreateGroupState.current = nil
+          CreateChatState.current = nil
         })
       ScrollView {
         VStack {
@@ -245,7 +245,7 @@ public struct CreateGroup: View {
               Spacer()
               Button {
                 if canGoNext {
-                  if state.group != nil {
+                  if state.chat != nil {
                     Task.detached {
                       await state.commit()
                       await MainActor.run {
@@ -257,10 +257,10 @@ public struct CreateGroup: View {
                   }
                 }
               } label: {
-                if state.group != nil {
+                if state.chat != nil {
                   VStack {
                     HStack {
-                      if state.group?.updating == true {
+                      if state.chat?.updating == true {
                         Spinner().size(35)
                           .foregroundColor(theme.colors.background)
                       }

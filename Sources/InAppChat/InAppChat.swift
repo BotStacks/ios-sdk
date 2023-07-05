@@ -45,18 +45,15 @@ public class InAppChat: ObservableObject {
 
   @Published var loggingIn = false
   public func login(
-    accessToken: String, userId: String, email: String, picture: String?,
-    name: String?,
-    nickname: String?
+    accessToken: String?, userId: String, username: String, picture: String?,
+    displayName: String?
   ) async throws {
     if loggingIn { return }
     await MainActor.run {
       loggingIn = true
     }
     do {
-      let _ = try await api.login(
-        accessToken: accessToken, userId: userId, email: email,
-        picture: picture, name: name, nickname: nickname)
+      let _ = try await api.login(accessToken: accessToken, userId: userId, username: username, picture: picture, display_name: displayName)
     } catch let err {
         print("Error logging in ", err)
       Monitoring.error(err)
@@ -67,18 +64,16 @@ public class InAppChat: ObservableObject {
   }
 
   public func nftLogin(
-    contract: String,
     address: String,
     tokenID: String,
     signature: String,
     profilePicture: String,
-    username: String?
+    username: String
   ) async throws {
     if loggingIn { return }
     loggingIn = true
     let _ = try await api.nftLogin(
-      contract: contract,
-      address: address,
+      wallet: address,
       tokenID: tokenID,
       signature: signature,
       profilePicture: profilePicture,

@@ -44,7 +44,7 @@ enum Change: String {
   case change = "change"
 }
 
-func react(
+func react_impl(
   uid: String,
   reaction: String,
   reactions: inout Reactions

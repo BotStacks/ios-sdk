@@ -13,11 +13,11 @@ public class Chats: ObservableObject {
   @Published var memberships: [Member] = []
   
   var dms: [Chat] {
-    return self.memberships.filter { it.chat.kind == Gql.ChatType.directMessage && it.isMember }
+    return self.memberships.filter { $0.chat.kind == Gql.ChatType.directMessage && $0.isMember }.map(\.chat)
   }
   
   var groups: [Chat] {
-    return self.memberships.filter { it.chat.kind == Gql.ChatType.group && it.isMember }
+    return self.memberships.filter { $0.chat.kind == Gql.ChatType.group && $0.isMember }.map(\.chat)
   }
   
   let messages = ThreadsPager()
@@ -67,7 +67,7 @@ public class Chats: ObservableObject {
       if let pushToken = pushToken {
         Task.detached {
           do {
-            try await api.registerPushToken(pushToken)
+            let _ = try await api.registerPushToken(pushToken)
           } catch let err {
             Monitoring.error(err)
           }
@@ -92,11 +92,16 @@ public class Chats: ObservableObject {
   public func loadGroupInvites() async throws {
     do {
       let invites = try await api.getInvites()
-      invites.forEach {
-        var i = self.invites[$0.groupId] ?? []
-        i.append($0.by)
-        self.invites[$0.groupId] = i
+      await MainActor.run {
+        invites.forEach {
+          let chat = Chat.get(.init(_dataDict: $0.chat.__data))
+          let user = User.get(.init(_dataDict: $0.user.__data))
+          var i = self.invites[chat.id] ?? []
+          i.append(user.id)
+          self.invites[chat.id] = i
+        }
       }
+      
     } catch let err {
       Monitoring.error(err)
     }
@@ -112,11 +117,11 @@ public class Chats: ObservableObject {
   func count(_ list: List) -> Int {
     switch list {
     case .users:
-      return users.items.reduce(0) {
+      return dms.reduce(0) {
         return $0 + $1.unreadCount
       }
     case .groups:
-      return groups.items.reduce(0) {
+      return groups.reduce(0) {
         return $0 + $1.unreadCount
       }
     case .threads:

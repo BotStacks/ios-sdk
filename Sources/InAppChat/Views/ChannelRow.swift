@@ -70,7 +70,7 @@ public struct ChannelRow: View {
 
               VStack(alignment: .leading, spacing: 0) {
                 HStack(alignment: .center) {
-                  Text(chat.name)
+                  Text(chat.displayName)
                     .lineLimit(1)
                     .font(theme.fonts.title3)
                   PrivacyPill(_private: chat._private)
@@ -82,7 +82,7 @@ public struct ChannelRow: View {
                   .multilineTextAlignment(.leading)
                 Spacer(minLength: 0)
                 HStack {
-                  ChatCount(count: chat.participants.count)
+                  ChatCount(count: chat.activeMembers.count)
                   Spacer()
                 }
               }.padding(.leading, 13.0)
@@ -112,5 +112,16 @@ public struct ChannelRow: View {
       .cornerRadius(15.0)
     }
     .padding(.horizontal, 16)
+  }
+}
+
+public struct ChatCount: View {
+  
+  let count: Int
+  @Environment(\.iacTheme) var theme
+  
+  public var body: some View {
+    Text("\(count))")
+      .foregroundColor(theme.colors.text)
   }
 }

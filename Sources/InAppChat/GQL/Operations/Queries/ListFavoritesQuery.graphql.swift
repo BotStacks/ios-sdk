@@ -122,7 +122,7 @@ public extension Gql {
           public var description: String? { __data["description"] }
           /// The image associated with the User
           public var image: String? { __data["image"] }
-          /// Whether or not this user is an AI bot or
+          /// Whether or not this user is an AI bot
           public var is_bot: Bool? { __data["is_bot"] }
           /// The online status of this user
           public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }

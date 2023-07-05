@@ -33,18 +33,18 @@ public struct ChatRoute: View {
       let c = Chat.get(cid)
       _chat = State(initialValue: c)
       if c == nil {
-        fetchGroup(gid)
+        fetchChat(cid)
       }
     }
     if let mid = mid {
       let m = Message.get(mid)
       _message = State(initialValue: m)
-      let t = m?.thread
-      _thread = State(initialValue: t)
+      let t = m?.chat
+      _chat = State(initialValue: t)
       if m == nil {
         fetchMessage(mid)
       } else if t == nil {
-        fetchThread(m!.threadID)
+        fetchChat(m!.chatID)
       }
     }
   }
@@ -55,10 +55,7 @@ public struct ChatRoute: View {
         let m = try await api.get(message: id)
         await MainActor.run {
           self.message = m
-          self.thread = m.thread
-        }
-        if m.thread == nil {
-          fetchThread(m.threadID)
+          self.chat = m.chat
         }
       } catch let err {
         Monitoring.error(err)
@@ -69,12 +66,12 @@ public struct ChatRoute: View {
     }
   }
   
-  func fetchThread(_ id: String) {
+  func fetchChat(_ id: String) {
     Task {
       do {
-        let t = try await api.get(thread: id)
+        let t = try await api.get(chat: id)
         await MainActor.run {
-          self.thread = t
+          self.chat = t
         }
       } catch let err {
         Monitoring.error(err)
@@ -88,25 +85,9 @@ public struct ChatRoute: View {
   func fetchUser(_ id: String) {
     Task {
       do {
-        let thread = try await api.getThread(forUser: id)
+        let chat = try await api.dm(user: id)
         await MainActor.run {
-          self.thread = thread
-        }
-      } catch let err {
-        Monitoring.error(err)
-        await MainActor.run {
-          failed = true
-        }
-      }
-    }
-  }
-  
-  func fetchGroup(_ id: String) {
-    Task {
-      do {
-        let thread = try await api.getThread(forGroup: id)
-        await MainActor.run {
-          self.thread = thread
+          self.chat = chat
         }
       } catch let err {
         Monitoring.error(err)
@@ -121,11 +102,11 @@ public struct ChatRoute: View {
   @Environment(\.iacTheme) var theme
 
   public var body: some View {
-    if let thread = thread {
-      ChatRoom(thread: thread, message: message)
+    if let chat = chat {
+      ChatRoom(chat: chat, message: message)
     } else {
       VStack {
-        Header(title: user?.usernameFb ?? "")
+        Header(title: user?.username ?? "")
         ZStack {
           if failed {
             Text("Chat not found")

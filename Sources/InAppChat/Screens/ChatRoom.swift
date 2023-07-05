@@ -55,7 +55,7 @@ public struct ChatRoom: View {
         }
       }.padding(.horizontal, 16.0)
         .padding(.top, 12.0)
-      ActionItem(image: AssetImage("chat-dots"), text: "Reply in Thread") {
+      ActionItem(image: AssetImage("chat-dots"), text: "Reply in chat") {
         navigator.navigate("/message/\(messageForAction!.id)")
         messageForAction = nil
       }
@@ -144,7 +144,7 @@ public struct ChatRoom: View {
       case .file:
         return AnyView(
           DocumentPicker {
-            chat.send(file: $0, inReplyTo: message)
+            chat.send(file: File(url: $0), type: .file, inReplyTo: message)
           }
         )
       case .gif:
@@ -165,28 +165,28 @@ public struct ChatRoom: View {
 
   public var body: some View {
     ZStack {
-      MessageList(thread: thread, onLongPress: { messageForAction = $0 })
+      MessageList(chat: chat, onLongPress: { messageForAction = $0 })
       Header(
         title: "",
-        onMenu: chat.group != nil
+        onMenu: chat.isGroup
           ? {
             menu = true
           } : nil
       ) {
         HStack {
-          Avatar(url: chat.image, size: 35, group: chat.group != nil)
+          Avatar(url: chat.image, size: 35, group: chat.isGroup)
           VStack(alignment: .leading, spacing: 0) {
-            Text(chat.name)
+            Text(chat.displayName)
               .lineLimit(1)
               .font(theme.fonts.title2)
               .foregroundColor(theme.colors.text)
-            if let group = chat.group {
-              GroupCount(count: group.participants.count)
+            if chat.isGroup {
+              GroupCount(count: chat.activeMembers.count)
             }
           }
         }.fixedSize()
       }.position(x: geometry.width / 2.0, y: (geometry.insets.top + Header<Image>.height) / 2.0)
-      MessageInput(thread: thread, replyingTo: message, onMedia: { media = true })
+      MessageInput(chat: chat, replyingTo: message, onMedia: { media = true })
         .position(x: geometry.width / 2.0, y: geometry.height - geometry.insets.bottom - 31.0)
       HappyPanel(isOpen: $messageForEmojiKeyboard.mappedToBool()) {
         messageForEmojiKeyboard?.react($0)
@@ -202,8 +202,8 @@ public struct ChatRoom: View {
     .sheet(isPresented: $selectMedia.mappedToBool()) {
       pickers
     }.sheet(isPresented: $menu) {
-      if let group = chat.group {
-        GroupDrawer(group)
+      if chat.isGroup {
+        GroupDrawer(chat)
       }
     }
   }
@@ -211,13 +211,15 @@ public struct ChatRoom: View {
   func onVideo(_ url: URL) {
     print("On Video", url.absoluteString)
     chat.send(
-      attachment: .init(url: url.absoluteString, kind: .video, type: nil),
+      file: File(url: url),
+      type: .video,
       inReplyTo: self.message)
   }
 
   func onImage(_ url: URL) {
     chat.send(
-      attachment: .init(url: url.absoluteString, kind: .image, type: nil),
+      file: File(url: url),
+      type: .image,
       inReplyTo: message)
   }
 }

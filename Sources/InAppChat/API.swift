@@ -47,7 +47,7 @@ struct APIError: Error {
 class Api: InterceptorProvider, ApolloInterceptor {
   var id: String = UUID().uuidString
   
-  var client: ApolloClient?
+  var client: ApolloClient!
 
   let deviceId: String
   var cfg: JSON!
@@ -107,15 +107,15 @@ class Api: InterceptorProvider, ApolloInterceptor {
         guard let self = self else {
           return
         }
-        Chats.current.onMeEvent(data)
+        Chats.current.onMeEvent(data.me)
       }
       subscriptions.append(subme)
     }
   };
   
   func unsubscribe() {
-    for (let sub in subscriptions) {
-      sub()
+    for sub in subscriptions {
+      sub.cancel()
     }
     subscriptions.removeAll()
   }
@@ -142,10 +142,8 @@ class Api: InterceptorProvider, ApolloInterceptor {
     if let token = self.authToken {
       request.addHeader(name: "Authorization", value: "Bearer \(token)")
     }
-    if let apiKey = InAppChat.shared.apiKey {
-      request.addHeader(name: "X-API-Key", value: apiKey)
-      request.addHeader(name: "X-Device-ID", value: deviceId)
-    }
+    request.addHeader(name: "X-API-Key", value: InAppChat.shared.apiKey)
+    request.addHeader(name: "X-Device-ID", value: deviceId)
   }
 
   func interceptors<Operation>(for operation: Operation) -> [ApolloInterceptor]
@@ -153,7 +151,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
     return [
       self,
       MaxRetryInterceptor(),
-      NetworkFetchInterceptor(client: self.client),
+      NetworkFetchInterceptor(client: URLSessionClient()),
       ResponseCodeInterceptor(),
       MultipartResponseParsingInterceptor(),
       JSONResponseParsingInterceptor(),
@@ -173,25 +171,36 @@ class Api: InterceptorProvider, ApolloInterceptor {
     self.client = makeClient()
   }
   
-  func getGroups(skip: Int = 0, limit: Int = 20, search: String? = nil) async throws -> [Chat] {
-    let res = try await client?.fetchAsync(query: Gql.ListGroupsQuery(count: skip, offset: limit, search: search))
-    return res.groups.map(Chat.get)
+  func getGroups(skip: Int = 0, limit: Int = 20) async throws -> [Chat] {
+    let res = try await client.fetchAsync(query: Gql.ListGroupsQuery(count: .some(skip), offset: .some(limit)))
+    let chats = await MainActor.run {
+      return res.groups.map {
+        return Chat.get(Gql.FChat(_dataDict: $0.__data))
+      }
+    }
+    return chats
   }
   
   func fetchMessages(_ chat: String, skip: Int = 0, limit: Int = 40, search: String? = nil) async throws
     -> [Message]
   {
     if let client = client {
-      let res = try await client.fetchAsync(query: Gql.ListMessagesQuery(chat: chat, count: pageSize, offset: offset, search: search))
-      return res.messages.map(Message.get)
+      let res = try await client.fetchAsync(query: Gql.ListMessagesQuery(chat: chat, count: .some(limit), offset: .some(skip), search: search.map({.some($0)}) ?? .none))
+      let messages = await MainActor.run {
+        return res.messages.map {
+          let _ = User.get(Gql.FUser(_dataDict: $0.user.__data))
+          return Message.get(Gql.FMessage(_dataDict: $0.__data))
+        }
+      }
+      return messages
     } else {
       return []
     }
   }
   
   func send(input: Gql.SendMessageInput) async throws -> Message {
-    let send = try await client?.fetchAsync(query: Gql.SendMessageMutation(input: input))
-    return Message.get(send.sendMessage)
+    let send = try await client.performAsync(mutation: Gql.SendMessageMutation(input: input))
+    return Message.get(.init(_dataDict: send.sendMessage.__data))
   }
 
   func send(text: String, to chat: String, inReplyTo parent: String?)
@@ -199,9 +208,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
     -> Message
   {
     return try await send(input: Gql.SendMessageInput(
-      text: text,
-      chat: chat,
-      parent: parent
+      chat: chat, parent: parent.gqlSomeOrNone, text: .some(text)
     ))
   }
 
@@ -217,119 +224,134 @@ class Api: InterceptorProvider, ApolloInterceptor {
     // TODO
   }
 
-  func send(attachment: Gql.FMessage.Attachment, to chat: String, inReplyTo parent: String?)
+  func send(attachment: Gql.AttachmentInput, to chat: String, inReplyTo parent: String?)
     async throws -> Message
   {
-    return try await self.send(input: Gql.SendMessageInput(chat: chat, attachments: [attachment]))
+    return try await self.send(input: Gql.SendMessageInput(attachments: [attachment], chat: chat))
   }
   
   func updateGroup(input: Gql.UpdateGroupInput) async throws -> Bool {
-    let res = try await self.client?.fetchAsync(query: Gql.UpdateGroupMutation(
+    let res = try await self.client.performAsync(mutation: Gql.UpdateGroupMutation(
       input: input
     ))
     return res.updateGroup
   }
 
   func update(group: String, image: URL) async throws -> Bool {
-    return try await self.updateGroup(input: Gql.UpdateGroupInput(input: id: group, image: image))
+    let url = try await self.uploadFile(file: File(url: image))
+    return try await self.updateGroup(input: Gql.UpdateGroupInput(id: group, image: .some(url)))
   }
 
   func update(group: String, name: String?, description: String?, image: URL?, _private: Bool?)
     async throws -> Bool
   {
-    return try await self.updateGroup(input: Gql.UpdateGroupInput(id: group, name: name, description: description, image: image, _private: _private))
+    var _image: String? = nil
+    if let image = image {
+      _image = try await self.uploadFile(file: File(url: image))
+    }
+    return try await self.updateGroup(input: Gql.UpdateGroupInput(_private: _private.map({.some($0)}) ?? .none, description: description.map({.some($0)}) ?? .none, id: group, image: _image.map({.some($0)}) ?? .none, name: name.map({.some($0)}) ?? .none))
   }
 
-  func createChat(name: String, description: String?, image: URL?, private _private: Bool)
+  func createChat(name: String, description: String?, image: URL?, private _private: Bool?)
     async throws
     -> Chat
   {
-    let res = try await self.client?.fetchAsync(query: Gql.CreateGroupInput(name: name, description: description, image: image, _private: _private))
-    return Chat.get(res.createGroup)
+    var _image: String? = nil
+    if let image = image {
+      _image = try await self.uploadFile(file: File(url: image))
+    }
+    let res = try await self.client.performAsync(mutation: Gql.CreateGroupMutation(input:  Gql.CreateGroupInput(_private: _private.gqlSomeOrNone, description: description.gqlSomeOrNone, image: _image.gqlSomeOrNone, name: name)))
+    if let g = res.createGroup {
+      return Chat.get(Gql.FChat.init(_dataDict: g.__data))
+    }
+    throw APIError(msg: "No group returned", critical: true)
   }
 
-  func delete(group: String) async throws {
-    try await self.client?.fetchAsync(query: Gql.DeleteGroupMutation(id: group))
+  func delete(group: String) async throws -> Bool {
+    let res = try await self.client.performAsync(mutation: Gql.DeleteGroupMutation(id: group))
+    return res.deleteGroup
   }
 
   func join(group: String) async throws -> Member {
-    let res = try await self.client?.fetchAsync(query: Gql.JoinChatMutation(id: group))
+    let res = try await self.client.performAsync(mutation: Gql.JoinChatMutation(id: group))
     if let fmember = res.join {
-      return Member.fromGql(fmember)
+      return Member.fromGql(.init(_dataDict: fmember.__data))
     } else {
-      throw APIError(msg: "Unable to join group. It may be private. Request an invitation.")
+      throw APIError(msg: "Unable to join group. It may be private. Request an invitation.", critical: false)
     }
   }
 
-  func leave(group: String) async throws {
-    try await self.client?.fetchAsync(query: Gql.LeaveChatMutation(id: group))
+  func leave(group: String) async throws -> Bool {
+    let res = try await self.client.performAsync(mutation: Gql.LeaveChatMutation(id: group))
+    return res.leave
   }
 
-  func dismiss(group: String, admin: String) async throws {
-    try await manage(gdroup: group, admin: admin, isPromote: false)
+  func dismiss(group: String, admin: String) async throws -> Bool {
+    return try await manage(group: group, admin: admin, isPromote: false)
   }
 
-  func promote(group: String, admin: String) async throws {
-    try await manage(group: group, admin: admin, isPromote: true)
+  func promote(group: String, admin: String) async throws -> Bool {
+    return try await manage(group: group, admin: admin, isPromote: true)
   }
 
-  func manage(group: String, admin: String, isPromote: Bool) async throws {
-    try await self.client?.fetchAsync(query: Gql.ModMemberMutation(input: Gql.ModMemberInput(chat: group, user: admin, role: isPromote ? Gql.MemberRole.admin : Gql.MemberRole.member)))
+  func manage(group: String, admin: String, isPromote: Bool) async throws -> Bool {
+    let res = try await self.client.performAsync(mutation: Gql.ModMemberRoleMutation(input: Gql.ModMemberInput(chat: group, role: .some(.case(isPromote ? Gql.MemberRole.admin : Gql.MemberRole.member)), user: admin)))
+    return res.modMember
   }
 
-  func edit(message: String, text: String) async throws {
-    let _ = try await self.client?.fetchAsync(query: Gql.UpdateMessageMutation(input: Gql.UpdateMessageInput(id: message, text: text)))
+  func edit(message: String, text: String) async throws -> Bool {
+    let edit = try await self.client.performAsync(mutation: Gql.UpdateMessageMutation(input: Gql.UpdateMessageInput(id: message, text: .some(text))))
+    return edit.updateMessage
   }
 
-  func delete(message: String) async throws {
-    let _ = try await client?.fetchAsync(query: Gql.DeleteMessageMutation(id: message))
+  func delete(message: String) async throws -> Bool {
+    return (try await client.performAsync(mutation: Gql.DeleteMessageMutation(id: message))).removeMessage
   }
 
-  func favorite(message: Message, add: Bool) async throws {
+  func favorite(message: Message, add: Bool) async throws -> Bool {
     if (add) {
-      let _ = try await client?.fetchAsync(query: Gql.FavoriteMutation(message: message.id))
+      return (try await client.performAsync(mutation: Gql.FavoriteMutation(message: message.id))).favorite
     } else {
-      let _ = try await client?.fetchAsync(query: Gql.UnfavoriteMutation(message: message.id))
+      return (try await client.performAsync(mutation: Gql.UnfavoriteMutation(message: message.id))).unfavorite
     }
   }
 
   func favorites(skip: Int = 0, limit: Int = 20) async throws -> [Message] {
-    let res = try await client?.fetchAsync(query: Gql.ListFavoritesQuery(offset: skip, count: limit))
-    return res.favorites.map(Message.get)
+    let res = try await client.fetchAsync(query: Gql.ListFavoritesQuery(count: .some(limit), offset: .some(skip)))
+    return res.favorites.map{ Message.get(.init(_dataDict: $0.__data))}
   }
 
-  func react(to message: String, reaction: String) async throws {
-    let _ = try await client?.fetchAsync(query: Gql.ReactMutation(id: message, reaction: reaction))
+  func react(to message: String, reaction: String) async throws -> Bool {
+    return (try await client.performAsync(mutation: Gql.ReactMutation(id: message, reaction: .some(reaction)))).react
   }
 
   func getInvites() async throws -> [Gql.GetInvitesQuery.Data.Invite] {
-    let res = try await client?.fetchAsync(query: Gql.GetInvitesQuery())
+    let res = try await client.fetchAsync(query: Gql.GetInvitesQuery())
     return res.invites
   }
 
-  func dismissInvites(for chat: String) async throws {
-    let _ = try await client?.fetchAsync(query: Gql.DismissInvitesMutation(chat:chat))
+  func dismissInvites(for chat: String) async throws -> Bool {
+    return try await client.performAsync(mutation: Gql.DismissInvitesMutation(chat:chat)).dismissInvites
   }
 
   func invite(users: [String], to group: String) async throws -> [Member] {
-    let res = try await self.client?.fetchAsync(query: Gql.InviteUsersMutation(chat: group, users: users))
-    return res.inviteMany.map(Member.fromGql)
+    let res = try await self.client.performAsync(mutation: Gql.InviteUsersMutation(chat: group, users: users))
+    return res.inviteMany.map{Member.fromGql(.init(_dataDict: $0.__data))}
   }
 
   func accept(invite toChat: String) async throws -> Member {
-    return self.join(group: toChat)
+    return try await self.join(group: toChat)
   }
 
   func getSharedMedia(user: String) async throws -> [Message] {
 //    let msgs = try await DefaultAPI.getUserMessages(uid: user, skip: 0, limit: 10, msgType: .image)
 //    return msgs.map(Message.get)
+    return []
   }
 
-  func onLogin(_ auth: Gql.LoginMutation.Data) async throws {
-    onToken(
-      accessToken: auth.token.accessToken, refreshToken: auth.token.refreshToken,
-      tokenExpiresAt: Date().addingTimeInterval(auth.token.expiresIn))
-    try await onUser(User.get(auth.user))
+  func onLogin(_ token: String, user: User) async throws {
+    onToken(token)
+    try await onUser(user)
   }
 
   func onUser(_ user: User) async throws {
@@ -345,139 +367,160 @@ class Api: InterceptorProvider, ApolloInterceptor {
     }
   }
 
-  func onToken(accessToken: String, refreshToken: String?, tokenExpiresAt: Date) {
-    self.authToken = accessToken
-    self.refreshToken = refreshToken
-    self.tokenExpiresAt = tokenExpiresAt
+  func onToken(_ token: String) {
+    self.authToken = token
   }
 
   func login(
-    accessToken: String,
+    accessToken: String?,
     userId: String,
-    email: String,
+    username: String,
     picture: String?,
-    name: String?,
-    nickname: String?
+    display_name: String?
   ) async throws -> User {
-    let res = try await self.client?.fetchAsync(
-      query: Gql.LoginMutation(input:
-        .init(
-        userId: userId,
-        accessToken: accessToken, email: email, picture: picture, name: name,
-        nickname: nickname, deviceId: deviceId, deviceType: .ios)
+    let res = try await self.client.performAsync(
+      mutation: Gql.LoginMutation(
+        input: Gql.LoginInput(
+          access_token: accessToken.gqlSomeOrNone, device: .none,
+          display_name: display_name.gqlSomeOrNone, email: .none, image: picture.gqlSomeOrNone, user_id: userId,
+          username: username
+        )
       )
     )
-    
-    try await onLogin(res.login)
-    return User.get(res.user)
+    if let login = res.login {
+      let user = User.get(.init(_dataDict: login.user.__data))
+      try await onLogin(login.token, user: user)
+      return user
+    } else {
+      throw APIError(msg: "Failed to login. No result.", critical: true)
+    }
   }
 
   public func nftLogin(
-    contract: String,
-    address: String,
+    wallet: String,
     tokenID: String,
     signature: String,
-    profilePicture: String,
-    username: String?
+    profilePicture: String?,
+    username: String
   ) async throws -> User {
-    let res = try await self.client?.fetchAsync(
-      query: Gql.EthLoginMutation(
-        input: Gql.EthLoginInput(
-        address: address, contract: contract, signature: signature, tokenID: tokenID,
-        username: username, profilePicture: profilePicture))
+    let res = try await self.client.performAsync(
+      mutation: Gql.EthLoginMutation(
+        input:
+          Gql.EthLoginInput(
+            device: .none, image: profilePicture.gqlSomeOrNone, signed_message: signature,
+            token_id: tokenID, username: username, wallet: wallet))
       )
-    try await onLogin(res.ethLogin)
-    return User.get(res.user)
+    if let login = res.ethLogin {
+      let user = User.get(.init(_dataDict: login.user.__data))
+      try await onLogin(login.token, user: user)
+      return user
+    } else {
+      throw APIError(msg: "Eth login failed. No response data", critical: true)
+    }
   }
 
   func get(user: String) async throws -> User {
-    let res = try await client?.fetchAsync(query: Gql.GetUserQuery(id: user))
+    let res = try await client.fetchAsync(query: Gql.GetUserQuery(id: user))
     if let fuser = res.user {
-      return User.get(fuser)
+      return User.get(.init(_dataDict: fuser.__data))
     } else {
       throw APIError(msg: "User not found", critical: false)
     }
   }
 
   func logout() async throws {
-    _ = try await AuthAPI.logout()
-    self.refreshToken = nil
+    _ = try await client.performAsync(mutation: Gql.LogoutMutation())
     self.authToken = nil
-    self.tokenExpiresAt = nil
   }
 
-  func block(user: String) async throws {
-    _ = try await client?.fetchAsync(query: Gql.BlockMutation(user: user))
+  func block(user: String) async throws -> Bool {
+    let res = try await client.performAsync(mutation: Gql.BlockMutation(user: user))
+    return res.block
   }
-  func unblock(user: String) async throws {
-    _ = try await client?.fetchAsync(query: Gql.UnblockMutation(user: user))
-  }
-
-  func updateSetting(notifications: NotificationSetting) async throws {
-    _ = try await client?.fetchAsync(query: Gql.UpdateProfileInput(notification_settings: notifications))
+  func unblock(user: String) async throws -> Bool {
+    let res = try await client.performAsync(mutation: Gql.UnblockMutation(user: user))
+    return res.unblock
   }
 
-  func update(availability: OnlineStatus) async throws {
-    _ = try await client?.fetchAsync(query: Gql.UpdateProfileInput(status: notifications))
+  func updateSetting(notifications: NotificationSetting) async throws -> Bool {
+    let res = try await client.performAsync(mutation: Gql.UpdateProfileMutation(input: Gql.UpdateProfileInput(notification_setting: .some(.case(notifications)))))
+    return res.updateProfile
   }
 
-  func update(chat: String, notifications: NotificationSetting) async throws {
-    _ = try await client?.fetchAsync(query: Gql.SetNotificationSettingMutation(chat: chat, setting: notifications))
+  func update(availability: OnlineStatus) async throws  -> Bool {
+    let res = try await client.performAsync(mutation: Gql.UpdateProfileMutation(input: Gql.UpdateProfileInput(status: .some(.case(availability)))))
+    return res.updateProfile
   }
 
-  func get(contacts: [String]) async throws {
-    let _ = try await client?.fetchAsync(query: Gql.SyncContactsMutation(numbers: contacts))
+  func update(chat: String, notifications: NotificationSetting) async throws -> Bool {
+    let res = try await client.performAsync(mutation: Gql.SetNotificationSettingMutation(chat: chat, setting: .case(notifications)))
+    return res.setNotificationSetting
+  }
+
+  func get(contacts: [String]) async throws -> Bool {
+    let res = try await client.performAsync(mutation: Gql.SyncContactsMutation(numbers: contacts))
+    return res.syncContacts
   }
 
   func getReplyThreads(skip: Int = 0, limit: Int = 20) async throws -> [Message] {
 //    return try await ChatAPI.getReplyThreads(limit: limit, skip: skip).map(Message.get)
+    return []
   }
 
   func get(chat: String) async throws -> Chat {
-    let res = try await self.client?.fetchAsync(query: Gql.GetChatQuery(id: id))
+    let res = try await self.client.fetchAsync(query: Gql.GetChatQuery(id: id))
     if let fchat = res.chat {
-      return Chat.get(fchat)
+      return Chat.get(.init(_dataDict: fchat.__data))
     } else {
       throw APIError(msg: "Chat not found", critical: false)
     }
   }
 
   func get(message: String) async throws -> Message {
-    let res = try await self.client?.fetchAsync(query: Gql.GetMessageQuery(id: message))
+    let res = try await self.client.fetchAsync(query: Gql.GetMessageQuery(id: message))
     if let fmessage = res.message {
-      return Message.get(fmessage)
+      return Message.get(.init(_dataDict: fmessage.__data))
     } else {
       throw APIError(msg: "Message not found", critical: false)
     }
   }
   
   func dm(user: String) async throws -> Chat {
-    let res = try await self.client?.fetchAsync(query: Gql.DMMutation(user: user))
+    let res = try await self.client.performAsync(mutation: Gql.DMMutation(user: user))
     if let dm = res.dm {
-      return Chat.get(dm)
+      return Chat.get(.init(_dataDict: dm.__data))
     } else {
       throw APIError(msg: "Unable to dm user", critical: true)
     }
   }
 
   func getReplies(for message: String, skip: Int = 0, limit: Int = 20) async throws -> [Message] {
-    let res = try await self.client?.fetchAsync(query: Gql.ListRepliesQuery(message: message, skip: skip, limit: limit))
-    return res.replies.map(Message.get)
+    let res = try await self.client.fetchAsync(query: Gql.ListRepliesQuery(message: message, skip: .some(skip), limit: .some(limit)))
+    return res.replies.map {
+      let user = User.get(.init(_dataDict: $0.user.__data))
+      return Message.get(.init(_dataDict: $0.__data))
+    }
   }
 
-  func registerPushToken(_ token: String) async throws {
-    let _ = try await client?.performAsync(mutation: Gql.RegisterPushMutation(token: token, kind: Gql.DeviceType.ios, fcm: false))
+  func registerPushToken(_ token: String) async throws -> Bool {
+    let res = try await client.performAsync(mutation: Gql.RegisterPushMutation(token: token, kind: .case(Gql.DeviceType.ios), fcm: .some(false)))
+    return res.registerPush
   }
 
   func registerFCMToken(_ token: String) async throws {
-    let _ = try await client?.performAsync(mutation: Gql.RegisterPushMutation(token: token, kind: Gql.DeviceType.ios, fcm: true))
+    let _ = try await client.performAsync(mutation: Gql.RegisterPushMutation(token: token, kind: .case(Gql.DeviceType.ios), fcm: .some(true)))
   }
 
-  func start(_ id: String) async throws -> User {
-    let res = try await client?.fetchAsync(query: Gql.GetMeQuery())
-    let user = User.get(res.me)
+  func start() async throws -> User {
+    let res = try await client.fetchAsync(query: Gql.GetMeQuery())
+    let user = User.get(.init(_dataDict:res.me.__data))
     User.current = user
     return user
+  }
+  
+  func listUsers(skip: Int = 0, limit: Int = 20) async throws -> [User] {
+    let res = try await client.fetchAsync(query: Gql.ListUsersQuery(count: .some(limit), offset: .some(skip)))
+    return res.users.map { User.get(.init(_dataDict: $0.__data))}
   }
 
   func uploadFile(file: File) async throws -> String {
@@ -485,8 +528,8 @@ class Api: InterceptorProvider, ApolloInterceptor {
     multipart.add(
       key: "file",
       fileName: file.name,
-      fileMimeType: url.mimeType(),
-      fileData: Data(contentsOf: file.url)
+      fileMimeType: file.mimeType,
+      fileData: try Data(contentsOf: file.url)
     )
     
     /// Create a regular HTTP URL request & use multipart
@@ -500,11 +543,11 @@ class Api: InterceptorProvider, ApolloInterceptor {
     /// Fire the request using URL sesson or anything else...
     let (data, response) = try await URLSession.shared.data(for: request)
     
-    let json = try JSONSerialization.jsonObject(with: data, options: nil)
-    if let url = json["url"] as String {
+    
+    if let json = try JSONSerialization.jsonObject(with: data, options: []) as? Dictionary<String, Any>,  let url = json["url"].flatMap({$0 as? String}) {
       return url
     } else {
-      throw APIError(msg: "Unknown upload response \(String(data: data, encoding: .utf8))")
+      throw APIError(msg: "Unknown upload response \(response.debugDescription) \(String(data: data, encoding: .utf8) ?? "")", critical: true)
     }
   }
 }
@@ -517,5 +560,11 @@ extension UserDefaults {
 
   func date(forKey key: String) -> Date? {
     return self.value(forKey: key) as? Date
+  }
+}
+
+extension Optional {
+  var gqlSomeOrNone: GraphQLNullable<Wrapped> {
+    return self.map({.some($0)}) ?? .none
   }
 }

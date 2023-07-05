@@ -29,7 +29,7 @@ public final class User: ObservableObject, Identifiable {
   }
 
   public var haveChatWith: Bool {
-    return Chats.current.users.items.contains(where: { $0.user?.id == self.id })
+    return Chats.current.users.contains(where: { $0.id == self.id })
   }
 
   public init(
@@ -43,7 +43,6 @@ public final class User: ObservableObject, Identifiable {
     blocked: Bool = false
   ) {
     self.id = id
-    self.email = email
     self.username = username
     self.displayName = displayName
     self.description = description
@@ -52,7 +51,6 @@ public final class User: ObservableObject, Identifiable {
     self.status = status
     self.blocked = blocked
     Chats.current.cache.user[id] = self
-    fetch()
   }
 
   public static var current: User? = nil
@@ -63,34 +61,29 @@ public final class User: ObservableObject, Identifiable {
   }
 
   var blocking = false
-
-  init(_ user: Gql.FUser) {
-    self.init(
-      id: user.id,
-      username: user.username,
-      lastSeen: user.last_seen.toDate()!.date,
-      description: user.description,
-      avatar: user.image,
-      blocked: Chat.current.settings.blocked.contains(user.id)
-    )
-    self.id = user.eRTCUserId
-    self.username = user.username
-    self.displayName = user.display_name
-    self.lastSeen = user.last_seen.toDate()!.date
-    self.image = user.image
-    self.status = user.status
-    self.blocked = Chats.current.settings.blocked.contains(user.eRTCUserId)
-    self.update(user)
-    Chats.current.cache.user[id] = self
-    fetch()
+  
+  func update(username: String, display_name: String?, last_seen: Date, image: String?, status: OnlineStatus) {
+    self.username = username
+    self.displayName = display_name
+    self.lastSeen = last_seen
+    self.avatar = image
+    self.status = status
   }
 
   static func get(_ user: Gql.FUser) -> User {
-    if let u = get(user.eRTCUserId) {
-      u.update(user)
+    if let u = get(user.id) {
+      u.update(username: user.username, display_name: user.display_name, last_seen: user.last_seen,
+               image: user.image, status: user.status.value())
       return u
     }
-    return User(user)
+    return User(  id: user.id,
+                  username: user.username,
+                  displayName: user.display_name,
+                  description: user.description,
+                  avatar: user.image,
+                  lastSeen: user.last_seen,
+                  status: user.status.value(),
+                  blocked: Chats.current.blocked.includes(user.id))
   }
 
   static func get(_ id: String) -> User? {

@@ -30,8 +30,8 @@ public struct MessageInput: View {
 
   @ObservedObject var chat: Chat
 
-  init(thread: Thread, replyingTo: Message?, onMedia: @escaping () -> Void) {
-    self._thread = ObservedObject(initialValue: thread)
+  init(chat: Chat, replyingTo: Message?, onMedia: @escaping () -> Void) {
+    self._chat = ObservedObject(initialValue: chat)
     self.onMedia = onMedia
     self.replyingTo = replyingTo
   }
@@ -80,7 +80,7 @@ public struct MessageInput: View {
         .cornerRadius(22)
         Button {
           if !text.isEmpty {
-            thread.send(text, inReplyTo: replyingTo)
+            chat.send(text, inReplyTo: replyingTo)
             text = ""
           }
         } label: {

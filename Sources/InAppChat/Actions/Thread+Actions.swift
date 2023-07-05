@@ -2,7 +2,7 @@ import Contacts
 import Photos
 import PhotosUI
 
-extension Thread {
+extension Chat {
 
   func send(_ text: String, inReplyTo: Message?) {
     let m = Message.init(
@@ -20,8 +20,8 @@ extension Thread {
       do {
         let newMessage = try await api.send(
           text: text,
-          to: self,
-          inReplyTo: inReplyTo
+          to: self.id,
+          inReplyTo: inReplyTo?.id
         )
         publish {
           self.sending.remove(element: m)
@@ -38,15 +38,15 @@ extension Thread {
     }
   }
 
-  func send(attachment: Gql.FMessage.Attachment, inReplyTo: Message?) {
+  func send(attachment: Gql.AttachmentInput, inReplyTo: Message?) {
     let m = Message.init(
       id: UUID().uuidString,
       createdAt: Date(),
       userID: User.current!.id,
-      threadID: self.id,
+      chatID: self.id,
       parent: inReplyTo,
       text: "",
-      attachments: [attachment],
+      attachments: [.init(_dataDict: attachment.__data)],
       reactions: [],
       status: .sending
     )
@@ -55,8 +55,8 @@ extension Thread {
       do {
         let newMessage = try await api.send(
           attachment: attachment,
-          to: self,
-          inReplyTo: inReplyTo
+          to: self.id,
+          inReplyTo: inReplyTo?.id
         )
         publish {
           self.sending.remove(element: m)
@@ -73,15 +73,23 @@ extension Thread {
     }
   }
 
-  func send(file: URL, inReplyTo: Message?) {
-    
+  func send(file: File, type: Gql.AttachmentType, inReplyTo: Message?) {
+    Task.detached {
+      let url = try await api.uploadFile(file: file)
+      DispatchQueue.main.async {
+        self.send(attachment: .init(id: UUID().uuidString, type: .case(type), url: url), inReplyTo: inReplyTo)
+      }
+    }
   }
 
   func sendLocation(inReplyTo: Message?) {
     Task.detached {
       do {
         let location = try await LocationUtil.fetch()
-        self.send(attachment: .init(_dataDict: ["type": Gql.AttachmentType.location, "latitude": location.latitude, "longitude": location.longitude, "url": "data"]), inReplyTo: inReplyTo)
+        self.send(attachment:
+            .init(id: UUID().uuidString, latitude: .some(location.latitude), longitude: .some(location.longitude), type: .case(.location), url: "data"),
+                  inReplyTo: inReplyTo
+        )
       } catch let err {
         print("Location", err)
       }
@@ -89,7 +97,13 @@ extension Thread {
   }
 
   func send(contact: CNContact, inReplyTo: Message?) {
-    self.send(attachment: .init(_dataDict: ["type": Gql.AttachmentType.vcard,"url": "data", "data": contact.toAppContact()]), inReplyTo: inReplyTo)
+    self.send(attachment: .init(data: .some(contact.toAppContact()), id: UUID().uuidString, type: .case(.vcard), url: "data"), inReplyTo: inReplyTo)
   }
 
+}
+
+extension Gql.AttachmentInput {
+  var attachment: Gql.FMessage.Attachment {
+    return .init(data: self.__data._jsonEncodableValue)
+  }
 }

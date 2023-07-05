@@ -30,14 +30,14 @@ public struct GroupDrawer: View {
         VStack(alignment: .leading, spacing: 0) {
           VStack(spacing: 0) {
             Spacer().height(24)
-            if let image = chat.image {
+            if let image = chat.displayImage {
               GifImageView(url: try! image.asURL())
                 .circle(70, .clear)
             } else {
               GroupPlaceholder().size(70)
             }
             Spacer().height(12)
-            Text(chat.name)
+            Text(chat.displayName)
               .font(theme.fonts.title2)
               .foregroundColor(theme.colors.text)
             Text(chat.description ?? "")
@@ -57,7 +57,7 @@ public struct GroupDrawer: View {
               .resizable()
               .size(16)
               .foregroundColor(theme.colors.caption)
-            Text("\(chat.members.count)")
+            Text("\(chat.activeMembers.count)")
               .font(theme.fonts.caption)
               .foregroundColor(theme.colors.caption)
           }.padding(.leading, 16)
@@ -153,13 +153,13 @@ public struct GroupDrawer: View {
           .cornerRadius(16)
       }
     }.confirmationDialog("Are you sure you want to leave this channel?", isPresented: $leave) {
-      Button("Leave \(chat.name)?", role: .destructive) {
+      Button("Leave \(chat.displayName)?", role: .destructive) {
         dismiss()
         chat.leave()
         navigator.goBack()
       }
     }.confirmationDialog("Are you sure you want to delete this channel?", isPresented: $delete) {
-      Button("Delete \(chat.name)?", role: .destructive) {
+      Button("Delete \(chat.displayName)?", role: .destructive) {
         Task.detached {
           do {
             try await chat.delete()

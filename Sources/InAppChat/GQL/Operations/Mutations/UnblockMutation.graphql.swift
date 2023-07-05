@@ -29,11 +29,11 @@ public extension Gql {
 
       public static var __parentType: Apollo.ParentType { Gql.Objects.Mutation }
       public static var __selections: [Apollo.Selection] { [
-        .field("unblock", Bool?.self, arguments: ["user": .variable("user")]),
+        .field("unblock", Bool.self, arguments: ["user": .variable("user")]),
       ] }
 
       /// Unblocks a User for the current User
-      public var unblock: Bool? { __data["unblock"] }
+      public var unblock: Bool { __data["unblock"] }
     }
   }
 

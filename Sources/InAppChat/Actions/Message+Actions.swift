@@ -1,7 +1,7 @@
 extension Message {
 
   func markRead() {
-    if self.chat.isDM != nil {
+    if !self.chat.isDM {
       return
     }
     if self.status != .seen {
@@ -25,28 +25,10 @@ extension Message {
     self.reactions = self.reactions ?? []
     let og = self.reactions ?? []
     let ogCurrent = self.currentReaction
-    if isSet {
-      if let i = self.reactions?.firstIndex(where: { $0.emojiCode == reaction }) {
-        let r = self.reactions![i]
-        var users = r.users
-        users.append(User.current!.id)
-        users = users.unique()
-        self.reactions![i] = Reaction(emojiCode: reaction, count: users.count, users: users)
-      } else {
-        self.reactions?.append(Reaction(emojiCode: reaction, count: 1, users: [User.current!.id]))
-      }
-      if let current = currentReaction {
-        decr(current)
-      }
-      self.currentReaction = reaction
-      Chats.current.onReaction(reaction)
-    } else {
-      decr(reaction)
-      self.currentReaction = nil
-    }
+    let _ = react_impl(uid: User.current!.id, reaction: reaction, reactions: &reactions!)
     Task.detached {
       do {
-        _ = try await api.react(to: self, reaction: reaction, set: isSet)
+        _ = try await api.react(to: self.id, reaction: reaction)
       } catch let err {
         Monitoring.error(err)
         publish {
@@ -86,7 +68,7 @@ extension Message {
     self.text = text
     Task.detached {
       do {
-        _ = try await api.edit(message: self, text: text)
+        _ = try await api.edit(message: self.id, text: text)
       } catch let err {
         Monitoring.error(err)
         publish {
@@ -100,11 +82,11 @@ extension Message {
   }
 
   func delete() {
-    Thread.get(self.threadID)?.items.remove(element: self)
+    Chat.get(self.chatID)?.items.remove(element: self)
     Chats.current.cache.messages.removeValue(forKey: self.id)
     Task.detached {
       do {
-        _ = try await api.delete(message: self)
+        _ = try await api.delete(message: self.id)
       } catch let err {
         Monitoring.error(err)
       }

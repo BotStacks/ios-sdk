@@ -21,7 +21,7 @@ public struct ContactRow: View {
       Avatar(url: user.avatar, size: 60)
       VStack(alignment: .leading) {
         HStack {
-          Text(user.usernameFb)
+          Text(user.username)
             .lineLimit(1)
             .font(theme.fonts.title3)
             .foregroundColor(theme.colors.text)
