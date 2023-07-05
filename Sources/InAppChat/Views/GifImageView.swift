@@ -12,7 +12,7 @@ import SwiftUI
 public struct GifImageView: View {
   let url: URL
   public init(url: String) {
-    self.url = try! url.asURL()
+    self.url = url.url!
   }
 
   public init(url: URL) {

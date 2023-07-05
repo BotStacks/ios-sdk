@@ -1,4 +1,3 @@
-import Alamofire
 import Apollo
 import CryptoKit
 import Foundation

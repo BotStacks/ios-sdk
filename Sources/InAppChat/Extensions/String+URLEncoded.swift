@@ -14,4 +14,8 @@ public extension String {
     var urlEncoded: String {
         return addingPercentEncoding(withAllowedCharacters: urlAllowed) ?? ""
     }
+  
+  var url: URL? {
+    return URL(string: self)
+  }
 }

@@ -31,7 +31,7 @@ public struct GroupDrawer: View {
           VStack(spacing: 0) {
             Spacer().height(24)
             if let image = chat.displayImage {
-              GifImageView(url: try! image.asURL())
+              GifImageView(url: image.url!)
                 .circle(70, .clear)
             } else {
               GroupPlaceholder().size(70)

@@ -29,7 +29,6 @@ public struct MessageContent: View {
 
   public var body: some View {
     VStack {
-      var markdown: String? = nil
       if let attachments = message.attachments {
         HStack {
           ForEach(attachments) { attachment in
@@ -39,7 +38,7 @@ public struct MessageContent: View {
                 .scaledToFill()
                 .size(self.theme.imagePreviewSize)
             } else if attachment.type == .video {
-              AZVideoPlayer(player: AVPlayer(url: try! attachment.url.asURL()))
+              AZVideoPlayer(player: AVPlayer(url: attachment.url.url!))
                 .size(self.theme.videoPreviewSize)
             } else if attachment.type == .audio {
               AudioView(attachment.url)
