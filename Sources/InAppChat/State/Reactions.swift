@@ -10,12 +10,12 @@ import Foundation
 public typealias Reactions = [(reaction: String, uids: [String])]
 
 func parseReactions(reactions: String?) -> Reactions? {
-  guard let reactions = reactions else {
+  guard let _reactions = reactions else {
     return nil
   }
-  return reactions.split(separator: ";").compactMap { reaction in
-    let (head, tail) = reaction.split(separator: ":")
-    return (reaction: head, uids: tail.split(","))
+  return _reactions.split(separator: ";").map { reaction in
+    let split = reaction.split(separator: ":")
+    return (reaction: String(split[0]), uids: split[1].split(separator: ",").map({String($0)}))
   }
 }
 

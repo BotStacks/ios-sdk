@@ -33,4 +33,6 @@ Pod::Spec.new do |s|
   s.dependency        "Giphy"
   s.dependency        "Gifu"
   s.dependency        'Sentry'
+  s.dependency        'Apollo'
+  s.dependency        'Apollo/WebSocket'
 end

@@ -76,36 +76,30 @@ public struct ChatsView: View {
             RepliesView(message: $0)
           }
         } else {
-          PagerList(
-            pager: list == .groups ? chats.groups : chats.users,
+          IACList(
+            items: list == .groups ? chats.groups : chats.dms,
             divider: true,
             topInset: geometry.insets.top + Header<EmptyView>.height,
             bottomInset: geometry.insets.bottom + Tabs.height,
             header: header,
-            empty: empty
-          ) {
-            ThreadRow(chat: $0)
-          }
+            empty: empty,
+            content: { ThreadRow(chat: $0) }
+          )
         }
         
         Header(title: "Message", showStartMessage: true, showSearch: true)
       }.onChange(of: list) { newValue in
         print("rendering message threads", chats.messages.items)
-        switch newValue {
-        case .users:
-          chats.users.loadMoreIfEmpty()
-        case .groups:
-          chats.groups.loadMoreIfEmpty()
-        case .threads:
+        if newValue == .threads {
           chats.messages.loadMoreIfEmpty()
         }
       }.onChange(of: scrollToTop) { newValue in
         var id:String? = nil
         switch list {
         case .users:
-          id = chats.users.items.first?.id
+          id = chats.dms.first?.id
         case .groups:
-          id = chats.groups.items.first?.id
+          id = chats.groups.first?.id
         case .threads:
           id = chats.messages.items.first?.id
         }

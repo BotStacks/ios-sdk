@@ -185,14 +185,14 @@ public final class Message: ObservableObject, Identifiable {
 
 struct Loc {
   
-  let latitude: Float?
-  let longitude: Float?
+  let latitude: Double?
+  let longitude: Double?
   let address: String?
   let link: String
   let markdownLink: String
   let display: String
   
-  init(latitude: Float?, longitude: Float?, address: String?) {
+  init(latitude: Double?, longitude: Double?, address: String?) {
     self.latitude = latitude
     self.longitude = longitude
     self.address = address
@@ -204,6 +204,7 @@ struct Loc {
       self.display = "\(lat),\(lng)"
     } else {
       self.link = ""
+      self.display = ""
     }
     self.markdownLink = "[Location\(address.map({": \($0)"}) ?? "")](\(link))"
   }

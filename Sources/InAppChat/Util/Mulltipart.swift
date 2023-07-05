@@ -19,12 +19,16 @@ public struct MultipartRequest {
     self.data = .init()
   }
   
+  private mutating func append(_ string: String) {
+    data.append(string.data(using: .utf8)!)
+  }
+  
   private mutating func appendBoundarySeparator() {
-    data.append("--\(boundary)\(separator)")
+    append("--\(boundary)\(separator)")
   }
   
   private mutating func appendSeparator() {
-    data.append(separator)
+    append(separator)
   }
   
   private func disposition(_ key: String) -> String {
@@ -36,9 +40,9 @@ public struct MultipartRequest {
     value: String
   ) {
     appendBoundarySeparator()
-    data.append(disposition(key) + separator)
+    append(disposition(key) + separator)
     appendSeparator()
-    data.append(value + separator)
+    append(value + separator)
   }
   
   public mutating func add(
@@ -48,8 +52,8 @@ public struct MultipartRequest {
     fileData: Data
   ) {
     appendBoundarySeparator()
-    data.append(disposition(key) + "; filename=\"\(fileName)\"" + separator)
-    data.append("Content-Type: \(fileMimeType)" + separator + separator)
+    append(disposition(key) + "; filename=\"\(fileName)\"" + separator)
+    append("Content-Type: \(fileMimeType)" + separator + separator)
     data.append(fileData)
     appendSeparator()
   }
@@ -60,7 +64,7 @@ public struct MultipartRequest {
   
   public var httpBody: Data {
     var bodyData = data
-    bodyData.append("--\(boundary)--")
+    bodyData.append("--\(boundary)--".data(using: .utf8)!)
     return bodyData
   }
 }

@@ -17,8 +17,8 @@ public struct MessageList: View {
   public var body: some View {
     ScrollViewReader { proxy in
       PagerList(
-        pager: thread,
-        prefix: thread.sending,
+        pager: chat,
+        prefix: chat.sending,
         invert: true,
         topInset: geometry.insets.top + Header<Image>.height,
         bottomInset: geometry.insets.bottom + 70.0
@@ -28,7 +28,7 @@ public struct MessageList: View {
             onLongPress(message)
           }
       }.height(geometry.height)
-        .onChange(of: thread.sending.first?.id ?? thread.items.first?.id) { newValue in
+        .onChange(of: chat.sending.first?.id ?? chat.items.first?.id) { newValue in
           if let id = newValue {
             withAnimation {
               proxy.scrollTo(id, anchor: .bottom)
@@ -49,8 +49,8 @@ public struct RepliesList: View {
   @ObservedObject var replies: RepliesPager
   let onLongPress: (Message) -> Void
   
-  public init(_ thread: Thread, message: Message, onLongPress: @escaping (Message) -> Void) {
-    self.thread = thread
+  public init(_ chat: Chat, message: Message, onLongPress: @escaping (Message) -> Void) {
+    self.chat = chat
     self.message = message
     self.replies = message.replies
     self.onLongPress = onLongPress
@@ -65,7 +65,7 @@ public struct RepliesList: View {
         MessageView(message: message).background(.thinMaterial)
         PagerList(
           pager: replies,
-          prefix: thread.sending.filter({$0.parent?.id == message.id}),
+          prefix: chat.sending.filter({$0.parent?.id == message.id}),
           invert: true,
           topInset: geometry.insets.top + Header<Image>.height,
           bottomInset: geometry.insets.bottom + 70.0
@@ -75,7 +75,7 @@ public struct RepliesList: View {
               onLongPress(message)
             }
         }
-        .onChange(of: thread.sending.first?.id ?? thread.items.first?.id) { newValue in
+        .onChange(of: chat.sending.first?.id ?? chat.items.first?.id) { newValue in
           if let id = newValue {
             withAnimation {
               proxy.scrollTo(id, anchor: .bottom)

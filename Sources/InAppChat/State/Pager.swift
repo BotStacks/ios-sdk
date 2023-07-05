@@ -69,6 +69,26 @@ open class Pager<T>: ObservableObject where T: Identifiable {
       }
     }
   }
+  
+  public func loadMoreAsync() async {
+    if isSinglePage && hasMore {
+      await MainActor.run {
+        hasMore = false
+      }
+    }
+    guard !isSinglePage && hasMore && !refreshing && !loading else { return }
+    await MainActor.run {
+      self.loading = true
+    }
+    let items = await self._load(false)
+    publish {
+      if items.count > 0 {
+        self.items = items
+      }
+      self.hasMore = items.count >= self.pageSize
+      self.loading = false
+    }
+  }
 
   private func _load(_ isRefresh: Bool) async -> [T] {
     do {

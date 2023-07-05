@@ -40,11 +40,11 @@ public struct MessageView: View {
   func reactions() -> some View {
     return message.reactions.map { reactions in
       return HStack(spacing: 8.0) {
-        ForEach(reactions, id: \.emojiCode) { reaction in
+        ForEach(reactions, id: \.reaction) { reaction in
           Button {
-            message.react(reaction.emojiCode)
+            message.react(reaction.reaction)
           } label: {
-            Text("\(reaction.emojiCode) \(reaction.count)")
+            Text("\(reaction.reaction) \(reaction.uids.count)")
               .font(theme.fonts.body)
               .foregroundColor(theme.colors.text)
               .padding(theme.bubblePadding)
@@ -55,7 +55,7 @@ public struct MessageView: View {
                 RoundedRectangle(
                   cornerRadius: 36
                 ).stroke(
-                  message.currentReaction == reaction.emojiCode ? theme.colors.primary : Color.clear,
+                  message.currentReaction == reaction.reaction ? theme.colors.primary : Color.clear,
                   lineWidth: 2)
               )
           }
