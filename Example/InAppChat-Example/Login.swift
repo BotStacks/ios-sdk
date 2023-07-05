@@ -20,7 +20,7 @@ struct Login: View {
     @ObservedObject var app = InAppChat.shared
     @State var loggingIn = false
 
-  let isEth = InAppChat.shared.config?["loginType"] != "email"
+  let isEth = InAppChat.shared.tenant.loginType != "email"
 
   var body: some View {
     Splash {
@@ -88,18 +88,15 @@ struct Login: View {
     Task {
       do {
           guard let jwt = try? decode(jwt: credentials.idToken),
-                let id = jwt["sub"].string,
-                let email = jwt["email"].string else { return }
+                let id = jwt["sub"].string else { return }
           let name = jwt["name"].string
           let nickname = jwt["nickname"].string ?? "0x41112A2e8626330752A8f9353462edd4771a48a2"
           let picture = "https://api.poisonpog.org/ipfs/31.png"
           let _ = try await InAppChat.shared.login(
             accessToken: credentials.accessToken,
             userId: id,
-            email: email,
-            picture: picture,
-            name: name,
-            nickname: nickname
+            username: nickname, picture: picture,
+            displayName: name
           )
       } catch let err {
         print("error logging in ", err)

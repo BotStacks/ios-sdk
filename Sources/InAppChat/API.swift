@@ -497,7 +497,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
   func getReplies(for message: String, skip: Int = 0, limit: Int = 20) async throws -> [Message] {
     let res = try await self.client.fetchAsync(query: Gql.ListRepliesQuery(message: message, skip: .some(skip), limit: .some(limit)))
     return res.replies.map {
-      let user = User.get(.init(_dataDict: $0.user.__data))
+      let _ = User.get(.init(_dataDict: $0.user.__data))
       return Message.get(.init(_dataDict: $0.__data))
     }
   }

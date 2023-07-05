@@ -37,17 +37,17 @@ public struct ThreadRow: View {
         }.size(60.0)
         VStack(alignment: .leading, spacing: 0.0) {
           HStack {
-            Text(chat.user?.displayName ?? chat.user?.username ?? chat.group?.name ?? "")
+            Text(chat.displayName)
               .font(theme.fonts.title3)
               .truncationMode(.tail)
               .foregroundColor(theme.colors.text)
               .lineLimit(1)
-            if let group = chat.group {
-              PrivacyPill(_private: group._private)
+            if chat.isGroup {
+              PrivacyPill(_private: chat._private)
             }
           }
           HStack {
-            if chat.latest?.status == .seen {
+            if chat.latestMessage?.status == .seen {
               Image(systemName: "checkmark.circle.fill")
                 .resizable()
                 .foregroundColor(theme.colors.primary)
@@ -64,7 +64,7 @@ public struct ThreadRow: View {
         }.padding(.leading, 14.0)
         Spacer(minLength: 18.0)
         VStack(alignment: .trailing) {
-          if let message = chat.latest {
+          if let message = chat.latestMessage {
             Text(
               message.createdAt >= Date() - 3.hours
               ? message.createdAt.toRelative(since: nil, dateTimeStyle: .numeric, unitsStyle: .short)

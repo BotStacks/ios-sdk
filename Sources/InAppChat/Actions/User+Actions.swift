@@ -14,7 +14,11 @@ extension User {
     blocked = !blocked
     Task.detached {
       do {
-        try await api.block(user: self, isBlock: self.blocked)
+        if self.blocked {
+          let _ = try await api.block(user: self.id)
+        } else {
+          let _ = try await api.unblock(user: self.id)
+        }
         Chats.current.settings.setBlock(self.id, self.blocked)
       } catch let err {
         Monitoring.error(err)

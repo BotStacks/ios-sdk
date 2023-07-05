@@ -2,6 +2,10 @@ import Combine
 import Foundation
 import SwiftyJSON
 
+public class Tenant {
+  public let loginType = "email"
+}
+
 let assets =
 Bundle.allBundles.compactMap({$0.url(forResource: "InAppChat", withExtension: "bundle").flatMap({Bundle(url: $0)})}).first
 ?? Bundle(for: InAppChat.self).url(forResource: "InAppChat", withExtension: "bundle").flatMap({Bundle(url: $0)})
@@ -11,6 +15,8 @@ public class InAppChat: ObservableObject {
 
   let apiKey: String
   let namespace: String
+  
+  public let tenant = Tenant()
 
   private var didStartLoading = false
 
@@ -109,7 +115,7 @@ public class InAppChat: ObservableObject {
     if shared?.isUserLoggedIn != true { return }
     Task {
       do {
-        try await api.registerPushToken(token)
+        let _ = try await api.registerPushToken(token)
       } catch let err {
         Monitoring.error(err)
       }

@@ -46,7 +46,7 @@ extension Chat {
       chatID: self.id,
       parent: inReplyTo,
       text: "",
-      attachments: [.init(_dataDict: attachment.__data)],
+      attachments: [attachment.attachment],
       reactions: [],
       status: .sending
     )
@@ -104,6 +104,30 @@ extension Chat {
 
 extension Gql.AttachmentInput {
   var attachment: Gql.FMessage.Attachment {
-    return .init(data: self.__data._jsonEncodableValue)
+    var dict: [String: AnyHashable] = [
+      "type": type.rawValue,
+      "url": url
+    ]
+    if let mime = mime.unwrapped {
+      dict["mime"] = mime
+    }
+    if let data = data.unwrapped {
+      dict["data"] = data
+    }
+    if let latitude = latitude.unwrapped, let longitude = longitude.unwrapped {
+      dict["latitude"] = latitude
+      dict["longitude"] = longitude
+    }
+    if let address = address.unwrapped {
+      dict["address"] = address
+    }
+    if let width = width.unwrapped, let height = height.unwrapped {
+      dict["width"] = width
+      dict["height"] = height
+    }
+    if let duration = duration.unwrapped {
+      dict["duration"] = duration
+    }
+    return .init(_dataDict: DataDict(data: dict, fulfilledFragments: Set()))
   }
 }

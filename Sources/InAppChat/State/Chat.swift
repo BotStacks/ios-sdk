@@ -157,7 +157,7 @@ public final class Chat: Pager<Message>, Identifiable {
               name: chat.name,
               description: chat.description,
               image: chat.image,
-              kind: try! chat.kind.value(),
+              kind: chat.kind.value!,
               unreadCount: chat.unread_count,
               latestMessage: chat.last_message.map({Message.get(.init(_dataDict: $0.__data))}),
               members: Member.fromGql(chat.members.map({.init(_dataDict: $0.__data)})),

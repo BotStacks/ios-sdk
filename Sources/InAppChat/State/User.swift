@@ -73,7 +73,7 @@ public final class User: ObservableObject, Identifiable {
   static func get(_ user: Gql.FUser) -> User {
     if let u = get(user.id) {
       u.update(username: user.username, display_name: user.display_name, last_seen: user.last_seen,
-               image: user.image, status: user.status.value())
+               image: user.image, status: user.status.value!)
       return u
     }
     return User(  id: user.id,
@@ -82,8 +82,9 @@ public final class User: ObservableObject, Identifiable {
                   description: user.description,
                   avatar: user.image,
                   lastSeen: user.last_seen,
-                  status: user.status.value(),
-                  blocked: Chats.current.blocked.includes(user.id))
+                  status: user.status.value!,
+                  blocked: Chats.current.settings.blocked.contains(user.id)
+    )
   }
 
   static func get(_ id: String) -> User? {

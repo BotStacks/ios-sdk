@@ -9,7 +9,7 @@ import Foundation
 
 extension Array where Element == User {
   var usernames: String {
-    let uns = self[0..<Swift.min(self.count, 3)].map(\.usernameFb)
+    let uns = self[0..<Swift.min(self.count, 3)].map(\.username)
     if count < 3 {
       return uns.join(" and ")
     } else if count == 3 {

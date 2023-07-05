@@ -9,11 +9,14 @@ import Foundation
 import SwiftUI
 import AVKit
 
+extension Gql.FMessage.Attachment: Identifiable {}
+
 public struct MessageContent: View {
 
   @Environment(\.iacTheme) var theme
   let message: Message
   
+  @ViewBuilder
   func text(_ text: String) -> some View {
     Text(.init(text))
       .font(theme.fonts.body)
@@ -29,7 +32,7 @@ public struct MessageContent: View {
       var markdown: String? = nil
       if let attachments = message.attachments {
         HStack {
-          ForEach(attachments, id: \.id) { attachment in
+          ForEach(attachments) { attachment in
             if attachment.type == .image {
               GifImageView(url: attachment.url)
                 .aspectRatio(contentMode: .fill)
@@ -49,7 +52,7 @@ public struct MessageContent: View {
                 .size(64.0)
             } else if attachment.type == .location, let md = attachment.loc?.markdownLink {
               text(md)
-            } else if attachment.type == .contact, let md = attachment.contact?.markdown {
+            } else if attachment.type == .vcard, let md = attachment.contact?.markdown {
               text(md)
             }
           }

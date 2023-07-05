@@ -76,12 +76,12 @@ extension ApolloClient {
 }
 
 extension GraphQLEnum {
-  func value() throws -> T {
-    switch (self) {
-    case .case(let value):
-      return value
-    case .unknown:
-      throw APIError(msg: "unknown enum value", critical: true)
-    }
-  }
+//  func value() throws -> T {
+//    switch (self) {
+//    case .case(let value):
+//      return value
+//    case .unknown:
+//      throw APIError(msg: "unknown enum value", critical: true)
+//    }
+//  }
 }

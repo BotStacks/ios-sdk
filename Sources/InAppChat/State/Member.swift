@@ -34,7 +34,7 @@ public final class Member: ObservableObject {
   
   static func fromGql(_ member: Gql.FMember) -> Member {
     let _ = User.get(.init(_dataDict: member.user.__data))
-    return Member(chat_id: member.chat_id, user_id: member.user.id, created_at: member.created_at, role: try! member.role.value())
+    return Member(chat_id: member.chat_id, user_id: member.user.id, created_at: member.created_at, role: member.role.value!)
   }
 
   static func fromGql(_ members: [Gql.FMember]) -> [Member] {
