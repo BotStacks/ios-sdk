@@ -29,7 +29,6 @@ Pod::Spec.new do |s|
   s.dependency        'SDWebImageSwiftUI'
   s.dependency        'ActivityIndicatorView'
   s.dependency        "SwiftyJSON"
-  s.dependency        "Alamofire"
   s.dependency        "Giphy"
   s.dependency        "Gifu"
   s.dependency        'Sentry'
