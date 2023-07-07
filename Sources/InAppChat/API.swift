@@ -63,7 +63,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
   var websocketUrl: String {
     let server = chatServer()
     let ext = server.ssl ? "wss" : "ws"
-    return "\(ext)://\(server)/graphql"
+    return "\(ext)://\(server.host)/graphql"
   }
 
   var apiUrl: String {
@@ -356,6 +356,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
       Chats.current.user = user
       Chats.current.currentUserID = user.id
       User.current = user
+      InAppChat.shared.isUserLoggedIn = true
     }
     do {
       try await Chats.current.loadAsync()

@@ -16,7 +16,7 @@ struct InAppChat_ExampleApp: App {
 
 
   init() {
-    InAppChat.setup(namespace: "sample.ertc.com", apiKey: "oj2k3r2x")
+    InAppChat.setup(namespace: "sample.ertc.com", apiKey: "obkbvsrf")
   }
 
   var body: some Scene {

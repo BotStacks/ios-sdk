@@ -98,9 +98,11 @@ struct Login: View {
             username: nickname, picture: picture,
             displayName: name
           )
+        print("Finish login")
       } catch let err {
         print("error logging in ", err)
       }
+      print("Calling callback")
       await MainActor.run {
         self.loggingIn = false
         cb()
