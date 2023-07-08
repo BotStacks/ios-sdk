@@ -8,6 +8,7 @@
 import SwiftDate
 import SwiftUI
 
+
 private let formatter = RelativeDateTimeFormatter()
 
 public struct ThreadRow: View {

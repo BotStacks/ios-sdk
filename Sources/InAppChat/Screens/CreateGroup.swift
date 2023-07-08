@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 
+
 class CreateChatState: ObservableObject {
 
   @Published var chat: Chat? = nil
@@ -48,7 +49,7 @@ class CreateChatState: ObservableObject {
 public struct CreateChat: View {
 
   @Environment(\.iacTheme) var theme
-  @EnvironmentObject var navigator: Navigator
+  @EnvironmentObject var pilot: UIPilot<Routes>
   @Environment(\.geometry) var geometry
 
   enum Field: Hashable {
@@ -76,7 +77,7 @@ public struct CreateChat: View {
       Header(
         title: "Create Channel",
         onBack: {
-          navigator.goBack()
+          pilot.pop()
           CreateChatState.current = nil
         })
       ScrollView {
@@ -249,11 +250,11 @@ public struct CreateChat: View {
                     Task.detached {
                       await state.commit()
                       await MainActor.run {
-                        navigator.goBack()
+                        pilot.pop()
                       }
                     }
                   } else {
-                    navigator.navigate("invite")
+                    pilot.push(Routes.InviteUsers(id: state.chat?.id))
                   }
                 }
               } label: {

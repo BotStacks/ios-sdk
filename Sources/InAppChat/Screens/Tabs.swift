@@ -8,14 +8,16 @@
 import Foundation
 import SwiftUI
 
+
 public struct Tabs: View {
 
   static let height = 57.0
 
   @Environment(\.iacTheme) var theme
   @Environment(\.geometry) var geometry
-  @EnvironmentObject private var navigator: Navigator
+  @EnvironmentObject private var router: UIPilot<Routes>
   @State var scrollToTop = 0
+  @State var tab = T.chats
 
   enum T: String {
     case chats = "chat-text-fill"
@@ -41,12 +43,6 @@ public struct Tabs: View {
     }
   }
 
-  let tab: T
-
-  public init(_ path: String) {
-    self.tab = .path(path)
-  }
-
   func path(_ tab: T) -> String {
     switch tab {
     case .chats:
@@ -59,37 +55,38 @@ public struct Tabs: View {
       return "/contacts"
     }
   }
+  
+  
+  var tabView: some View {
+    switch tab {
+    case .channels:
+      return AnyView(ChannelsView(scrollToTop: $scrollToTop))
+    case .chats:
+      return AnyView(ChatsView(scrollToTop: $scrollToTop, onExploreChannels: {tab = .channels}, onSendAMessage: {tab = .contacts}))
+    case .contacts:
+      return AnyView(ContactsView(scrollToTop: $scrollToTop))
+    case .settings:
+      return AnyView(MyProfile())
+    }
+  }
 
   public var body: some View {
     ZStack(alignment: .bottom) {
-      SwitchRoutes {
-        Route("/chats") {
-          ChatsView(scrollToTop: $scrollToTop)
-        }
-        Route("/channels") {
-          ChannelsView(scrollToTop: $scrollToTop)
-        }
-        Route("/contacts") {
-          ContactsView(scrollToTop: $scrollToTop)
-        }
-        Route("/settings") {
-          MyProfile()
-        }
-      }
+      tabView
       HStack {
         ForEach(T.all, id: \.rawValue) { t in
           Button {
             if tab == t {
               scrollToTop += 1
             } else {
-              navigator.navigate(path(t), replace: true)
+              tab = t
             }
           } label: {
             ZStack {
               AssetImage(t.rawValue)
                 .resizable()
                 .scaledToFit()
-                .foregroundColor(t == tab ? theme.colors.primary : theme.colors.caption)
+                .foregroundColor(t == tab ? theme.colors.primary : theme.colors.text)
                 .size(45)
             }.grow()
           }.grow()
@@ -98,6 +95,6 @@ public struct Tabs: View {
         .frame(height: Tabs.height)
         .padding(.bottom, geometry.insets.bottom)
         .background(.thinMaterial)
-    }.grow()
+    }.grow().edgesIgnoringSafeArea(.all)
   }
 }

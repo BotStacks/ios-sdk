@@ -8,23 +8,29 @@
 import InAppChat
 import SwiftUI
 
-struct ContentView: View {
 
-  init() {
-    
-  }
+enum Routes: Equatable {
+  case Splash
+  case Login
+  case Chat
+}
+
+struct ContentView: View {
+  
+  @StateObject var pilot = UIPilot(initial: Routes.Splash)
+
+  public init() {}
 
   var body: some View {
-      InAppChatUI {
-          IACMainRoutes(initialPath: "/splash") {
-            Route("splash") {
-              Splash()
-            }
-            Route("login") {
-              Login()
-            }
-          }
+    UIPilotHost(pilot) { route in
+      switch (route) {
+        case .Splash: Splash()
+        case .Login: Login()
+        case .Chat: InAppChatUI()
       }
+    }.edgesIgnoringSafeArea(.all)
+      .uipNavigationBarHidden(true)
+      .navigationBarBackButtonHidden()
   }
 }
 

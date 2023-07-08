@@ -2,12 +2,6 @@ import Foundation
 
 public class Chats: ObservableObject {
 
-  var currentUserID: String? = nil  //UserDefaults.standard.string(forKey: "iac-current-uid")
-  {
-    didSet {
-      UserDefaults.standard.setValue(currentUserID, forKey: "iac-current-uid")
-    }
-  }
   @Published var user: User? = nil
 
   @Published var memberships: [Member] = []
@@ -57,7 +51,7 @@ public class Chats: ObservableObject {
   }
 
   public func loadAsync() async throws {
-    if let id = currentUserID {
+    if api.authToken != nil {
       let user = try await api.start()
       print("loaded current user")
       await MainActor.run {
@@ -106,12 +100,19 @@ public class Chats: ObservableObject {
       Monitoring.error(err)
     }
   }
+  
+  func startSession(user: User) {
+    self.user = user
+    Task.detached {
+      try await self.loadGroupInvites()
+    }
+  }
 
   public enum List: String {
     case groups = "Channels"
     case users = "Chat"
-    case threads = "Threads"
-    static let all: [List] = [.groups, .users, .threads]
+//    case threads = "Threads"
+    static let all: [List] = [.groups, .users]
   }
 
   func count(_ list: List) -> Int {
@@ -124,8 +125,6 @@ public class Chats: ObservableObject {
       return groups.reduce(0) {
         return $0 + $1.unreadCount
       }
-    case .threads:
-      return 0
     }
   }
   

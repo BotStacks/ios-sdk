@@ -104,16 +104,16 @@ public final class Chat: Pager<Message>, Identifiable {
   }
 
 
-  var path: String {
-    return "/chat/\(id)"
+  var path: Routes {
+    return Routes.Chat(id: id, isUser: false)
   }
 
-  var editPath: String {
-    return "/chat/\(id)/edit"
+  var editPath: Routes {
+    return Routes.CreateChat(id: id)
   }
 
-  var invitePath: String {
-    return "/chat/\(id)/invite"
+  var invitePath: Routes {
+    return Routes.InviteUsers(id: id)
   }
 
   @Published var invited: [User] = []

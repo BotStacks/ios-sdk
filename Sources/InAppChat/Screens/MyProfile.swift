@@ -25,13 +25,13 @@ public struct MyProfile: View {
         .truncationMode(.middle)
         .multilineTextAlignment(.center)
       }
-      NavLink(to: "/profile") {
+      NavLink(to: Routes.Profile(id: User.current?.id)) {
         Row(icon: "user-fill", text: "Profile")
       }
-      NavLink(to: "/favorites") {
+      NavLink(to: Routes.Favorites) {
         Row(icon: "star-fill", text: "Favorite Messages")
       }
-      NavLink(to: "/settings/notifications") {
+      NavLink(to: Routes.ManageNotifications) {
         Row(
           icon: "bell-simple-fill", text: "Manage Notifications"
         )
@@ -58,6 +58,6 @@ public struct MyProfile: View {
             .foregroundColor(theme.colors.primary)
             .font(theme.fonts.headline)
         }
-      }
+      }.background(.cyan)
   }
 }

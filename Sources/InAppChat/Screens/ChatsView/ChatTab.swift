@@ -25,9 +25,6 @@ public struct ChatTabView: View {
       current = tab
     } label: {
       HStack(alignment: .top) {
-        if tab == .groups {
-          Spacer()
-        }
         VStack(spacing: 2) {
           Text(tab.rawValue)
             .font(theme.fonts.title2.bold())
@@ -42,9 +39,6 @@ public struct ChatTabView: View {
           ZStack {
             Badge(count: unreadCount)
           }.frame(width: 0, height: 20)
-        }
-        if tab == .threads {
-          Spacer()
         }
       }.growX()
     }

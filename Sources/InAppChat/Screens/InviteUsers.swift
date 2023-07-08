@@ -8,12 +8,13 @@
 import Foundation
 import SwiftUI
 
+
 public struct InviteUsers: View {
 
   @ObservedObject var chats = Chats.current
   @Environment(\.geometry) var geometry
   @Environment(\.iacTheme) var theme
-  @EnvironmentObject var navigator: Navigator
+  @EnvironmentObject var pilot: UIPilot<Routes>
 
   let chat: Chat?
   let state = CreateChatState.current
@@ -53,7 +54,7 @@ public struct InviteUsers: View {
         }.height(geometry.height - geometry.insets.bottom - 60.0)
         HStack(spacing: 22.0) {
           Button {
-            navigator.goBack()
+            pilot.pop()
           } label: {
             ZStack {
               Image(systemName: "chevron.left")
@@ -67,7 +68,7 @@ public struct InviteUsers: View {
           Button {
             if let chat = chat {
               chat.invite(users: selected)
-              navigator.goBack()
+              pilot.pop()
             } else if !creating, let state = state {
               self.creating = true
               Task.detached {
@@ -81,8 +82,8 @@ public struct InviteUsers: View {
                   await chat.invite(users: self.selected)
                   await MainActor.run {
                     CreateChatState.current = nil
-                    navigator.goBack(total: 2)
-                    navigator.navigate(chat.path)
+                    pilot.popTo(.Tabs)
+                    pilot.push(chat.path)
                   }
                 } catch let err {
                   Monitoring.error(err)

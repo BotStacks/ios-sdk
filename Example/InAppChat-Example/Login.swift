@@ -12,11 +12,12 @@ import SwiftUI
 import JWTDecode
 import UserNotifications
 
+
 struct Login: View {
 
   @Environment(\.openURL) private var openURL
   @Environment(\.geometry) private var geometry
-  @EnvironmentObject var navigator: Navigator
+  @EnvironmentObject var pilot: UIPilot<Routes>
     @ObservedObject var app = InAppChat.shared
     @State var loggingIn = false
 
@@ -48,7 +49,7 @@ struct Login: View {
                                       UIApplication.shared.registerForRemoteNotifications()
                                   }
                               }
-                          navigator.navigate("chats", replaceAll: true)
+                        pilot.push(Routes.Chat)
                       }
                   }
                 case .failure(let error):
@@ -75,7 +76,7 @@ struct Login: View {
       }.padding(.bottom, geometry.insets.bottom)
     }.onChange(of: app.isUserLoggedIn) { newValue in
         if (newValue) {
-            navigator.navigate("/chats", replace: false, replaceAll: true)
+          pilot.push(.Chat)
         }
     }
   }

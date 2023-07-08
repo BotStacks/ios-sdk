@@ -99,7 +99,6 @@ public class InAppChat: ObservableObject {
   }
 
   public static func logout() {
-    Chats.current.currentUserID = nil
     Chats.current = Chats()
     User.current = nil
     Task.detached {

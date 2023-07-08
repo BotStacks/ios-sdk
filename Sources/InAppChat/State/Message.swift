@@ -45,8 +45,8 @@ public final class Message: ObservableObject, Identifiable {
 
   lazy var replies = RepliesPager(self)
 
-  var path: String {
-    return "/message/\(id)"
+  var path: Routes {
+    return Routes.Message(id)
   }
 
   public init(

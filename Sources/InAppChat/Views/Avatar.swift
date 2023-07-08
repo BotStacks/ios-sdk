@@ -26,10 +26,12 @@ public struct Avatar: View {
     ZStack {
       if let url = url {
         GifImageView(url: url)
+          .scaledToFit()
           .grow()
       } else {
         if group {
           GroupPlaceholder()
+            .scaledToFit()
             .grow()
         } else {
           AssetImage("user-fill")

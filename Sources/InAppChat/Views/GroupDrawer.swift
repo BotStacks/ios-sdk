@@ -8,11 +8,12 @@
 import Foundation
 import SwiftUI
 
+
 public struct GroupDrawer: View {
 
   @Environment(\.iacTheme) var theme
   @Environment(\.geometry) var geometry
-  @EnvironmentObject var navigator: Navigator
+  @EnvironmentObject var pilot: UIPilot<Routes>
   @Environment(\.dismiss) var dismiss
 
   @ObservedObject var chat: Chat
@@ -66,7 +67,7 @@ public struct GroupDrawer: View {
             ForEach(chat.admins) { user in
               Button {
                 dismiss()
-                navigator.navigate(user.path)
+                pilot.push(user.path)
               } label: {
                 ContactRow(user: user)
               }
@@ -75,7 +76,7 @@ public struct GroupDrawer: View {
             ForEach(chat.onlineNotAdminUsers) { user in
               Button {
                 dismiss()
-                navigator.navigate(user.path)
+                pilot.push(user.path)
               } label: {
                 ContactRow(user: user)
               }
@@ -84,7 +85,7 @@ public struct GroupDrawer: View {
             ForEach(chat.offlineUsers) { user in
               Button {
                 dismiss()
-                navigator.navigate(user.path)
+                pilot.push(user.path)
               } label: {
                 ContactRow(user: user)
               }
@@ -97,7 +98,7 @@ public struct GroupDrawer: View {
           if chat.isAdmin {
             Button {
               dismiss()
-              navigator.navigate(chat.editPath)
+              pilot.push(chat.editPath)
             } label: {
               ZStack {
                 VStack(spacing: 0) {
@@ -114,7 +115,7 @@ public struct GroupDrawer: View {
           }
           Button {
             dismiss()
-            navigator.navigate(chat.invitePath)
+            pilot.push(chat.invitePath)
           } label: {
             ZStack {
               VStack(spacing: 0) {
@@ -156,7 +157,7 @@ public struct GroupDrawer: View {
       Button("Leave \(chat.displayName)?", role: .destructive) {
         dismiss()
         chat.leave()
-        navigator.goBack()
+        pilot.pop()
       }
     }.confirmationDialog("Are you sure you want to delete this channel?", isPresented: $delete) {
       Button("Delete \(chat.displayName)?", role: .destructive) {
@@ -165,7 +166,7 @@ public struct GroupDrawer: View {
             try await chat.delete()
             await MainActor.run {
               self.dismiss()
-              self.navigator.goBack()
+              self.pilot.pop()
             }
           } catch let err {
             Monitoring.error(err)

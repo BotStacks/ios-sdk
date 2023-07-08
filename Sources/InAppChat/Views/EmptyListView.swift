@@ -3,23 +3,12 @@ import Foundation
 import SwiftUI
 import UIKit
 
-public struct CTA {
+struct CTA  {
   let icon: Image?
   let text: String
-  let to: String
-  let replace: Bool
-  public init(
-    icon: Image? = nil,
-    text: String,
-    to: String,
-    replace: Bool = false
-  ) {
-    self.icon = icon
-    self.text = text
-    self.to = to
-    self.replace = replace
-  }
+  let action: () -> Void
 }
+
 
 public struct EmptyListView: View {
   var loading: Bool
@@ -27,13 +16,14 @@ public struct EmptyListView: View {
   let tab: Bool
   let extraHeight: CGFloat
   let cta: CTA?
+  
 
   init(
     loading: Bool,
     config: EmptyScreenConfig,
     tab: Bool = false,
     extraHeight: CGFloat = 0.0,
-    cta: CTA? = nil
+    cta: CTA?
   ) {
     self.loading = loading
     self.config = config
@@ -41,6 +31,8 @@ public struct EmptyListView: View {
     self.extraHeight = extraHeight
     self.cta = cta
   }
+  
+  
 
   @Environment(\.iacTheme) var theme
 
@@ -62,32 +54,40 @@ public struct EmptyListView: View {
           }
           Spacer()
           if let cta = cta {
-            Spacer()
-            NavLink(to: cta.to, replace: cta.replace) {
-              VStack {
-                HStack {
-                  Spacer()
-                  if let image = cta.icon {
-                    image
-                      .resizable()
-                      .size(32.0)
-                      .foregroundColor(theme.colors.text)
-                  }
-                  Text(cta.text)
-                    .textCase(.uppercase)
-                    .font(theme.fonts.headline)
-                    .foregroundColor(theme.colors.text)
-                  Spacer()
-                }.height(60.0)
-                  .overlay(
-                    RoundedRectangle(cornerRadius: 30)
-                      .stroke(theme.colors.text, lineWidth: 2.0)
-                  )
-              }.padding(.horizontal, 32.0)
-            }
+            CTAView(icon: cta.icon, text: cta.text, action: cta.action)
           }
+            
         }
       }
     }.padding(.all, 32.0)
   }
+  
+  @ViewBuilder
+  func CTAView(icon:Image?, text: String, action: () -> Void) -> some View {
+    Spacer()
+    VStack {
+      HStack {
+        Spacer()
+        if let image = icon {
+          image
+            .resizable()
+            .size(32.0)
+            .foregroundColor(theme.colors.text)
+        }
+        Text(text)
+          .textCase(.uppercase)
+          .font(theme.fonts.headline)
+          .foregroundColor(theme.colors.text)
+        Spacer()
+      }.height(60.0)
+        .overlay(
+          RoundedRectangle(cornerRadius: 30)
+            .stroke(theme.colors.text, lineWidth: 2.0)
+        )
+    }.padding(.horizontal, 32.0)
+  }
+  
 }
+
+
+

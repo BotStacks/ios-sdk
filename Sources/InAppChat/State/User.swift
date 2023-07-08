@@ -20,12 +20,12 @@ public final class User: ObservableObject, Identifiable {
   @Published public var statusMessage: String?
   @Published var haveContact: Bool = false
 
-  var path: String {
-    return "/user/\(id)"
+  var path: Routes {
+    return Routes.Profile(id: id)
   }
 
-  var chatPath: String {
-    return "\(path)/chat"
+  var chatPath: Routes {
+    return Routes.Chat(id: id, isUser: true)
   }
 
   public var haveChatWith: Bool {

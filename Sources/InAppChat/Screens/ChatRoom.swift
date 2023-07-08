@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import UIKit
 
+
 public struct ChatRoom: View {
 
   enum Media {
@@ -25,7 +26,7 @@ public struct ChatRoom: View {
 
   @FocusState var textFocus
   @Environment(\.geometry) var geometry
-  @EnvironmentObject var navigator: Navigator
+  @EnvironmentObject var pilot: UIPilot<Routes>
 
   @State var menu: Bool = false
   @State var media: Bool = false
@@ -56,7 +57,7 @@ public struct ChatRoom: View {
       }.padding(.horizontal, 16.0)
         .padding(.top, 12.0)
       ActionItem(image: AssetImage("chat-dots"), text: "Reply in chat") {
-        navigator.navigate("/message/\(messageForAction!.id)")
+        pilot.push(messageForAction!.path)
         messageForAction = nil
       }
       ActionItem(

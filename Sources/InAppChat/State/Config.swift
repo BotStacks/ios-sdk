@@ -22,8 +22,6 @@ public struct Assets {
     switch list {
     case .groups:
       return emptyChannels
-    case .threads:
-      return emptyThreads
     case .users:
       return emptyChat
     }

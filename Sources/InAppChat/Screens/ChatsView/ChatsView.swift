@@ -8,25 +8,6 @@
 import Foundation
 import SwiftUI
 
-func ctaForList(_ list: Chats.List) -> CTA {
-  switch list {
-  case .groups, .threads:
-    return CTA(
-      icon: nil,
-      text: "Explore Channels",
-      to: "/channels",
-      replace: true
-    )
-  case .users:
-    return CTA(
-      icon: AssetImage("paper-plane-tilt-fill"),
-      text: "Send a Message",
-      to: "/contacts",
-      replace: true
-    )
-  }
-}
-
 public struct ChatsView: View {
 
   @State var list: Chats.List = .groups
@@ -36,9 +17,33 @@ public struct ChatsView: View {
   @Environment(\.geometry) var geometry
 
   @Binding var scrollToTop: Int
-  public init(scrollToTop: Binding<Int>) {
+  
+  let onExploreChannels: () -> Void
+  let onSendAMessage: () -> Void
+  public init(scrollToTop: Binding<Int>, onExploreChannels: @escaping () -> Void, onSendAMessage: @escaping () -> Void) {
     self._scrollToTop = scrollToTop
+    self.onExploreChannels = onExploreChannels
+    self.onSendAMessage = onSendAMessage
   }
+  
+  func currentCta() -> CTA {
+    switch list {
+    case .groups:
+      return CTA(
+        icon: nil,
+        text: "Explore Channels",
+        action: onExploreChannels
+      )
+    case .users:
+      return CTA(
+        icon: AssetImage("paper-plane-tilt-fill"),
+        text: "Send a Message",
+        action: onSendAMessage
+      )
+    }
+  }
+  
+  
 
   public var body: some View {
     ScrollViewReader { proxy in
@@ -49,7 +54,7 @@ public struct ChatsView: View {
             config: theme.assets.list(list),
             tab: true,
             extraHeight: -44.0,
-            cta: ctaForList(list)
+            cta: currentCta()
           )
         }
         let header = {
@@ -64,35 +69,17 @@ public struct ChatsView: View {
             }
           }.height(44.0)
         }
-        if list == .threads {
-          PagerList(
-            pager: chats.messages,
-            divider: true,
-            topInset: geometry.insets.top + Header<EmptyView>.height,
-            bottomInset: geometry.insets.bottom + Tabs.height,
-            header: header,
-            empty: empty
-          ) {
-            RepliesView(message: $0)
-          }
-        } else {
-          IACList(
-            items: list == .groups ? chats.groups : chats.dms,
-            divider: true,
-            topInset: geometry.insets.top + Header<EmptyView>.height,
-            bottomInset: geometry.insets.bottom + Tabs.height,
-            header: header,
-            empty: empty,
-            content: { ThreadRow(chat: $0) }
-          )
-        }
+        IACList(
+          items: list == .groups ? chats.groups : chats.dms,
+          divider: true,
+          topInset: geometry.insets.top + Header<EmptyView>.height,
+          bottomInset: geometry.insets.bottom + Tabs.height,
+          header: header,
+          empty: empty,
+          content: { ThreadRow(chat: $0) }
+        )
         
         Header(title: "Message", showStartMessage: true, showSearch: true)
-      }.onChange(of: list) { newValue in
-        print("rendering message threads", chats.messages.items)
-        if newValue == .threads {
-          chats.messages.loadMoreIfEmpty()
-        }
       }.onChange(of: scrollToTop) { newValue in
         var id:String? = nil
         switch list {
@@ -100,8 +87,6 @@ public struct ChatsView: View {
           id = chats.dms.first?.id
         case .groups:
           id = chats.groups.first?.id
-        case .threads:
-          id = chats.messages.items.first?.id
         }
         if let id = id {
           withAnimation {

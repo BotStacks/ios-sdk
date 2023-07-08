@@ -8,16 +8,13 @@
 import Foundation
 import SwiftUI
 
-struct ViewLog: View {
-
-  @EnvironmentObject var navigator: Navigator
-
+struct LogView: View {
+  
+  init(log: String) {
+    print(log)
+  }
+  
   var body: some View {
     EmptyView()
-      .onChange(
-        of: navigator.path,
-        perform: { path in
-          print(navigator.historyStack, navigator.path)
-        })
   }
 }

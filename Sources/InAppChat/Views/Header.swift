@@ -9,7 +9,7 @@ public struct Header<Content>: View where Content: View {
 
   @Environment(\.iacTheme) var theme
   @Environment(\.geometry) var geometry
-  @EnvironmentObject var navigator: Navigator
+  @EnvironmentObject var pilot: UIPilot<Routes>
 
   public let title: String
   public let showStartMessage: Bool
@@ -17,14 +17,14 @@ public struct Header<Content>: View where Content: View {
   public let onBack: (() -> Void)?
   public let onMenu: (() -> Void)?
   public let icon: (() -> Content)?
-  public let addPath: String?
+  public let addPath: Routes?
 
   public init(
     title: String, showStartMessage: Bool = false, showSearch: Bool = false,
     onBack: (() -> Void)? = nil,
     background: Color? = nil,
     onMenu: (() -> Void)? = nil,
-    addPath: String? = nil,
+    addPath: Routes? = nil,
     icon: (() -> Content)?
   ) {
     self.title = title
@@ -37,7 +37,7 @@ public struct Header<Content>: View where Content: View {
   }
 
   var back: (() -> Void)? {
-    return onBack ?? (navigator.canGoBack ? { navigator.goBack() } : nil)
+    return onBack ?? (pilot.routes.count > 1 ? { pilot.pop() } : nil)
   }
 
   public var body: some View {
@@ -45,6 +45,7 @@ public struct Header<Content>: View where Content: View {
       HStack {
         if let back = back {
           Button {
+            print("Header back button back")
             back()
           } label: {
             Image(systemName: "chevron.left")
@@ -75,7 +76,7 @@ public struct Header<Content>: View where Content: View {
           }
         }
         if showSearch {
-          NavLink(to: "/search") {
+          NavLink(to: Routes.Search) {
             ZStack {
               Circle().fill(theme.colors.button)
               Image(
@@ -89,7 +90,7 @@ public struct Header<Content>: View where Content: View {
           }
         }
         if showStartMessage {
-          NavLink(to: "/chats/new") {
+          NavLink(to: Routes.NewChat) {
             ZStack {
               Circle().fill(theme.colors.button)
               Image(
@@ -131,7 +132,7 @@ extension Header where Content == Image {
     title: String, showStartMessage: Bool = false, showSearch: Bool = false,
     onBack: (() -> Void)? = nil,
     onMenu: (() -> Void)? = nil,
-    addPath: String? = nil,
+    addPath: Routes? = nil,
     background: Color? = nil
   ) {
     self.init(

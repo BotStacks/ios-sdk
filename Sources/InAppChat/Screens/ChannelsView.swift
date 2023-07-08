@@ -1,11 +1,13 @@
 import Foundation
 import SwiftUI
 
+
 public struct ChannelsView: View {
 
   @Environment(\.iacTheme) var theme
   @ObservedObject var chats = Chats.current
   @Environment(\.geometry) var geometry
+  @EnvironmentObject var pilot: UIPilot<Routes>
 
   @Binding var scrollToTop: Int
   public init(scrollToTop: Binding<Int>) {
@@ -24,7 +26,9 @@ public struct ChannelsView: View {
               loading: chats.network.loading,
               config: theme.assets.emptyAllChannels,
               tab: true,
-              cta: CTA(icon: nil, text: "Create A Channel", to: "/group/new")
+              cta: CTA(icon: nil, text: "Create A Channel", action: {
+                pilot.push(.CreateChat(id: nil))
+              })
             )
           }
         ) { chat in
@@ -37,7 +41,7 @@ public struct ChannelsView: View {
           }
         }
         Header(
-          title: "All Channels", showStartMessage: false, showSearch: true, addPath: "/groups/new"
+          title: "All Channels", showStartMessage: false, showSearch: true, addPath: Routes.CreateChat(id: nil)
         )
       }
     }

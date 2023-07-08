@@ -124,7 +124,6 @@ class Api: InterceptorProvider, ApolloInterceptor {
         uploadingNetworkTransport: apiTransport, webSocketNetworkTransport: socket)
     }
     self.client = ApolloClient(networkTransport: networkTransport, store: store)
-    subscribe()
     return self.client!
   }
 
@@ -353,16 +352,11 @@ class Api: InterceptorProvider, ApolloInterceptor {
 
   func onUser(_ user: User) async throws {
     await MainActor.run {
-      Chats.current.user = user
-      Chats.current.currentUserID = user.id
+      Chats.current.startSession(user:user)
       User.current = user
       InAppChat.shared.isUserLoggedIn = true
     }
-    do {
-      try await Chats.current.loadAsync()
-    } catch let err {
-      Monitoring.error(err)
-    }
+    subscribe()
   }
 
   func onToken(_ token: String) {
@@ -515,7 +509,13 @@ class Api: InterceptorProvider, ApolloInterceptor {
   func start() async throws -> User {
     let res = try await client.fetchAsync(query: Gql.GetMeQuery())
     let user = User.get(.init(_dataDict:res.me.__data))
-    User.current = user
+    try await onUser(user)
+    Chats.current.settings.blocked.append(contentsOf: res.me.blocks ?? [])
+    let mraw = res.memberships
+    let memberships = mraw.map { it in
+      let chat = Chat.get(Gql.FChat(_dataDict: it.chat.__data))
+      return Member.fromGql(Gql.FMember(_dataDict: it.__data))
+    }
     return user
   }
   

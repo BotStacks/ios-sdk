@@ -70,6 +70,8 @@ public struct ContactsView: View {
             }
           }
         Header(title: "My Contacts", showSearch: true)
+      }.onAppear {
+        contacts.loadMoreIfEmpty()
       }
     }
   }

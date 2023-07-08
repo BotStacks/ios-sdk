@@ -10,13 +10,14 @@ import Foundation
 import InAppChat
 import SwiftUI
 
+
 struct Splash<Content>: View where Content: View {
 
   @Environment(\.geometry) var geometry
   let content: (() -> Content)?
-  @EnvironmentObject var navigator: Navigator
+  @EnvironmentObject var pilot: UIPilot<Routes>
 
-    @ObservedObject var app = InAppChat.shared
+  @ObservedObject var app = InAppChat.shared
 
   init(@ViewBuilder _ content: @escaping () -> Content) {
     self.content = content
@@ -53,7 +54,7 @@ struct Splash<Content>: View where Content: View {
     }
     .onChange(of: app.loaded) { newValue in
       if newValue {
-          navigator.navigate(app.isUserLoggedIn ? "/chats" : "/login", replace: true)
+        pilot.push(app.isUserLoggedIn ? Routes.Chat : Routes.Login)
           if (app.isUserLoggedIn) {
               UIApplication.shared
                   .registerForRemoteNotifications()
