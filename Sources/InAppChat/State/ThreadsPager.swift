@@ -13,6 +13,7 @@ public class ThreadsPager: Pager<Message> {
     let messages = try await api.getReplyThreads(skip: skip, limit: limit)
     return try await messages.concurrentMap { message in
       if message.chat == nil {
+        print("Threads pager fill chat")
         let _ = try await api.get(chat: message.chatID)
       }
       return message

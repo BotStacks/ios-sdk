@@ -125,6 +125,7 @@ public struct Route<ValidatedData, Content: View>: View {
     }
     let background = self.theme.colors.background
 
+    print("Render route \(path)")
     return SwiftUI.Group {
       if let validatedData = validatedData,
         let routeInformation = routeInformation

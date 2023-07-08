@@ -121,6 +121,7 @@ public final class Message: ObservableObject, Identifiable {
   
   func fillChat() {
     if chat == nil {
+      print("Message Fill Chat")
       Chat.fetch(id: chatID)
     }
   }

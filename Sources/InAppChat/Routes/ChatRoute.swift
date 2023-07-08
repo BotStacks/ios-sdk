@@ -69,6 +69,7 @@ public struct ChatRoute: View {
   func fetchChat(_ id: String) {
     Task {
       do {
+        print("Chat Route Fetch Chat")
         let t = try await api.get(chat: id)
         await MainActor.run {
           self.chat = t

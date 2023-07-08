@@ -503,8 +503,9 @@ class Api: InterceptorProvider, ApolloInterceptor {
   }
 
   func registerPushToken(_ token: String) async throws -> Bool {
-    let res = try await client.performAsync(mutation: Gql.RegisterPushMutation(token: token, kind: .case(Gql.DeviceType.ios), fcm: .some(false)))
-    return res.registerPush
+//    let res = try await client.performAsync(mutation: Gql.RegisterPushMutation(token: token, kind: .case(Gql.DeviceType.ios), fcm: .some(false)))
+//    return res.registerPush
+    return true
   }
 
   func registerFCMToken(_ token: String) async throws {
