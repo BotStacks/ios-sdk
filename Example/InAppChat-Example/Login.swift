@@ -74,10 +74,6 @@ struct Login: View {
               .padding(.vertical, 16.0)
           }.disabled(loggingIn)
       }.padding(.bottom, geometry.insets.bottom)
-    }.onChange(of: app.isUserLoggedIn) { newValue in
-        if (newValue) {
-          pilot.push(.Chat)
-        }
     }
   }
 

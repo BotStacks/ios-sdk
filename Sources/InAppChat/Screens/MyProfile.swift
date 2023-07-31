@@ -58,6 +58,6 @@ public struct MyProfile: View {
             .foregroundColor(theme.colors.primary)
             .font(theme.fonts.headline)
         }
-      }.background(.cyan)
+      }
   }
 }

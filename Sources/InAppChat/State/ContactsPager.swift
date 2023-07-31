@@ -32,10 +32,6 @@ public class ContactsPager: Pager<User> {
     }
   }
 
-  override var isSinglePage: Bool {
-    return true
-  }
-
   override public func load(skip: Int, limit: Int) async throws -> [User] {
     return try await api.listUsers(skip: skip, limit: limit)
   }

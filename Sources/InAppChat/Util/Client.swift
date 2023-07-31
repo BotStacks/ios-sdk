@@ -20,7 +20,9 @@ extension ApolloClient {
             Monitoring.error(error)
           }
         } else if let data = graphQLResult.data {
-          resultHandler(data)
+          DispatchQueue.main.async {
+            resultHandler(data)
+          }
         }
       case .failure(let error):
         Monitoring.error(error)
@@ -46,10 +48,15 @@ extension ApolloClient {
       switch (result) {
       case .success(let res):
         if let data = res.data {
-          cont.resume(returning: data)
+          DispatchQueue.main.async {
+            cont.resume(returning: data)
+          }
         } else if let errs = res.errors {
           for err in errs {
             Monitoring.error(err)
+            if err.message == "login required" {
+              api.loggedOut()
+            }
           }
           cont.resume(throwing: APIError(msg: "GQL Errors", critical: true))
         } else {

@@ -14,7 +14,6 @@ Bundle.allBundles.compactMap({$0.url(forResource: "InAppChat", withExtension: "b
 public class InAppChat: ObservableObject {
 
   let apiKey: String
-  let namespace: String
   
   public let tenant = Tenant()
 
@@ -28,8 +27,7 @@ public class InAppChat: ObservableObject {
     return Chats.current.user
   }
 
-  public init(namespace: String, apiKey: String) {
-    self.namespace = namespace
+  public init(apiKey: String) {
     self.apiKey = apiKey
     Monitoring.start()
   }
@@ -43,8 +41,8 @@ public class InAppChat: ObservableObject {
     }
   }
 
-  public static func setup(namespace: String, apiKey: String, delayLoad: Bool = false) {
-    InAppChat.shared = InAppChat(namespace: namespace, apiKey: apiKey)
+  public static func setup(apiKey: String, delayLoad: Bool = false) {
+    InAppChat.shared = InAppChat(apiKey: apiKey)
     if !delayLoad {
       Task {
         do {

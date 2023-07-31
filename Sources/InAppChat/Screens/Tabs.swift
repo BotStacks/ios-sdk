@@ -62,7 +62,10 @@ public struct Tabs: View {
     case .channels:
       return AnyView(ChannelsView(scrollToTop: $scrollToTop))
     case .chats:
-      return AnyView(ChatsView(scrollToTop: $scrollToTop, onExploreChannels: {tab = .channels}, onSendAMessage: {tab = .contacts}))
+      return AnyView(ChatsView(scrollToTop: $scrollToTop, onExploreChannels: {
+        print("On Explore Channels")
+        tab = .channels
+      }, onSendAMessage: {tab = .contacts}))
     case .contacts:
       return AnyView(ContactsView(scrollToTop: $scrollToTop))
     case .settings:

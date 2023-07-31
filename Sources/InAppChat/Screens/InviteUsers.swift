@@ -77,7 +77,8 @@ public struct InviteUsers: View {
                     name: state.name,
                     description: state.description,
                     image: state.image,
-                    private: state._private
+                    private: state._private ,
+                    invites: self.selected.map(\.id)
                   )
                   await chat.invite(users: self.selected)
                   await MainActor.run {

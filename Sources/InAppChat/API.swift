@@ -15,7 +15,7 @@ let servers = (
   )
 )
 
-let env = "dev"
+let env = "local"
 
 func chatServer() -> (host: String, ssl: Bool) {
   switch env {
@@ -248,7 +248,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
     return try await self.updateGroup(input: Gql.UpdateGroupInput(_private: _private.map({.some($0)}) ?? .none, description: description.map({.some($0)}) ?? .none, id: group, image: _image.map({.some($0)}) ?? .none, name: name.map({.some($0)}) ?? .none))
   }
 
-  func createChat(name: String, description: String?, image: URL?, private _private: Bool?)
+  func createChat(name: String, description: String?, image: URL?, private _private: Bool?, invites: [String]?)
     async throws
     -> Chat
   {
@@ -256,7 +256,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
     if let image = image {
       _image = try await self.uploadFile(file: File(url: image))
     }
-    let res = try await self.client.performAsync(mutation: Gql.CreateGroupMutation(input:  Gql.CreateGroupInput(_private: _private.gqlSomeOrNone, description: description.gqlSomeOrNone, image: _image.gqlSomeOrNone, name: name)))
+    let res = try await self.client.performAsync(mutation: Gql.CreateGroupMutation(input:  Gql.CreateGroupInput(_private: _private.gqlSomeOrNone, description: description.gqlSomeOrNone, image: _image.gqlSomeOrNone, invites: invites.map({GraphQLNullable.some($0)}) ?? .none, name: name)))
     if let g = res.createGroup {
       return Chat.get(Gql.FChat.init(_dataDict: g.__data))
     }
@@ -424,6 +424,10 @@ class Api: InterceptorProvider, ApolloInterceptor {
 
   func logout() async throws {
     _ = try await client.performAsync(mutation: Gql.LogoutMutation())
+    self.loggedOut()
+  }
+  
+  func loggedOut() {
     self.authToken = nil
   }
 
@@ -535,10 +539,14 @@ class Api: InterceptorProvider, ApolloInterceptor {
     
     /// Create a regular HTTP URL request & use multipart
     let server = chatServer()
-    let url = URL(string: "http\(server.ssl ? "s" : "")://\(server.host)/misc/upload")!
+    let url = URL(string: "http\(server.ssl ? "s" : "")://\(server.host)/misc/upload/\(file.name.urlEncoded)")!
     var request = URLRequest(url: url)
     request.httpMethod = "POST"
     request.setValue(multipart.httpContentTypeHeadeValue, forHTTPHeaderField: "Content-Type")
+    if let token = authToken {
+      request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+    }
+    request.setValue(InAppChat.shared.apiKey, forHTTPHeaderField: "X-API-Key")
     request.httpBody = multipart.httpBody
     
     /// Fire the request using URL sesson or anything else...

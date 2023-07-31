@@ -73,13 +73,13 @@ public struct CreateChat: View {
   }
 
   public var body: some View {
-    VStack(alignment: .leading) {
+    VStack(alignment: .leading, spacing: .none) {
       Header(
         title: "Create Channel",
         onBack: {
           pilot.pop()
           CreateChatState.current = nil
-        })
+        }).frame(height: Header<EmptyView>.height)
       ScrollView {
         VStack {
           VStack {

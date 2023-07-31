@@ -63,27 +63,29 @@ public struct EmptyListView: View {
   }
   
   @ViewBuilder
-  func CTAView(icon:Image?, text: String, action: () -> Void) -> some View {
+  func CTAView(icon:Image?, text: String, action: @escaping () -> Void) -> some View {
     Spacer()
     VStack {
-      HStack {
-        Spacer()
-        if let image = icon {
-          image
-            .resizable()
-            .size(32.0)
+      Button(action: action) {
+        HStack {
+          Spacer()
+          if let image = icon {
+            image
+              .resizable()
+              .size(32.0)
+              .foregroundColor(theme.colors.text)
+          }
+          Text(text)
+            .textCase(.uppercase)
+            .font(theme.fonts.headline)
             .foregroundColor(theme.colors.text)
-        }
-        Text(text)
-          .textCase(.uppercase)
-          .font(theme.fonts.headline)
-          .foregroundColor(theme.colors.text)
-        Spacer()
-      }.height(60.0)
-        .overlay(
-          RoundedRectangle(cornerRadius: 30)
-            .stroke(theme.colors.text, lineWidth: 2.0)
-        )
+          Spacer()
+        }.height(60.0)
+          .overlay(
+            RoundedRectangle(cornerRadius: 30)
+              .stroke(theme.colors.text, lineWidth: 2.0)
+          )
+      }
     }.padding(.horizontal, 32.0)
   }
   
