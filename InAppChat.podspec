@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
   s.authors      = {
     'Zaid Daghestani' => 'zaid@dag.tech'
   }
-  s.source       = { :git => 'https://github.com/RipBullNetworks/inappchat-ios.git', :tag => s.version.to_s }
+  s.source       = { :git => 'https://github.com/InAppChat/ios.git', :tag => s.version.to_s }
   s.ios.deployment_target = '15.0'
   s.platform = :ios, '15.0'
   s.swift_version = "5.0"
