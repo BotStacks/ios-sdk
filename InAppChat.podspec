@@ -7,7 +7,7 @@
 
 Pod::Spec.new do |s|
   s.name = 'InAppChat'
-  s.version      = "1.0.12"
+  s.version      = "1.0.13"
   s.summary      = 'InAppChat Chat iOS Framework'
   s.description  = 'Messaging and Chat API for Mobile Apps and Websites'
   s.homepage     = 'https://inappchat.io'

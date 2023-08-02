@@ -15,7 +15,7 @@ let servers = (
   )
 )
 
-let env = "local"
+let env = "prod"
 
 func chatServer() -> (host: String, ssl: Bool) {
   switch env {
