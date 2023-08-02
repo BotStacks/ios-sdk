@@ -59,7 +59,7 @@ public struct EmptyListView: View {
             
         }
       }
-    }.padding(.all, 32.0)
+    }.padding(.all, 16.0)
   }
   
   @ViewBuilder

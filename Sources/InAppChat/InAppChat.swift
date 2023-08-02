@@ -7,9 +7,8 @@ public class Tenant {
 }
 
 let assets =
-Bundle(for: InAppChat.self).url(forResource: "InAppChat", withExtension: "bundle").flatMap({Bundle(url: $0)})
-?? Bundle.allBundles.compactMap({$0.url(forResource: "InAppChat", withExtension: "bundle").flatMap({Bundle(url: $0)})}).first
-??  Bundle.main
+Bundle.main.url(forResource: "InAppChat", withExtension: "bundle", subdirectory: "Frameworks/InAppChat.framework").flatMap({Bundle(url: $0)})!
+//??  Bundle.main
 
 public class InAppChat: ObservableObject {
 
