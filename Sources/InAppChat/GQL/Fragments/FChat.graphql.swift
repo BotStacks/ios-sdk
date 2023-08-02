@@ -6,7 +6,7 @@
 public extension Gql {
   struct FChat: Gql.SelectionSet, Fragment {
     public static var fragmentDefinition: StaticString {
-      "fragment FChat on Chat { __typename id kind created_at updated_at name description image _private encrypted unread_count members { __typename ...FMember } last_message { __typename ...FMessage } notification_setting }"
+      #"fragment FChat on Chat { __typename id kind created_at updated_at name description image _private encrypted unread_count members { __typename ...FMember } last_message { __typename ...FMessage } notification_setting }"#
     }
 
     public let __data: DataDict

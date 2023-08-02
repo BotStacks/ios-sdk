@@ -27,7 +27,7 @@ Add the pod to your podfile
 In your app delegate, or anywhere else you put your startup logic, initialize the InAppChat SDK
 
 ```swift
-InAppChat.setup(namespace: namespace, apiKey: apiKey, delayLoad: true)
+InAppChat.setup(apiKey: apiKey, delayLoad: true)
 ```
 
 Note, you can optionally delay load and later call `InAppChat.shared.load` to load IAC in whatever load sequence you please

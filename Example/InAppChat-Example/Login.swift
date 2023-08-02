@@ -49,7 +49,7 @@ struct Login: View {
                                       UIApplication.shared.registerForRemoteNotifications()
                                   }
                               }
-                        navigator.navigate("chats", replaceAll: true)
+                        navigator.navigate("/chats", replaceAll: true)
                       }
                   }
                 case .failure(let error):

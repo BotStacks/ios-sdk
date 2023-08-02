@@ -6,7 +6,7 @@
 public extension Gql {
   struct FUser: Gql.SelectionSet, Fragment {
     public static var fragmentDefinition: StaticString {
-      "fragment FUser on User { __typename id updated_at created_at last_seen username display_name description image is_bot status app_role devices { __typename ...FDevice } }"
+      #"fragment FUser on User { __typename id updated_at created_at last_seen username display_name description image is_bot status app_role devices { __typename ...FDevice } }"#
     }
 
     public let __data: DataDict

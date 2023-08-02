@@ -6,7 +6,7 @@
 public extension Gql {
   struct FInvite: Gql.SelectionSet, Fragment {
     public static var fragmentDefinition: StaticString {
-      "fragment FInvite on InviteEvent { __typename by { __typename ...FUser } to { __typename ...FChat } }"
+      #"fragment FInvite on InviteEvent { __typename by { __typename ...FUser } to { __typename ...FChat } }"#
     }
 
     public let __data: DataDict

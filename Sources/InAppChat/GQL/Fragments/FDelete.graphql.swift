@@ -6,7 +6,7 @@
 public extension Gql {
   struct FDelete: Gql.SelectionSet, Fragment {
     public static var fragmentDefinition: StaticString {
-      "fragment FDelete on DeleteEvent { __typename id kind }"
+      #"fragment FDelete on DeleteEvent { __typename id kind }"#
     }
 
     public let __data: DataDict

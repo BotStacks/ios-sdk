@@ -168,7 +168,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
   }
   
   func getGroups(skip: Int = 0, limit: Int = 20) async throws -> [Chat] {
-    let res = try await client.fetchAsync(query: Gql.ListGroupsQuery(count: .some(skip), offset: .some(limit)))
+    let res = try await client.fetchAsync(query: Gql.ListGroupsQuery(count: .some(limit), offset: .some(skip)))
     let chats = await MainActor.run {
       return res.groups.map {
         return Chat.get(Gql.FChat(_dataDict: $0.__data))
@@ -196,7 +196,9 @@ class Api: InterceptorProvider, ApolloInterceptor {
   
   func send(input: Gql.SendMessageInput) async throws -> Message {
     let send = try await client.performAsync(mutation: Gql.SendMessageMutation(input: input))
-    return Message.get(.init(_dataDict: send.sendMessage.__data))
+    return await MainActor.run {
+      Message.get(.init(_dataDict: send.sendMessage.__data))
+    }
   }
 
   func send(text: String, to chat: String, inReplyTo parent: String?)
@@ -262,7 +264,14 @@ class Api: InterceptorProvider, ApolloInterceptor {
     }
     let res = try await self.client.performAsync(mutation: Gql.CreateGroupMutation(input:  Gql.CreateGroupInput(_private: _private.gqlSomeOrNone, description: description.gqlSomeOrNone, image: _image.gqlSomeOrNone, invites: invites.map({GraphQLNullable.some($0)}) ?? .none, name: name)))
     if let g = res.createGroup {
-      return Chat.get(Gql.FChat.init(_dataDict: g.__data))
+      return await MainActor.run {
+        let chat = Chat.get(Gql.FChat.init(_dataDict: g.__data))
+        if let member = chat.membership {
+          Chats.current.memberships.append(member)
+        }
+        Chats.current.network.items.append(chat)
+        return chat
+      }
     }
     throw APIError(msg: "No group returned", critical: true)
   }
@@ -488,7 +497,13 @@ class Api: InterceptorProvider, ApolloInterceptor {
   func dm(user: String) async throws -> Chat {
     let res = try await self.client.performAsync(mutation: Gql.DMMutation(user: user))
     if let dm = res.dm {
-      return Chat.get(.init(_dataDict: dm.__data))
+      return await MainActor.run {
+        let chat = Chat.get(.init(_dataDict: dm.chat.__data))
+        let member = Member.fromGql(.init(_dataDict: dm.__data))
+        Chats.current.memberships.append(member)
+        return chat
+      }
+      
     } else {
       throw APIError(msg: "Unable to dm user", critical: true)
     }

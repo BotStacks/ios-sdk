@@ -6,7 +6,7 @@
 public extension Gql {
   struct FReply: Gql.SelectionSet, Fragment {
     public static var fragmentDefinition: StaticString {
-      "fragment FReply on ReplyEvent { __typename message { __typename ...FMessage } }"
+      #"fragment FReply on ReplyEvent { __typename message { __typename ...FMessage } }"#
     }
 
     public let __data: DataDict

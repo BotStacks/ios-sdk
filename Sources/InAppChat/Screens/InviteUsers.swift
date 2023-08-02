@@ -66,12 +66,15 @@ public struct InviteUsers: View {
             }.circle(50, theme.inverted.softBackground)
           }
           Button {
+            print("On Create Chat \(state?.name) \(creating)")
             if let chat = chat {
               chat.invite(users: selected)
               navigator.goBack()
             } else if !creating, let state = state {
+              print("Creating new chat")
               self.creating = true
               Task.detached {
+                print("Create chat task started")
                 do {
                   let chat = try await api.createChat(
                     name: state.name,
@@ -80,13 +83,13 @@ public struct InviteUsers: View {
                     private: state._private ,
                     invites: self.selected.map(\.id)
                   )
-                  await chat.invite(users: self.selected)
                   await MainActor.run {
                     CreateChatState.current = nil
                     navigator.goBack(total: 2)
                     navigator.navigate(chat.path)
                   }
                 } catch let err {
+                  print("Error creating chat \(err)")
                   Monitoring.error(err)
                   await MainActor.run {
                     creating = false

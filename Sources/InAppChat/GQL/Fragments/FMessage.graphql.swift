@@ -6,7 +6,7 @@
 public extension Gql {
   struct FMessage: Gql.SelectionSet, Fragment {
     public static var fragmentDefinition: StaticString {
-      "fragment FMessage on Message { __typename id system created_at updated_at text parent_id reply_count reactions chat_id user { __typename ...FUser } attachments { __typename id type url data mime width height duration address latitude longitude } mentions { __typename user_id username offset } }"
+      #"fragment FMessage on Message { __typename id system created_at updated_at text parent_id reply_count reactions chat_id user { __typename ...FUser } attachments { __typename id type url data mime width height duration address latitude longitude } mentions { __typename user_id username offset } }"#
     }
 
     public let __data: DataDict

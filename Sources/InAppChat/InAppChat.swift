@@ -7,9 +7,9 @@ public class Tenant {
 }
 
 let assets =
-Bundle.allBundles.compactMap({$0.url(forResource: "InAppChat", withExtension: "bundle").flatMap({Bundle(url: $0)})}).first
-?? Bundle(for: InAppChat.self).url(forResource: "InAppChat", withExtension: "bundle").flatMap({Bundle(url: $0)})
-  ?? Bundle.main
+Bundle(for: InAppChat.self).url(forResource: "InAppChat", withExtension: "bundle").flatMap({Bundle(url: $0)})
+?? Bundle.allBundles.compactMap({$0.url(forResource: "InAppChat", withExtension: "bundle").flatMap({Bundle(url: $0)})}).first
+??  Bundle.main
 
 public class InAppChat: ObservableObject {
 
@@ -35,7 +35,11 @@ public class InAppChat: ObservableObject {
   public func load() async throws {
     guard !didStartLoading else { return }
     didStartLoading = true
-    try await Chats.current.loadAsync()
+    do {
+      try await Chats.current.loadAsync()
+    } catch {
+      api.loggedOut()
+    }
     await MainActor.run {
       self.loaded = true
     }

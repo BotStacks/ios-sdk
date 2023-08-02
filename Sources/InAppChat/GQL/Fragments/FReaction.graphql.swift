@@ -6,7 +6,7 @@
 public extension Gql {
   struct FReaction: Gql.SelectionSet, Fragment {
     public static var fragmentDefinition: StaticString {
-      "fragment FReaction on ReactionEvent { __typename reaction user { __typename ...FUser } message { __typename ...FMessage } }"
+      #"fragment FReaction on ReactionEvent { __typename reaction user { __typename ...FUser } message { __typename ...FMessage } }"#
     }
 
     public let __data: DataDict

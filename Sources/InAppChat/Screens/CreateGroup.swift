@@ -254,7 +254,7 @@ public struct CreateChat: View {
                       }
                     }
                   } else {
-                    navigator.navigate(state.chat?.invitePath ?? "/chat/new/invite")
+                    navigator.navigate(state.chat?.invitePath ?? "/group/new/invite")
                   }
                 }
               } label: {

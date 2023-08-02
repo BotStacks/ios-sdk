@@ -6,7 +6,7 @@
 public extension Gql {
   struct FEntity: Gql.SelectionSet, Fragment {
     public static var fragmentDefinition: StaticString {
-      "fragment FEntity on EntityEvent { __typename type entity { __typename ... on User { ...FUser } ... on Message { ...FMessage } ... on Member { ...FMember } ... on Chat { ...FChat } } }"
+      #"fragment FEntity on EntityEvent { __typename type entity { __typename ... on User { ...FUser } ... on Message { ...FMessage } ... on Member { ...FMember } ... on Chat { ...FChat } } }"#
     }
 
     public let __data: DataDict
