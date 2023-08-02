@@ -45,8 +45,8 @@ public final class Message: ObservableObject, Identifiable {
 
   lazy var replies = RepliesPager(self)
 
-  var path: Routes {
-    return Routes.Message(id)
+  var path: String {
+    return "/message/\(id)"
   }
 
   public init(
@@ -96,7 +96,7 @@ public final class Message: ObservableObject, Identifiable {
     self.update(msg)
     self.makeMarkdown()
     Chats.current.cache.messages[id] = self
-    fillChat()
+//    fillChat()
     fillParent()
   }
   
@@ -176,6 +176,7 @@ public final class Message: ObservableObject, Identifiable {
   }
 
   static func get(_ msg: Gql.FMessage) -> Message {
+    let _ = User.get(.init(_dataDict: msg.user.__data))
     if let m = get(msg.id) {
       m.update(msg)
       return m

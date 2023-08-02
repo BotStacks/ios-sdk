@@ -78,7 +78,6 @@ public struct ChatsView: View {
           empty: empty,
           content: { ThreadRow(chat: $0) }
         )
-        
         Header(title: "Message", showStartMessage: true, showSearch: true)
       }.onChange(of: scrollToTop) { newValue in
         var id:String? = nil

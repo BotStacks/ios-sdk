@@ -49,7 +49,7 @@ class CreateChatState: ObservableObject {
 public struct CreateChat: View {
 
   @Environment(\.iacTheme) var theme
-  @EnvironmentObject var pilot: UIPilot<Routes>
+  @EnvironmentObject var navigator: Navigator
   @Environment(\.geometry) var geometry
 
   enum Field: Hashable {
@@ -77,9 +77,9 @@ public struct CreateChat: View {
       Header(
         title: "Create Channel",
         onBack: {
-          pilot.pop()
+          navigator.goBack()
           CreateChatState.current = nil
-        }).frame(height: Header<EmptyView>.height)
+        })
       ScrollView {
         VStack {
           VStack {
@@ -250,11 +250,11 @@ public struct CreateChat: View {
                     Task.detached {
                       await state.commit()
                       await MainActor.run {
-                        pilot.pop()
+                        navigator.goBack()
                       }
                     }
                   } else {
-                    pilot.push(Routes.InviteUsers(id: state.chat?.id))
+                    navigator.navigate(state.chat?.invitePath ?? "/chat/new/invite")
                   }
                 }
               } label: {

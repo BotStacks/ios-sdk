@@ -6,16 +6,9 @@
 public extension Gql {
   class InviteUsersMutation: GraphQLMutation {
     public static let operationName: String = "InviteUsers"
-    public static let document: Apollo.DocumentType = .notPersisted(
+    public static let operationDocument: Apollo.OperationDocument = .init(
       definition: .init(
-        #"""
-        mutation InviteUsers($chat: ID!, $users: [ID!]!) {
-          inviteMany(chat: $chat, users: $users) {
-            __typename
-            ...FMember
-          }
-        }
-        """#,
+        #"mutation InviteUsers($chat: ID!, $users: [ID!]!) { inviteMany(chat: $chat, users: $users) { __typename ...FMember } }"#,
         fragments: [FMember.self, FUser.self, FDevice.self]
       ))
 
@@ -107,6 +100,8 @@ public extension Gql {
           public var is_bot: Bool? { __data["is_bot"] }
           /// The online status of this user
           public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }
+          /// The Role of this User in their primary App
+          public var app_role: GraphQLEnum<Gql.AppUserRole> { __data["app_role"] }
           /// The User's devices
           public var devices: [Device] { __data["devices"] }
 

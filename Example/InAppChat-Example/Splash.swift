@@ -15,7 +15,7 @@ struct Splash<Content>: View where Content: View {
 
   @Environment(\.geometry) var geometry
   let content: (() -> Content)?
-  @EnvironmentObject var pilot: UIPilot<Routes>
+  @EnvironmentObject var navigator: Navigator
 
   @ObservedObject var app = InAppChat.shared
 
@@ -54,7 +54,7 @@ struct Splash<Content>: View where Content: View {
     }
     .onChange(of: app.loaded) { newValue in
       if newValue {
-        pilot.push(app.isUserLoggedIn ? Routes.Chat : Routes.Login)
+        navigator.navigate(app.isUserLoggedIn ? "/chats" : "/login", replace: true)
           if (app.isUserLoggedIn) {
               UIApplication.shared
                   .registerForRemoteNotifications()

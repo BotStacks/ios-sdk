@@ -18,6 +18,7 @@ public struct ChatRoute: View {
   @State var failed = false
 
   public init(uid: String? = nil, cid: String? = nil, mid: String? = nil) {
+    print("Chat Route \(uid ?? "nouid") \(cid ?? "nocid") \(mid ?? "nomid")")
     self.uid = uid
     self.cid = cid
     self.mid = mid
@@ -47,9 +48,11 @@ public struct ChatRoute: View {
         fetchChat(m!.chatID)
       }
     }
+//    print("Have chat \(chat?.id ?? "none")")
   }
   
   func fetchMessage(_ id: String) {
+    print("Fetch Message")
     Task {
       do {
         let m = try await api.get(message: id)
@@ -67,6 +70,7 @@ public struct ChatRoute: View {
   }
   
   func fetchChat(_ id: String) {
+    print("Fetch Chat")
     Task {
       do {
         print("Chat Route Fetch Chat")
@@ -84,6 +88,7 @@ public struct ChatRoute: View {
   }
   
   func fetchUser(_ id: String) {
+    print("Fetch user chat")
     Task {
       do {
         let chat = try await api.dm(user: id)
@@ -101,13 +106,19 @@ public struct ChatRoute: View {
 
 
   @Environment(\.iacTheme) var theme
+  
+  var logChat: some View {
+    print("Render chat room with chat \(self.chat?.id)")
+    return EmptyView()
+  }
 
   public var body: some View {
-    if let chat = chat {
+    logChat
+    if let chat = chat ?? cid.flatMap({Chat.get($0)}) ?? uid.flatMap({Chat.get(uid: $0)}) {
       ChatRoom(chat: chat, message: message)
     } else {
       VStack {
-        Header(title: user?.username ?? "")
+        Header<Image>(title: user?.username ?? "")
         ZStack {
           if failed {
             Text("Chat not found")

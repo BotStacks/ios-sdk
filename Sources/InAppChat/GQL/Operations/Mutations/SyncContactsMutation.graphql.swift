@@ -6,13 +6,9 @@
 public extension Gql {
   class SyncContactsMutation: GraphQLMutation {
     public static let operationName: String = "SyncContacts"
-    public static let document: Apollo.DocumentType = .notPersisted(
+    public static let operationDocument: Apollo.OperationDocument = .init(
       definition: .init(
-        #"""
-        mutation SyncContacts($numbers: [String!]!) {
-          syncContacts(numbers: $numbers)
-        }
-        """#
+        #"mutation SyncContacts($numbers: [String!]!) { syncContacts(numbers: $numbers) }"#
       ))
 
     public var numbers: [String]

@@ -26,11 +26,11 @@ public struct Avatar: View {
     ZStack {
       if let url = url {
         GifImageView(url: url)
-          .scaledToFit()
+          .aspectRatio(contentMode: .fit)
           .grow()
       } else {
         if group {
-          GroupPlaceholder()
+          GroupPlaceholder(size: size)
             .scaledToFit()
             .grow()
         } else {
@@ -41,6 +41,7 @@ public struct Avatar: View {
             .foregroundColor(theme.colors.text)
         }
       }
-    }.circle(size, theme.colors.softBackground)
+    }.size(size).background(theme.colors.softBackground).cornerRadius(size / 2.0)
+//    .circle(size, theme.colors.softBackground)
   }
 }

@@ -100,13 +100,24 @@ extension Chat {
     self.send(attachment: .init(data: .some(contact.toAppContact()), id: UUID().uuidString, type: .case(.vcard), url: "data"), inReplyTo: inReplyTo)
   }
 
+  func markRead() {
+    self.unreadCount = 0
+    Task.detached {
+      do {
+        try await api.markChatRead(self.id)
+      } catch let err {
+        Monitoring.error(err)
+      }
+    }
+  }
 }
 
 extension Gql.AttachmentInput {
   var attachment: Gql.FMessage.Attachment {
     var dict: [String: AnyHashable] = [
-      "type": type.rawValue,
-      "url": url
+      "type": type,
+      "url": url,
+      "id" : id
     ]
     if let mime = mime.unwrapped {
       dict["mime"] = mime

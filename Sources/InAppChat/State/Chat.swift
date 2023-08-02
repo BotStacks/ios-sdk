@@ -104,16 +104,16 @@ public final class Chat: Pager<Message>, Identifiable {
   }
 
 
-  var path: Routes {
-    return Routes.Chat(id: id, isUser: false)
+  var path: String {
+    return "/chat/\(id)"
   }
 
-  var editPath: Routes {
-    return Routes.CreateChat(id: id)
+  var editPath: String {
+    return "/group/\(id)/edit"
   }
 
-  var invitePath: Routes {
-    return Routes.InviteUsers(id: id)
+  var invitePath: String {
+    return "/group/\(id)/invite"
   }
 
   @Published var invited: [User] = []
@@ -210,5 +210,8 @@ public final class Chat: Pager<Message>, Identifiable {
   }
 }
 
-
-
+extension Chat: Equatable {
+  public static func ==(lhs: Chat, rhs: Chat) -> Bool {
+    return lhs.id == rhs.id
+  }
+}

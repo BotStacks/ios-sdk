@@ -6,13 +6,9 @@
 public extension Gql {
   class RegisterPushMutation: GraphQLMutation {
     public static let operationName: String = "registerPush"
-    public static let document: Apollo.DocumentType = .notPersisted(
+    public static let operationDocument: Apollo.OperationDocument = .init(
       definition: .init(
-        #"""
-        mutation registerPush($token: String!, $kind: DeviceType!, $fcm: Boolean) {
-          registerPush(token: $token, kind: $kind, fcm: $fcm)
-        }
-        """#
+        #"mutation registerPush($token: String!, $kind: DeviceType!, $fcm: Boolean) { registerPush(token: $token, kind: $kind, fcm: $fcm) }"#
       ))
 
     public var token: String

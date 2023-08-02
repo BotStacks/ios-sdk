@@ -17,7 +17,7 @@ struct Login: View {
 
   @Environment(\.openURL) private var openURL
   @Environment(\.geometry) private var geometry
-  @EnvironmentObject var pilot: UIPilot<Routes>
+  @EnvironmentObject var navigator: Navigator
     @ObservedObject var app = InAppChat.shared
     @State var loggingIn = false
 
@@ -49,7 +49,7 @@ struct Login: View {
                                       UIApplication.shared.registerForRemoteNotifications()
                                   }
                               }
-                        pilot.push(Routes.Chat)
+                        navigator.navigate("chats", replaceAll: true)
                       }
                   }
                 case .failure(let error):

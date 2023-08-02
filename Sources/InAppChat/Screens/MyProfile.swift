@@ -25,13 +25,13 @@ public struct MyProfile: View {
         .truncationMode(.middle)
         .multilineTextAlignment(.center)
       }
-      NavLink(to: Routes.Profile(id: User.current?.id)) {
+      NavLink(to: User.current!.path) {
         Row(icon: "user-fill", text: "Profile")
       }
-      NavLink(to: Routes.Favorites) {
+      NavLink(to: "/favorites") {
         Row(icon: "star-fill", text: "Favorite Messages")
       }
-      NavLink(to: Routes.ManageNotifications) {
+      NavLink(to: "/settings/notifications") {
         Row(
           icon: "bell-simple-fill", text: "Manage Notifications"
         )

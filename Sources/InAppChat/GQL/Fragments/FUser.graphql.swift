@@ -5,25 +5,9 @@
 
 public extension Gql {
   struct FUser: Gql.SelectionSet, Fragment {
-    public static var fragmentDefinition: StaticString { """
-      fragment FUser on User {
-        __typename
-        id
-        updated_at
-        created_at
-        last_seen
-        username
-        display_name
-        description
-        image
-        is_bot
-        status
-        devices {
-          __typename
-          ...FDevice
-        }
-      }
-      """ }
+    public static var fragmentDefinition: StaticString {
+      "fragment FUser on User { __typename id updated_at created_at last_seen username display_name description image is_bot status app_role devices { __typename ...FDevice } }"
+    }
 
     public let __data: DataDict
     public init(_dataDict: DataDict) { __data = _dataDict }
@@ -41,6 +25,7 @@ public extension Gql {
       .field("image", String?.self),
       .field("is_bot", Bool?.self),
       .field("status", GraphQLEnum<Gql.OnlineStatus>.self),
+      .field("app_role", GraphQLEnum<Gql.AppUserRole>.self),
       .field("devices", [Device].self),
     ] }
 
@@ -64,6 +49,8 @@ public extension Gql {
     public var is_bot: Bool? { __data["is_bot"] }
     /// The online status of this user
     public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }
+    /// The Role of this User in their primary App
+    public var app_role: GraphQLEnum<Gql.AppUserRole> { __data["app_role"] }
     /// The User's devices
     public var devices: [Device] { __data["devices"] }
 

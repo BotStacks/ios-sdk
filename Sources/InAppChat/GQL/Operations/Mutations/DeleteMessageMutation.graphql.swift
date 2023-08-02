@@ -6,13 +6,9 @@
 public extension Gql {
   class DeleteMessageMutation: GraphQLMutation {
     public static let operationName: String = "DeleteMessage"
-    public static let document: Apollo.DocumentType = .notPersisted(
+    public static let operationDocument: Apollo.OperationDocument = .init(
       definition: .init(
-        #"""
-        mutation DeleteMessage($id: ID!) {
-          removeMessage(id: $id)
-        }
-        """#
+        #"mutation DeleteMessage($id: ID!) { removeMessage(id: $id) }"#
       ))
 
     public var id: ID

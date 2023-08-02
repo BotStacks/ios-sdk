@@ -18,6 +18,7 @@ public extension Gql {
       display_name: GraphQLNullable<String> = nil,
       email: GraphQLNullable<String> = nil,
       image: GraphQLNullable<String> = nil,
+      is_1webchat: GraphQLNullable<Bool> = nil,
       user_id: ID,
       username: String
     ) {
@@ -27,6 +28,7 @@ public extension Gql {
         "display_name": display_name,
         "email": email,
         "image": image,
+        "is_1webchat": is_1webchat,
         "user_id": user_id,
         "username": username
       ])
@@ -61,6 +63,12 @@ public extension Gql {
     public var image: GraphQLNullable<String> {
       get { __data["image"] }
       set { __data["image"] = newValue }
+    }
+
+    /// Signifies that a user is guest / 1webchat and not intended for normal chat
+    public var is_1webchat: GraphQLNullable<Bool> {
+      get { __data["is_1webchat"] }
+      set { __data["is_1webchat"] = newValue }
     }
 
     /// The ID of the user on the silo owner's app network

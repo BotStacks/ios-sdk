@@ -211,6 +211,10 @@ class Api: InterceptorProvider, ApolloInterceptor {
   func markRead(_ message: Message) async throws {
     try await updateMessageStatus(message, status: .seen)
   }
+  
+  func markChatRead(_ chat: String) async throws {
+    let _ = try await self.client.performAsync(mutation: Gql.MarkChatReadMutation(id: chat))
+  }
 
   func markReceived(_ message: Message) async throws {
     try await updateMessageStatus(message, status: .delivered)
@@ -350,12 +354,10 @@ class Api: InterceptorProvider, ApolloInterceptor {
     try await onUser(user)
   }
 
-  func onUser(_ user: User) async throws {
-    await MainActor.run {
-      Chats.current.startSession(user:user)
-      User.current = user
-      InAppChat.shared.isUserLoggedIn = true
-    }
+  func onUser(_ user: User) {
+    Chats.current.startSession(user:user)
+    User.current = user
+    InAppChat.shared.isUserLoggedIn = true
     subscribe()
   }
 
@@ -510,17 +512,19 @@ class Api: InterceptorProvider, ApolloInterceptor {
     let _ = try await client.performAsync(mutation: Gql.RegisterPushMutation(token: token, kind: .case(Gql.DeviceType.ios), fcm: .some(true)))
   }
 
-  func start() async throws -> User {
+  func start() async throws -> (User, [Member]) {
     let res = try await client.fetchAsync(query: Gql.GetMeQuery())
-    let user = User.get(.init(_dataDict:res.me.__data))
-    try await onUser(user)
-    Chats.current.settings.blocked.append(contentsOf: res.me.blocks ?? [])
-    let mraw = res.memberships
-    let memberships = mraw.map { it in
-      let chat = Chat.get(Gql.FChat(_dataDict: it.chat.__data))
-      return Member.fromGql(Gql.FMember(_dataDict: it.__data))
+    return await MainActor.run {
+      let user = User.get(.init(_dataDict:res.me.__data))
+      onUser(user)
+      Chats.current.settings.blocked.append(contentsOf: res.me.blocks ?? [])
+      let mraw = res.memberships
+      let memberships = mraw.map { it in
+        let _ = Chat.get(Gql.FChat(_dataDict: it.chat.__data))
+        return Member.fromGql(Gql.FMember(_dataDict: it.__data))
+      }
+      return (user, memberships)
     }
-    return user
   }
   
   func listUsers(skip: Int = 0, limit: Int = 20) async throws -> [User] {
@@ -529,25 +533,18 @@ class Api: InterceptorProvider, ApolloInterceptor {
   }
 
   func uploadFile(file: File) async throws -> String {
-    var multipart = MultipartRequest()
-    multipart.add(
-      key: "file",
-      fileName: file.name,
-      fileMimeType: file.mimeType,
-      fileData: try Data(contentsOf: file.url)
-    )
     
     /// Create a regular HTTP URL request & use multipart
     let server = chatServer()
     let url = URL(string: "http\(server.ssl ? "s" : "")://\(server.host)/misc/upload/\(file.name.urlEncoded)")!
     var request = URLRequest(url: url)
     request.httpMethod = "POST"
-    request.setValue(multipart.httpContentTypeHeadeValue, forHTTPHeaderField: "Content-Type")
+    request.setValue(file.mimeType, forHTTPHeaderField: "Content-Type")
     if let token = authToken {
       request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
     }
     request.setValue(InAppChat.shared.apiKey, forHTTPHeaderField: "X-API-Key")
-    request.httpBody = multipart.httpBody
+    request.httpBody = try Data(contentsOf: file.url)
     
     /// Fire the request using URL sesson or anything else...
     let (data, response) = try await URLSession.shared.data(for: request)

@@ -52,10 +52,11 @@ public class Chats: ObservableObject {
 
   public func loadAsync() async throws {
     if api.authToken != nil {
-      let user = try await api.start()
+      let (user, memberships) = try await api.start()
       print("loaded current user")
       await MainActor.run {
         self.user = user
+        self.memberships.append(contentsOf: memberships)
       }
       print("got active threads")
       if let pushToken = pushToken {

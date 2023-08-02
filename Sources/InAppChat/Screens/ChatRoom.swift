@@ -9,7 +9,6 @@ import Foundation
 import SwiftUI
 import UIKit
 
-
 public struct ChatRoom: View {
 
   enum Media {
@@ -26,7 +25,7 @@ public struct ChatRoom: View {
 
   @FocusState var textFocus
   @Environment(\.geometry) var geometry
-  @EnvironmentObject var pilot: UIPilot<Routes>
+  @EnvironmentObject var navigator: Navigator
 
   @State var menu: Bool = false
   @State var media: Bool = false
@@ -57,7 +56,7 @@ public struct ChatRoom: View {
       }.padding(.horizontal, 16.0)
         .padding(.top, 12.0)
       ActionItem(image: AssetImage("chat-dots"), text: "Reply in chat") {
-        pilot.push(messageForAction!.path)
+        navigator.navigate(messageForAction!.path)
         messageForAction = nil
       }
       ActionItem(
@@ -149,7 +148,11 @@ public struct ChatRoom: View {
           }
         )
       case .gif:
-        return AnyView(EmptyView())
+        return AnyView(
+          GiphyPicker {
+            chat.send(attachment: .init(id: UUID().uuidString, type: .case(.image), url: $0.absoluteString), inReplyTo: message)
+          }
+        )
       }
     } else {
       return nil
@@ -169,6 +172,10 @@ public struct ChatRoom: View {
       MessageList(chat: chat, onLongPress: { messageForAction = $0 })
       Header(
         title: "",
+        onBack: {
+          navigator.goBack()
+          chat.markRead()
+        },
         onMenu: chat.isGroup
           ? {
             menu = true
@@ -206,6 +213,8 @@ public struct ChatRoom: View {
       if chat.isGroup {
         GroupDrawer(chat)
       }
+    }.onAppear {
+      chat.markRead()
     }
   }
 

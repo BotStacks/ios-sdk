@@ -31,12 +31,11 @@ public extension Gql {
 
     public static func objectType(forTypename typename: String) -> Object? {
       switch typename {
-      case "Query": return Gql.Objects.Query
-      case "App": return Gql.Objects.App
       case "Mutation": return Gql.Objects.Mutation
       case "Auth": return Gql.Objects.Auth
       case "User": return Gql.Objects.User
       case "Device": return Gql.Objects.Device
+      case "Query": return Gql.Objects.Query
       case "Member": return Gql.Objects.Member
       case "Chat": return Gql.Objects.Chat
       case "Message": return Gql.Objects.Message

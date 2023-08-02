@@ -6,13 +6,9 @@
 public extension Gql {
   class UpdateMessageMutation: GraphQLMutation {
     public static let operationName: String = "UpdateMessage"
-    public static let document: Apollo.DocumentType = .notPersisted(
+    public static let operationDocument: Apollo.OperationDocument = .init(
       definition: .init(
-        #"""
-        mutation UpdateMessage($input: UpdateMessageInput!) {
-          updateMessage(input: $input)
-        }
-        """#
+        #"mutation UpdateMessage($input: UpdateMessageInput!) { updateMessage(input: $input) }"#
       ))
 
     public var input: UpdateMessageInput

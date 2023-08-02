@@ -5,30 +5,9 @@
 
 public extension Gql {
   struct FChat: Gql.SelectionSet, Fragment {
-    public static var fragmentDefinition: StaticString { """
-      fragment FChat on Chat {
-        __typename
-        id
-        kind
-        created_at
-        updated_at
-        name
-        description
-        image
-        _private
-        encrypted
-        unread_count
-        members {
-          __typename
-          ...FMember
-        }
-        last_message {
-          __typename
-          ...FMessage
-        }
-        notification_setting
-      }
-      """ }
+    public static var fragmentDefinition: StaticString {
+      "fragment FChat on Chat { __typename id kind created_at updated_at name description image _private encrypted unread_count members { __typename ...FMember } last_message { __typename ...FMessage } notification_setting }"
+    }
 
     public let __data: DataDict
     public init(_dataDict: DataDict) { __data = _dataDict }
@@ -136,6 +115,8 @@ public extension Gql {
         public var is_bot: Bool? { __data["is_bot"] }
         /// The online status of this user
         public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }
+        /// The Role of this User in their primary App
+        public var app_role: GraphQLEnum<Gql.AppUserRole> { __data["app_role"] }
         /// The User's devices
         public var devices: [Device] { __data["devices"] }
 
@@ -256,6 +237,8 @@ public extension Gql {
         public var is_bot: Bool? { __data["is_bot"] }
         /// The online status of this user
         public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }
+        /// The Role of this User in their primary App
+        public var app_role: GraphQLEnum<Gql.AppUserRole> { __data["app_role"] }
         /// The User's devices
         public var devices: [Device] { __data["devices"] }
 

@@ -63,8 +63,7 @@ public struct ChannelRow: View {
                   .size(87)
                   .cornerRadius(15.0)
               } else {
-                GroupPlaceholder()
-                  .size(87)
+                GroupPlaceholder(size: 87)
                   .cornerRadius(15.0)
               }
 

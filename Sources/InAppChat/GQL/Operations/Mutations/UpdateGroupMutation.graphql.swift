@@ -6,13 +6,9 @@
 public extension Gql {
   class UpdateGroupMutation: GraphQLMutation {
     public static let operationName: String = "UpdateGroup"
-    public static let document: Apollo.DocumentType = .notPersisted(
+    public static let operationDocument: Apollo.OperationDocument = .init(
       definition: .init(
-        #"""
-        mutation UpdateGroup($input: UpdateGroupInput!) {
-          updateGroup(input: $input)
-        }
-        """#
+        #"mutation UpdateGroup($input: UpdateGroupInput!) { updateGroup(input: $input) }"#
       ))
 
     public var input: UpdateGroupInput

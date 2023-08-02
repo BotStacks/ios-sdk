@@ -6,40 +6,10 @@
 public extension Gql {
   class CoreSubscription: GraphQLSubscription {
     public static let operationName: String = "CoreSubscription"
-    public static let document: Apollo.DocumentType = .notPersisted(
+    public static let operationDocument: Apollo.OperationDocument = .init(
       definition: .init(
-        #"""
-        subscription CoreSubscription {
-          core {
-            __typename
-            ... on DeleteEvent {
-              __typename
-              id
-              kind
-            }
-            ... on EntityEvent {
-              __typename
-              type
-              entity {
-                __typename
-                ... on User {
-                  ...FUser
-                }
-                ... on Message {
-                  ...FMessage
-                }
-                ... on Member {
-                  ...FMember
-                }
-                ... on Chat {
-                  ...FChat
-                }
-              }
-            }
-          }
-        }
-        """#,
-        fragments: [FUser.self, FDevice.self, FMessage.self, FMember.self, FChat.self]
+        #"subscription CoreSubscription { core { __typename ... on DeleteEvent { ...FDelete } ... on EntityEvent { ...FEntity } } }"#,
+        fragments: [FDelete.self, FEntity.self, FUser.self, FDevice.self, FMessage.self, FMember.self, FChat.self]
       ))
 
     public init() {}
@@ -82,12 +52,18 @@ public extension Gql {
           public typealias RootEntityType = CoreSubscription.Data.Core
           public static var __parentType: Apollo.ParentType { Gql.Objects.DeleteEvent }
           public static var __selections: [Apollo.Selection] { [
-            .field("id", Gql.ID.self),
-            .field("kind", GraphQLEnum<Gql.DeleteEntity>.self),
+            .fragment(FDelete.self),
           ] }
 
           public var id: Gql.ID { __data["id"] }
           public var kind: GraphQLEnum<Gql.DeleteEntity> { __data["kind"] }
+
+          public struct Fragments: FragmentContainer {
+            public let __data: DataDict
+            public init(_dataDict: DataDict) { __data = _dataDict }
+
+            public var fDelete: FDelete { _toFragment() }
+          }
         }
 
         /// Core.AsEntityEvent
@@ -100,12 +76,18 @@ public extension Gql {
           public typealias RootEntityType = CoreSubscription.Data.Core
           public static var __parentType: Apollo.ParentType { Gql.Objects.EntityEvent }
           public static var __selections: [Apollo.Selection] { [
-            .field("type", GraphQLEnum<Gql.EntityEventType>.self),
-            .field("entity", Entity.self),
+            .fragment(FEntity.self),
           ] }
 
           public var type: GraphQLEnum<Gql.EntityEventType> { __data["type"] }
           public var entity: Entity { __data["entity"] }
+
+          public struct Fragments: FragmentContainer {
+            public let __data: DataDict
+            public init(_dataDict: DataDict) { __data = _dataDict }
+
+            public var fEntity: FEntity { _toFragment() }
+          }
 
           /// Core.AsEntityEvent.Entity
           ///
@@ -115,13 +97,6 @@ public extension Gql {
             public init(_dataDict: DataDict) { __data = _dataDict }
 
             public static var __parentType: Apollo.ParentType { Gql.Unions.Entities }
-            public static var __selections: [Apollo.Selection] { [
-              .field("__typename", String.self),
-              .inlineFragment(AsUser.self),
-              .inlineFragment(AsMessage.self),
-              .inlineFragment(AsMember.self),
-              .inlineFragment(AsChat.self),
-            ] }
 
             public var asUser: AsUser? { _asInlineFragment() }
             public var asMessage: AsMessage? { _asInlineFragment() }
@@ -131,14 +106,15 @@ public extension Gql {
             /// Core.AsEntityEvent.Entity.AsUser
             ///
             /// Parent Type: `User`
-            public struct AsUser: Gql.InlineFragment {
+            public struct AsUser: Gql.InlineFragment, Apollo.CompositeInlineFragment {
               public let __data: DataDict
               public init(_dataDict: DataDict) { __data = _dataDict }
 
               public typealias RootEntityType = CoreSubscription.Data.Core.AsEntityEvent.Entity
               public static var __parentType: Apollo.ParentType { Gql.Objects.User }
-              public static var __selections: [Apollo.Selection] { [
-                .fragment(FUser.self),
+              public static var __mergedSources: [any Apollo.SelectionSet.Type] { [
+                FUser.self,
+                FEntity.Entity.AsUser.self
               ] }
 
               /// The ID of the User
@@ -161,6 +137,8 @@ public extension Gql {
               public var is_bot: Bool? { __data["is_bot"] }
               /// The online status of this user
               public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }
+              /// The Role of this User in their primary App
+              public var app_role: GraphQLEnum<Gql.AppUserRole> { __data["app_role"] }
               /// The User's devices
               public var devices: [Device] { __data["devices"] }
 
@@ -207,14 +185,15 @@ public extension Gql {
             /// Core.AsEntityEvent.Entity.AsMessage
             ///
             /// Parent Type: `Message`
-            public struct AsMessage: Gql.InlineFragment {
+            public struct AsMessage: Gql.InlineFragment, Apollo.CompositeInlineFragment {
               public let __data: DataDict
               public init(_dataDict: DataDict) { __data = _dataDict }
 
               public typealias RootEntityType = CoreSubscription.Data.Core.AsEntityEvent.Entity
               public static var __parentType: Apollo.ParentType { Gql.Objects.Message }
-              public static var __selections: [Apollo.Selection] { [
-                .fragment(FMessage.self),
+              public static var __mergedSources: [any Apollo.SelectionSet.Type] { [
+                FMessage.self,
+                FEntity.Entity.AsMessage.self
               ] }
 
               /// The ID of the Message
@@ -280,6 +259,8 @@ public extension Gql {
                 public var is_bot: Bool? { __data["is_bot"] }
                 /// The online status of this user
                 public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }
+                /// The Role of this User in their primary App
+                public var app_role: GraphQLEnum<Gql.AppUserRole> { __data["app_role"] }
                 /// The User's devices
                 public var devices: [Device] { __data["devices"] }
 
@@ -327,14 +308,15 @@ public extension Gql {
             /// Core.AsEntityEvent.Entity.AsMember
             ///
             /// Parent Type: `Member`
-            public struct AsMember: Gql.InlineFragment {
+            public struct AsMember: Gql.InlineFragment, Apollo.CompositeInlineFragment {
               public let __data: DataDict
               public init(_dataDict: DataDict) { __data = _dataDict }
 
               public typealias RootEntityType = CoreSubscription.Data.Core.AsEntityEvent.Entity
               public static var __parentType: Apollo.ParentType { Gql.Objects.Member }
-              public static var __selections: [Apollo.Selection] { [
-                .fragment(FMember.self),
+              public static var __mergedSources: [any Apollo.SelectionSet.Type] { [
+                FMember.self,
+                FEntity.Entity.AsMember.self
               ] }
 
               /// THe Role of the Member in the Chat
@@ -382,6 +364,8 @@ public extension Gql {
                 public var is_bot: Bool? { __data["is_bot"] }
                 /// The online status of this user
                 public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }
+                /// The Role of this User in their primary App
+                public var app_role: GraphQLEnum<Gql.AppUserRole> { __data["app_role"] }
                 /// The User's devices
                 public var devices: [Device] { __data["devices"] }
 
@@ -429,14 +413,15 @@ public extension Gql {
             /// Core.AsEntityEvent.Entity.AsChat
             ///
             /// Parent Type: `Chat`
-            public struct AsChat: Gql.InlineFragment {
+            public struct AsChat: Gql.InlineFragment, Apollo.CompositeInlineFragment {
               public let __data: DataDict
               public init(_dataDict: DataDict) { __data = _dataDict }
 
               public typealias RootEntityType = CoreSubscription.Data.Core.AsEntityEvent.Entity
               public static var __parentType: Apollo.ParentType { Gql.Objects.Chat }
-              public static var __selections: [Apollo.Selection] { [
-                .fragment(FChat.self),
+              public static var __mergedSources: [any Apollo.SelectionSet.Type] { [
+                FChat.self,
+                FEntity.Entity.AsChat.self
               ] }
 
               /// The ID of this Chat
@@ -527,6 +512,8 @@ public extension Gql {
                   public var is_bot: Bool? { __data["is_bot"] }
                   /// The online status of this user
                   public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }
+                  /// The Role of this User in their primary App
+                  public var app_role: GraphQLEnum<Gql.AppUserRole> { __data["app_role"] }
                   /// The User's devices
                   public var devices: [Device] { __data["devices"] }
 
@@ -643,6 +630,8 @@ public extension Gql {
                   public var is_bot: Bool? { __data["is_bot"] }
                   /// The online status of this user
                   public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }
+                  /// The Role of this User in their primary App
+                  public var app_role: GraphQLEnum<Gql.AppUserRole> { __data["app_role"] }
                   /// The User's devices
                   public var devices: [Device] { __data["devices"] }
 

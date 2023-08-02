@@ -6,13 +6,9 @@
 public extension Gql {
   class MarkChatReadMutation: GraphQLMutation {
     public static let operationName: String = "markChatRead"
-    public static let document: Apollo.DocumentType = .notPersisted(
+    public static let operationDocument: Apollo.OperationDocument = .init(
       definition: .init(
-        #"""
-        mutation markChatRead($id: ID!) {
-          markChatRead(chat: $id)
-        }
-        """#
+        #"mutation markChatRead($id: ID!) { markChatRead(chat: $id) }"#
       ))
 
     public var id: ID

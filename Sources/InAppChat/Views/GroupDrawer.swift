@@ -13,7 +13,7 @@ public struct GroupDrawer: View {
 
   @Environment(\.iacTheme) var theme
   @Environment(\.geometry) var geometry
-  @EnvironmentObject var pilot: UIPilot<Routes>
+  @EnvironmentObject var navigator: Navigator
   @Environment(\.dismiss) var dismiss
 
   @ObservedObject var chat: Chat
@@ -35,7 +35,7 @@ public struct GroupDrawer: View {
               GifImageView(url: image.url!)
                 .circle(70, .clear)
             } else {
-              GroupPlaceholder().size(70)
+              GroupPlaceholder(size: 70)
             }
             Spacer().height(12)
             Text(chat.displayName)
@@ -61,44 +61,46 @@ public struct GroupDrawer: View {
             Text("\(chat.activeMembers.count)")
               .font(theme.fonts.caption)
               .foregroundColor(theme.colors.caption)
-          }.padding(.leading, 16)
-          List {
-            header("Admin")
-            ForEach(chat.admins) { user in
-              Button {
-                dismiss()
-                pilot.push(user.path)
-              } label: {
-                ContactRow(user: user)
-              }
+          }
+          header("Admin")
+          ForEach(chat.admins) { user in
+            Button {
+              dismiss()
+              navigator.navigate(user.path)
+            } label: {
+              ContactRow(user: user)
             }
+          }
+          if !chat.onlineNotAdminUsers.isEmpty {
             header("members - online")
             ForEach(chat.onlineNotAdminUsers) { user in
               Button {
                 dismiss()
-                pilot.push(user.path)
+                navigator.navigate(user.path)
               } label: {
                 ContactRow(user: user)
               }
             }
+          }
+          if !chat.offlineUsers.isEmpty {
             header("members")
             ForEach(chat.offlineUsers) { user in
               Button {
                 dismiss()
-                pilot.push(user.path)
+                navigator.navigate(user.path)
               } label: {
                 ContactRow(user: user)
               }
             }
-            Spacer().height(geometry.insets.bottom + 72)
-          }.listStyle(.plain)
-            .listItemTint(.clear)
-        }
+          }
+          Spacer().height(geometry.insets.bottom + 72)
+        }.listStyle(.plain)
+          .listItemTint(.clear)
         HStack(spacing: 4) {
           if chat.isAdmin {
             Button {
               dismiss()
-              pilot.push(chat.editPath)
+              navigator.navigate(chat.editPath)
             } label: {
               ZStack {
                 VStack(spacing: 0) {
@@ -115,7 +117,7 @@ public struct GroupDrawer: View {
           }
           Button {
             dismiss()
-            pilot.push(chat.invitePath)
+            navigator.navigate(chat.invitePath)
           } label: {
             ZStack {
               VStack(spacing: 0) {
@@ -152,12 +154,12 @@ public struct GroupDrawer: View {
           .height(60)
           .background(.thinMaterial)
           .cornerRadius(16)
-      }
+      }.padding(.horizontal, 16)
     }.confirmationDialog("Are you sure you want to leave this channel?", isPresented: $leave) {
       Button("Leave \(chat.displayName)?", role: .destructive) {
         dismiss()
         chat.leave()
-        pilot.pop()
+        navigator.goBack()
       }
     }.confirmationDialog("Are you sure you want to delete this channel?", isPresented: $delete) {
       Button("Delete \(chat.displayName)?", role: .destructive) {
@@ -166,7 +168,7 @@ public struct GroupDrawer: View {
             try await chat.delete()
             await MainActor.run {
               self.dismiss()
-              self.pilot.pop()
+              navigator.goBack()
             }
           } catch let err {
             Monitoring.error(err)

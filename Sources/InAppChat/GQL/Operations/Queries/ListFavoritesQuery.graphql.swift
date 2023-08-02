@@ -6,16 +6,9 @@
 public extension Gql {
   class ListFavoritesQuery: GraphQLQuery {
     public static let operationName: String = "ListFavorites"
-    public static let document: Apollo.DocumentType = .notPersisted(
+    public static let operationDocument: Apollo.OperationDocument = .init(
       definition: .init(
-        #"""
-        query ListFavorites($count: Int, $offset: Int) {
-          favorites(count: $count, offset: $offset) {
-            __typename
-            ...FMessage
-          }
-        }
-        """#,
+        #"query ListFavorites($count: Int, $offset: Int) { favorites(count: $count, offset: $offset) { __typename ...FMessage } }"#,
         fragments: [FMessage.self, FUser.self, FDevice.self]
       ))
 
@@ -126,6 +119,8 @@ public extension Gql {
           public var is_bot: Bool? { __data["is_bot"] }
           /// The online status of this user
           public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }
+          /// The Role of this User in their primary App
+          public var app_role: GraphQLEnum<Gql.AppUserRole> { __data["app_role"] }
           /// The User's devices
           public var devices: [Device] { __data["devices"] }
 

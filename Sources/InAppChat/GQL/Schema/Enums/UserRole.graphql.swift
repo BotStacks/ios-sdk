@@ -4,13 +4,13 @@
 import Apollo
 
 public extension Gql {
-  /// A User's Role in this Chat silo
-  enum TenantUserRole: String, EnumType {
-    /// A User with Admin priveleges
+  /// A User's Role across all network silos, ie, InAppChat
+  enum UserRole: String, EnumType {
+    /// A User with InAppChat Admin priveleges
     case admin = "Admin"
-    /// A standard User, can Chat, create Groups and update own Profile
+    /// A standard User, usually a customer
     case member = "Member"
-    /// A moderator, can manage flags, and content
+    /// A moderator, can manage flags, and content, support requests
     case moderator = "Moderator"
     /// A fully priveleged User
     case owner = "Owner"

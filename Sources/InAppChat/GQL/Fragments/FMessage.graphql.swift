@@ -5,44 +5,9 @@
 
 public extension Gql {
   struct FMessage: Gql.SelectionSet, Fragment {
-    public static var fragmentDefinition: StaticString { """
-      fragment FMessage on Message {
-        __typename
-        id
-        system
-        created_at
-        updated_at
-        text
-        parent_id
-        reply_count
-        reactions
-        chat_id
-        user {
-          __typename
-          ...FUser
-        }
-        attachments {
-          __typename
-          id
-          type
-          url
-          data
-          mime
-          width
-          height
-          duration
-          address
-          latitude
-          longitude
-        }
-        mentions {
-          __typename
-          user_id
-          username
-          offset
-        }
-      }
-      """ }
+    public static var fragmentDefinition: StaticString {
+      "fragment FMessage on Message { __typename id system created_at updated_at text parent_id reply_count reactions chat_id user { __typename ...FUser } attachments { __typename id type url data mime width height duration address latitude longitude } mentions { __typename user_id username offset } }"
+    }
 
     public let __data: DataDict
     public init(_dataDict: DataDict) { __data = _dataDict }
@@ -124,6 +89,8 @@ public extension Gql {
       public var is_bot: Bool? { __data["is_bot"] }
       /// The online status of this user
       public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }
+      /// The Role of this User in their primary App
+      public var app_role: GraphQLEnum<Gql.AppUserRole> { __data["app_role"] }
       /// The User's devices
       public var devices: [Device] { __data["devices"] }
 

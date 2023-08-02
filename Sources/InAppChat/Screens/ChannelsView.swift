@@ -1,5 +1,12 @@
 import Foundation
 import SwiftUI
+import UIKit
+
+public class ChannelsController: UITableViewController {
+  
+  
+  
+}
 
 
 public struct ChannelsView: View {
@@ -7,7 +14,7 @@ public struct ChannelsView: View {
   @Environment(\.iacTheme) var theme
   @ObservedObject var chats = Chats.current
   @Environment(\.geometry) var geometry
-  @EnvironmentObject var pilot: UIPilot<Routes>
+  @EnvironmentObject var navigator: Navigator
 
   @Binding var scrollToTop: Int
   public init(scrollToTop: Binding<Int>) {
@@ -27,7 +34,7 @@ public struct ChannelsView: View {
               config: theme.assets.emptyAllChannels,
               tab: true,
               cta: CTA(icon: nil, text: "Create A Channel", action: {
-                pilot.push(.CreateChat(id: nil))
+                navigator.navigate("/groups/new")
               })
             )
           }
@@ -41,7 +48,7 @@ public struct ChannelsView: View {
           }
         }
         Header(
-          title: "All Channels", showStartMessage: false, showSearch: true, addPath: Routes.CreateChat(id: nil)
+          title: "All Channels", showStartMessage: false, showSearch: true, addPath: "/groups/new"
         )
       }
     }

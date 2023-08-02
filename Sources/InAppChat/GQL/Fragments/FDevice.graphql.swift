@@ -5,18 +5,9 @@
 
 public extension Gql {
   struct FDevice: Gql.SelectionSet, Fragment {
-    public static var fragmentDefinition: StaticString { """
-      fragment FDevice on Device {
-        __typename
-        id
-        created_at
-        updated_at
-        ik
-        spk
-        pks
-        opk
-      }
-      """ }
+    public static var fragmentDefinition: StaticString {
+      "fragment FDevice on Device { __typename id created_at updated_at ik spk pks opk }"
+    }
 
     public let __data: DataDict
     public init(_dataDict: DataDict) { __data = _dataDict }

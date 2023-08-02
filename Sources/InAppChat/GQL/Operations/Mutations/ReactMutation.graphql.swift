@@ -6,13 +6,9 @@
 public extension Gql {
   class ReactMutation: GraphQLMutation {
     public static let operationName: String = "React"
-    public static let document: Apollo.DocumentType = .notPersisted(
+    public static let operationDocument: Apollo.OperationDocument = .init(
       definition: .init(
-        #"""
-        mutation React($id: ID!, $reaction: String) {
-          react(id: $id, reaction: $reaction)
-        }
-        """#
+        #"mutation React($id: ID!, $reaction: String) { react(id: $id, reaction: $reaction) }"#
       ))
 
     public var id: ID

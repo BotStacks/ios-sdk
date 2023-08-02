@@ -129,19 +129,20 @@ where T: Identifiable, Header: View, Content: View, Footer: View, Empty: View
     if items.isEmpty && !hasMore {
         stack
     } else {
-        let list = List(items, id: \.id) { item in
-          renderItem(item)
+      let list = ScrollView {
+        LazyVStack {
+          ForEach(items, id: \.id) { item in
+            renderItem(item)
+          }
         }
-          .listItemTint(.clear)
-          .listStyle(.plain)
-          .invert(invert)
-          .onAppear {
-            if items.isEmpty, let loadMore = loadMore {
-              Task.detached {
-                await loadMore(nil)
-              }
+      }.invert(invert)
+        .onAppear {
+          if items.isEmpty, let loadMore = loadMore {
+            Task.detached {
+              await loadMore(nil)
             }
           }
+        }
       if let ptr = pullToRefresh {
         list.refreshable {
           await ptr()

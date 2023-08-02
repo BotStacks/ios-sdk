@@ -6,23 +6,9 @@
 public extension Gql {
   class EthLoginMutation: GraphQLMutation {
     public static let operationName: String = "EthLogin"
-    public static let document: Apollo.DocumentType = .notPersisted(
+    public static let operationDocument: Apollo.OperationDocument = .init(
       definition: .init(
-        #"""
-        mutation EthLogin($input: EthLoginInput!) {
-          ethLogin(input: $input) {
-            __typename
-            token
-            user {
-              __typename
-              ...FUser
-              blocks
-              blocked_by
-              role
-            }
-          }
-        }
-        """#,
+        #"mutation EthLogin($input: EthLoginInput!) { ethLogin(input: $input) { __typename token user { __typename ...FUser blocks blocked_by role } } }"#,
         fragments: [FUser.self, FDevice.self]
       ))
 
@@ -77,7 +63,7 @@ public extension Gql {
             .field("__typename", String.self),
             .field("blocks", [Gql.ID]?.self),
             .field("blocked_by", [Gql.ID]?.self),
-            .field("role", GraphQLEnum<Gql.TenantUserRole>.self),
+            .field("role", GraphQLEnum<Gql.UserRole>.self),
             .fragment(FUser.self),
           ] }
 
@@ -86,7 +72,7 @@ public extension Gql {
           /// The IDs fo Users that have blocked this User
           public var blocked_by: [Gql.ID]? { __data["blocked_by"] }
           /// The Role of this User in their Chat silo
-          public var role: GraphQLEnum<Gql.TenantUserRole> { __data["role"] }
+          public var role: GraphQLEnum<Gql.UserRole> { __data["role"] }
           /// The ID of the User
           public var id: Gql.ID { __data["id"] }
           /// The date this User was updated
@@ -107,6 +93,8 @@ public extension Gql {
           public var is_bot: Bool? { __data["is_bot"] }
           /// The online status of this user
           public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }
+          /// The Role of this User in their primary App
+          public var app_role: GraphQLEnum<Gql.AppUserRole> { __data["app_role"] }
           /// The User's devices
           public var devices: [Device] { __data["devices"] }
 

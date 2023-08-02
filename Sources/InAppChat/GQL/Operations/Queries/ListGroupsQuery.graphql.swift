@@ -6,16 +6,9 @@
 public extension Gql {
   class ListGroupsQuery: GraphQLQuery {
     public static let operationName: String = "ListGroups"
-    public static let document: Apollo.DocumentType = .notPersisted(
+    public static let operationDocument: Apollo.OperationDocument = .init(
       definition: .init(
-        #"""
-        query ListGroups($count: Int, $offset: Int) {
-          groups(count: $count, offset: $offset) {
-            __typename
-            ...FChat
-          }
-        }
-        """#,
+        #"query ListGroups($count: Int, $offset: Int) { groups(count: $count, offset: $offset) { __typename ...FChat } }"#,
         fragments: [FChat.self, FMember.self, FUser.self, FDevice.self, FMessage.self]
       ))
 
@@ -151,6 +144,8 @@ public extension Gql {
             public var is_bot: Bool? { __data["is_bot"] }
             /// The online status of this user
             public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }
+            /// The Role of this User in their primary App
+            public var app_role: GraphQLEnum<Gql.AppUserRole> { __data["app_role"] }
             /// The User's devices
             public var devices: [Device] { __data["devices"] }
 
@@ -267,6 +262,8 @@ public extension Gql {
             public var is_bot: Bool? { __data["is_bot"] }
             /// The online status of this user
             public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }
+            /// The Role of this User in their primary App
+            public var app_role: GraphQLEnum<Gql.AppUserRole> { __data["app_role"] }
             /// The User's devices
             public var devices: [Device] { __data["devices"] }
 

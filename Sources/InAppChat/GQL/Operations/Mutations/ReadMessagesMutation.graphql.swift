@@ -6,13 +6,9 @@
 public extension Gql {
   class ReadMessagesMutation: GraphQLMutation {
     public static let operationName: String = "ReadMessages"
-    public static let document: Apollo.DocumentType = .notPersisted(
+    public static let operationDocument: Apollo.OperationDocument = .init(
       definition: .init(
-        #"""
-        mutation ReadMessages($header: String!) {
-          read(header: $header)
-        }
-        """#
+        #"mutation ReadMessages($header: String!) { read(header: $header) }"#
       ))
 
     public var header: String

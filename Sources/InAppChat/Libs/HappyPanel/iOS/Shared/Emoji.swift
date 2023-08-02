@@ -16,12 +16,15 @@ public struct Emoji: Decodable, Hashable {
 }
 
 private extension Emoji {
-    static func parse(from fileURL: URL) -> [Emoji] {
+    static func parse(from raw: String) -> [Emoji] {
         do {
-            let data = try Data(contentsOf: fileURL, options: .mappedIfSafe)
+          if let data = raw.data(using: .utf8) {
             let decoder = JSONDecoder()
             let list = try decoder.decode([Emoji].self, from: data)
             return list
+          } else {
+            return []
+          }
         } catch {
             return []
         }
@@ -38,17 +41,9 @@ public final class EmojiStore {
     private static let itemPerGroup: Int = 7
     
     public init() {
-        guard let emojiURL = assets.url(forResource: "emoji", withExtension: "json"),
-              let kaomojiURL = assets.url(forResource: "kaomoji", withExtension: "json") else {
-            self.allEmojis = []
-            self.allKaomojis = []
-            self.emojisByCategory = [:]
-            self.kaomojisByTag = [:]
-            return
-        }
         
-        self.allEmojis = Emoji.parse(from: emojiURL)
-        self.allKaomojis = Emoji.parse(from: kaomojiURL)
+        self.allEmojis = Emoji.parse(from: emojiJSON)
+        self.allKaomojis = Emoji.parse(from: kaomojiJSON)
         
         var result: [String: [Emoji]] = [:]
         for category in SectionType.defaultCategories {

@@ -9,7 +9,7 @@ public struct Header<Content>: View where Content: View {
 
   @Environment(\.iacTheme) var theme
   @Environment(\.geometry) var geometry
-  @EnvironmentObject var pilot: UIPilot<Routes>
+  @EnvironmentObject var navigator: Navigator
 
   public let title: String
   public let showStartMessage: Bool
@@ -17,14 +17,14 @@ public struct Header<Content>: View where Content: View {
   public let onBack: (() -> Void)?
   public let onMenu: (() -> Void)?
   public let icon: (() -> Content)?
-  public let addPath: Routes?
+  public let addPath: String?
 
   public init(
     title: String, showStartMessage: Bool = false, showSearch: Bool = false,
     onBack: (() -> Void)? = nil,
     background: Color? = nil,
     onMenu: (() -> Void)? = nil,
-    addPath: Routes? = nil,
+    addPath: String? = nil,
     icon: (() -> Content)?
   ) {
     self.title = title
@@ -37,12 +37,13 @@ public struct Header<Content>: View where Content: View {
   }
 
   var back: (() -> Void)? {
-    return onBack ?? (pilot.routes.count > 1 ? { pilot.pop() } : nil)
+    print("HEader Geometry \(geometry)")
+    return onBack ?? (navigator.canGoBack ? { navigator.goBack() } : nil)
   }
 
   public var body: some View {
     VStack {
-      HStack {
+      HStack(alignment: .center) {
         if let back = back {
           Button {
             print("Header back button back")
@@ -76,7 +77,7 @@ public struct Header<Content>: View where Content: View {
           }
         }
         if showSearch {
-          NavLink(to: Routes.Search) {
+          NavLink(to: "/search") {
             ZStack {
               Circle().fill(theme.colors.button)
               Image(
@@ -90,7 +91,7 @@ public struct Header<Content>: View where Content: View {
           }
         }
         if showStartMessage {
-          NavLink(to: Routes.NewChat) {
+          NavLink(to: "/chats/new") {
             ZStack {
               Circle().fill(theme.colors.button)
               Image(
@@ -132,7 +133,7 @@ extension Header where Content == Image {
     title: String, showStartMessage: Bool = false, showSearch: Bool = false,
     onBack: (() -> Void)? = nil,
     onMenu: (() -> Void)? = nil,
-    addPath: Routes? = nil,
+    addPath: String? = nil,
     background: Color? = nil
   ) {
     self.init(

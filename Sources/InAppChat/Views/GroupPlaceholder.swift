@@ -5,6 +5,12 @@ import SwiftUI
 public struct GroupPlaceholder: View {
 
   @Environment(\.iacTheme) var theme
+  
+  let size: CGFloat
+  
+  init(size: CGFloat = 87.0) {
+    self.size = size
+  }
 
   public var body: some View {
     return ZStack {
@@ -17,8 +23,10 @@ public struct GroupPlaceholder: View {
       theme
         .assets
         .group
-        .size(50.0)
+        .resizable()
+        .aspectRatio(contentMode: .fit)
+        .size(size / 87.0 * 50.0)
         .foregroundColor(Color.white)
-    }
+    }.size(size)
   }
 }

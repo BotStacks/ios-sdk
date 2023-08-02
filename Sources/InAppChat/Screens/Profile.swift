@@ -6,6 +6,7 @@ public struct Profile: View {
   let id: String
   @State var user: User?
   @Environment(\.iacTheme) var theme
+  @Environment(\.geometry) var geometry
 
   public init(id: String) {
     self.id = id
@@ -13,23 +14,25 @@ public struct Profile: View {
   }
 
   public var body: some View {
-    ScrollView {
+    ZStack(alignment: .top) {
+      ScrollView {
+        if let user = user {
+          UserProfile(user: user).grow()
+        } else {
+          SpinnerList()
+        }
+      }.grow().padding(.top, geometry.insets.top + Header<Image>.height + 20.0)
       Header(title: user?.username ?? "") {
         Avatar(url: user?.avatar)
       }
-      if let user = user {
-        UserProfile(user: user)
-      } else {
-        SpinnerList()
-      }
-    }.edgesIgnoringSafeArea(.all)
-
+    }.grow().edgesIgnoringSafeArea(.all)
   }
 }
 
 public struct UserProfile: View {
   @ObservedObject var user: User
   @Environment(\.iacTheme) var theme
+  @Environment(\.geometry) var geometry
 
   public var body: some View {
     VStack {
@@ -54,22 +57,21 @@ public struct UserProfile: View {
           Row(icon: "paper-plane-tilt-fill", text: "Send a Chat", iconPrimary: true)
         }
       }
-      HStack {
-        Text("Shared Media")
-          .foregroundColor(theme.colors.text)
-          .font(theme.fonts.body)
-        Spacer()
-      }.padding(.top, 8.0)
-        .padding(.leading, 16.0)
-      ScrollView(.horizontal, showsIndicators: false) {
-        LazyHStack {
-          ForEach(user.sharedMedia.items, id: \.id) {
-            message in
-            MessageContent(message: message)
-          }
-        }.padding(.leading, 16.0)
-      }
-
+//      HStack {
+//        Text("Shared Media")
+//          .foregroundColor(theme.colors.text)
+//          .font(theme.fonts.body)
+//        Spacer()
+//      }.padding(.top, 8.0)
+//        .padding(.leading, 16.0)
+//      ScrollView(.horizontal, showsIndicators: false) {
+//        LazyHStack {
+//          ForEach(user.sharedMedia.items, id: \.id) {
+//            message in
+//            MessageContent(message: message)
+//          }
+//        }.padding(.leading, 16.0)
+//      }
       Spacer().height(24.0)
       Divider().foregroundColor(theme.colors.caption)
       if !user.isCurrent {
@@ -84,8 +86,9 @@ public struct UserProfile: View {
           )
         }
       }
-    }.onChange(of: user.blocked) { newValue in
-      print("User blocked ", newValue)
     }
+      .onChange(of: user.blocked) { newValue in
+        print("User blocked ", newValue)
+      }
   }
 }

@@ -6,13 +6,9 @@
 public extension Gql {
   class DismissInvitesMutation: GraphQLMutation {
     public static let operationName: String = "DismissInvites"
-    public static let document: Apollo.DocumentType = .notPersisted(
+    public static let operationDocument: Apollo.OperationDocument = .init(
       definition: .init(
-        #"""
-        mutation DismissInvites($chat: ID!) {
-          dismissInvites(chat: $chat)
-        }
-        """#
+        #"mutation DismissInvites($chat: ID!) { dismissInvites(chat: $chat) }"#
       ))
 
     public var chat: ID

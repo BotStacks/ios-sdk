@@ -17,20 +17,19 @@ enum Routes: Equatable {
 
 struct ContentView: View {
   
-  @StateObject var pilot = UIPilot(initial: Routes.Splash)
-
   public init() {}
 
   var body: some View {
-    UIPilotHost(pilot) { route in
-      switch (route) {
-        case .Splash: Splash()
-        case .Login: Login()
-        case .Chat: InAppChatUI()
+    InAppChatUI {
+      IACMainRoutes(initialPath: "/splash") {
+        Route("splash") {
+          Splash()
+        }
+        Route("login") {
+          Login()
+        }
       }
-    }.edgesIgnoringSafeArea(.all)
-      .uipNavigationBarHidden(true)
-      .navigationBarBackButtonHidden()
+    }
   }
 }
 

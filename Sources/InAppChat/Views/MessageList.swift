@@ -15,26 +15,34 @@ public struct MessageList: View {
   let onLongPress: (Message) -> Void
 
   public var body: some View {
+    let items = (chat.sending + chat.items).reversed()
     ScrollViewReader { proxy in
-      PagerList(
-        pager: chat,
-        prefix: chat.sending,
-        invert: true,
-        topInset: geometry.insets.top + Header<Image>.height,
-        bottomInset: geometry.insets.bottom + 70.0
-      ) { message in
-        MessageView(message: message)
-          .onLongPressGesture {
-            onLongPress(message)
+      ScrollView {
+        LazyVStack {
+          Spacer()
+          Spacer().height(geometry.insets.top + Header<Image>.height)
+          ForEach(items,  id: \.id) { message in
+            MessageView(message: message)
+              .onLongPressGesture {
+                onLongPress(message)
+              }.onAppear {
+                chat.loadMoreIfNeeded(message)
+              }
           }
-      }.height(geometry.height)
-        .onChange(of: chat.sending.first?.id ?? chat.items.first?.id) { newValue in
+          Spacer().height(geometry.insets.bottom + 70.0).id("bottom")
+        }.frame(minHeight: geometry.height)
+      }
+        .height(geometry.height)
+        .onChange(of: items.last?.id) { newValue in
           if let id = newValue {
             withAnimation {
-              proxy.scrollTo(id, anchor: .bottom)
+              proxy.scrollTo("bottom", anchor: .bottom)
             }
           }
-        }
+        }.onAppear {
+          chat.loadMoreIfEmpty()
+          proxy.scrollTo("bottom", anchor: .bottom)
+        }.edgesIgnoringSafeArea(.all)
     }
   }
 }

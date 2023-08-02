@@ -6,13 +6,9 @@
 public extension Gql {
   class UnblockMutation: GraphQLMutation {
     public static let operationName: String = "Unblock"
-    public static let document: Apollo.DocumentType = .notPersisted(
+    public static let operationDocument: Apollo.OperationDocument = .init(
       definition: .init(
-        #"""
-        mutation Unblock($user: ID!) {
-          unblock(user: $user)
-        }
-        """#
+        #"mutation Unblock($user: ID!) { unblock(user: $user) }"#
       ))
 
     public var user: ID

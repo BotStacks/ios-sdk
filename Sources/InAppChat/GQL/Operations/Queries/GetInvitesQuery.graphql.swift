@@ -6,25 +6,9 @@
 public extension Gql {
   class GetInvitesQuery: GraphQLQuery {
     public static let operationName: String = "GetInvites"
-    public static let document: Apollo.DocumentType = .notPersisted(
+    public static let operationDocument: Apollo.OperationDocument = .init(
       definition: .init(
-        #"""
-        query GetInvites {
-          invites {
-            __typename
-            created_at
-            updated_at
-            user {
-              __typename
-              ...FUser
-            }
-            chat {
-              __typename
-              ...FChat
-            }
-          }
-        }
-        """#,
+        #"query GetInvites { invites { __typename created_at updated_at user { __typename ...FUser } chat { __typename ...FChat } } }"#,
         fragments: [FUser.self, FDevice.self, FChat.self, FMember.self, FMessage.self]
       ))
 
@@ -96,6 +80,8 @@ public extension Gql {
           public var is_bot: Bool? { __data["is_bot"] }
           /// The online status of this user
           public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }
+          /// The Role of this User in their primary App
+          public var app_role: GraphQLEnum<Gql.AppUserRole> { __data["app_role"] }
           /// The User's devices
           public var devices: [Device] { __data["devices"] }
 
@@ -240,6 +226,8 @@ public extension Gql {
               public var is_bot: Bool? { __data["is_bot"] }
               /// The online status of this user
               public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }
+              /// The Role of this User in their primary App
+              public var app_role: GraphQLEnum<Gql.AppUserRole> { __data["app_role"] }
               /// The User's devices
               public var devices: [Device] { __data["devices"] }
 
@@ -356,6 +344,8 @@ public extension Gql {
               public var is_bot: Bool? { __data["is_bot"] }
               /// The online status of this user
               public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }
+              /// The Role of this User in their primary App
+              public var app_role: GraphQLEnum<Gql.AppUserRole> { __data["app_role"] }
               /// The User's devices
               public var devices: [Device] { __data["devices"] }
 

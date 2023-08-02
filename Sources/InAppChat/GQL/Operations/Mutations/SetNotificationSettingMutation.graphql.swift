@@ -6,13 +6,9 @@
 public extension Gql {
   class SetNotificationSettingMutation: GraphQLMutation {
     public static let operationName: String = "SetNotificationSetting"
-    public static let document: Apollo.DocumentType = .notPersisted(
+    public static let operationDocument: Apollo.OperationDocument = .init(
       definition: .init(
-        #"""
-        mutation SetNotificationSetting($chat: ID!, $setting: NotificationSetting!) {
-          setNotificationSetting(chat: $chat, setting: $setting)
-        }
-        """#
+        #"mutation SetNotificationSetting($chat: ID!, $setting: NotificationSetting!) { setNotificationSetting(chat: $chat, setting: $setting) }"#
       ))
 
     public var chat: ID

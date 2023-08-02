@@ -6,13 +6,9 @@
 public extension Gql {
   class FavoriteMutation: GraphQLMutation {
     public static let operationName: String = "Favorite"
-    public static let document: Apollo.DocumentType = .notPersisted(
+    public static let operationDocument: Apollo.OperationDocument = .init(
       definition: .init(
-        #"""
-        mutation Favorite($message: ID!) {
-          favorite(id: $message)
-        }
-        """#
+        #"mutation Favorite($message: ID!) { favorite(id: $message) }"#
       ))
 
     public var message: ID

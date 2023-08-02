@@ -8,6 +8,7 @@
 import InAppChat
 import SwiftUI
 import Firebase
+import GiphyUISDK
 
 @main
 struct InAppChat_ExampleApp: App {
@@ -16,6 +17,7 @@ struct InAppChat_ExampleApp: App {
 
 
   init() {
+    Giphy.configure(apiKey: "y29MF80OOqL4I0YQafUDAlcLiRjea4yI")
     InAppChat.setup(apiKey: "rp1pptcmrxceuwj31oj8uwlo")
   }
 
@@ -24,7 +26,6 @@ struct InAppChat_ExampleApp: App {
       ContentView()
     }
   }
-    
     
 }
 

@@ -6,32 +6,9 @@
 public extension Gql {
   class GetMeQuery: GraphQLQuery {
     public static let operationName: String = "GetMe"
-    public static let document: Apollo.DocumentType = .notPersisted(
+    public static let operationDocument: Apollo.OperationDocument = .init(
       definition: .init(
-        #"""
-        query GetMe {
-          me {
-            __typename
-            ...FUser
-            blocks
-            blocked_by
-            notification_settings
-            devices {
-              __typename
-              ...FDevice
-            }
-          }
-          memberships {
-            __typename
-            ...FMember
-            last_read_at
-            chat {
-              __typename
-              ...FChat
-            }
-          }
-        }
-        """#,
+        #"query GetMe { me { __typename ...FUser blocks blocked_by notification_settings devices { __typename ...FDevice } } memberships { __typename ...FMember last_read_at chat { __typename ...FChat } } }"#,
         fragments: [FUser.self, FDevice.self, FMember.self, FChat.self, FMessage.self]
       ))
 
@@ -97,6 +74,8 @@ public extension Gql {
         public var is_bot: Bool? { __data["is_bot"] }
         /// The online status of this user
         public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }
+        /// The Role of this User in their primary App
+        public var app_role: GraphQLEnum<Gql.AppUserRole> { __data["app_role"] }
 
         public struct Fragments: FragmentContainer {
           public let __data: DataDict
@@ -278,6 +257,8 @@ public extension Gql {
               public var is_bot: Bool? { __data["is_bot"] }
               /// The online status of this user
               public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }
+              /// The Role of this User in their primary App
+              public var app_role: GraphQLEnum<Gql.AppUserRole> { __data["app_role"] }
               /// The User's devices
               public var devices: [Device] { __data["devices"] }
 
@@ -394,6 +375,8 @@ public extension Gql {
               public var is_bot: Bool? { __data["is_bot"] }
               /// The online status of this user
               public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }
+              /// The Role of this User in their primary App
+              public var app_role: GraphQLEnum<Gql.AppUserRole> { __data["app_role"] }
               /// The User's devices
               public var devices: [Device] { __data["devices"] }
 
@@ -467,6 +450,8 @@ public extension Gql {
           public var is_bot: Bool? { __data["is_bot"] }
           /// The online status of this user
           public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }
+          /// The Role of this User in their primary App
+          public var app_role: GraphQLEnum<Gql.AppUserRole> { __data["app_role"] }
           /// The User's devices
           public var devices: [Device] { __data["devices"] }
 

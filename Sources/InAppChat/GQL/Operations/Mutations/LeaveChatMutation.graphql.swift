@@ -6,13 +6,9 @@
 public extension Gql {
   class LeaveChatMutation: GraphQLMutation {
     public static let operationName: String = "LeaveChat"
-    public static let document: Apollo.DocumentType = .notPersisted(
+    public static let operationDocument: Apollo.OperationDocument = .init(
       definition: .init(
-        #"""
-        mutation LeaveChat($id: ID!) {
-          leave(chat: $id)
-        }
-        """#
+        #"mutation LeaveChat($id: ID!) { leave(chat: $id) }"#
       ))
 
     public var id: ID

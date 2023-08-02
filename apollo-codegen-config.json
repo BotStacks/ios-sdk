@@ -4,8 +4,8 @@
     "cocoapodsCompatibleImportStatements": true
   },
   "input": {
-    "operationSearchPaths": ["../inappchat-js/libs/chat-sdk/**/*.graphql"],
-    "schemaSearchPaths": ["../inappchat-js/libs/chat-common/**/*.graphql"]
+    "operationSearchPaths": ["../inappchat-js/libs/sdk/**/*.graphql"],
+    "schemaSearchPaths": ["../inappchat-js/libs/common/**/*.graphql"]
   },
   "output": {
     "testMocks": {

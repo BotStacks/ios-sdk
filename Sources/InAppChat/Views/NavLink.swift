@@ -10,20 +10,20 @@ import SwiftUI
 
 
 
-public struct NavLink<T, Content>: View where T:Equatable, Content:View {
-  @EnvironmentObject var pilot: UIPilot<T>
+public struct NavLink<Content>: View where Content:View {
+  @EnvironmentObject var navigator: Navigator
   
-  let path: T
+  let path: String
   let content: () -> Content
   
-  init(to path: T, @ViewBuilder content: @escaping () -> Content) {
+  init(to path: String, @ViewBuilder content: @escaping () -> Content) {
     self.path = path
     self.content = content
   }
   
   public var body: some View {
     Button(action: {
-      pilot.push(path)
+      navigator.navigate(path)
     }, label: content)
   }
 }

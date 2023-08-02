@@ -13,41 +13,36 @@ public enum Style {
   case full
 }
 
-public struct InAppChatUI: View {
-
+public struct InAppChatUI<Content>: View where Content: View {
+  
   @Environment(\.colorScheme) var colorScheme
   let theme: Theme
-  let style: Style
-
+  let content: () -> Content
+  
   public init(
     theme: Theme = Theme.default,
-    style: Style = .full
+    @ViewBuilder content: @escaping () -> Content = { IACMainRoutes() }
   ) {
     self.theme = theme
-    self.style = style
-
+    self.content = content
+    
     UITableView.appearance().backgroundColor = .clear
     UITableView.appearance().separatorStyle = .none
     UICollectionView.appearance().backgroundColor = .clear
   }
   
-  @ViewBuilder
-  func ui() -> some View {
-    switch (style) {
-    case .full:
-      InAppChatFull()
-    }
-  }
-
   public var body: some View {
     GeometryReader { proxy in
-      ui()
-        .background(theme.with(colorScheme).colors.background.new())
+      (theme.with(colorScheme).colors.background.new())
         .edgesIgnoringSafeArea(.all)
+      content()
         .environment(\.geometry, Geometry(size: proxy.size, insets: proxy.safeAreaInsets))
         .environment(\.iacTheme, theme.with(colorScheme))
         .preferredColorScheme(colorScheme)
         .buttonStyle(.borderless)
+        .navigationBarHidden(true)
+        .navigationTitle(Text("Chat"))
+        .edgesIgnoringSafeArea(.all)
     }
   }
 }

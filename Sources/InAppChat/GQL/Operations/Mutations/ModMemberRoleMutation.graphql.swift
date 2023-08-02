@@ -6,13 +6,9 @@
 public extension Gql {
   class ModMemberRoleMutation: GraphQLMutation {
     public static let operationName: String = "ModMemberRole"
-    public static let document: Apollo.DocumentType = .notPersisted(
+    public static let operationDocument: Apollo.OperationDocument = .init(
       definition: .init(
-        #"""
-        mutation ModMemberRole($input: ModMemberInput!) {
-          modMember(input: $input)
-        }
-        """#
+        #"mutation ModMemberRole($input: ModMemberInput!) { modMember(input: $input) }"#
       ))
 
     public var input: ModMemberInput

@@ -15,9 +15,14 @@ public struct Tabs: View {
 
   @Environment(\.iacTheme) var theme
   @Environment(\.geometry) var geometry
-  @EnvironmentObject private var router: UIPilot<Routes>
+  @EnvironmentObject private var navigator: Navigator
   @State var scrollToTop = 0
-  @State var tab = T.chats
+  
+  let tab: T
+  
+  init(tab: T) {
+    self.tab = tab
+  }
 
   enum T: String {
     case chats = "chat-text-fill"
@@ -64,8 +69,10 @@ public struct Tabs: View {
     case .chats:
       return AnyView(ChatsView(scrollToTop: $scrollToTop, onExploreChannels: {
         print("On Explore Channels")
-        tab = .channels
-      }, onSendAMessage: {tab = .contacts}))
+        navigator.navigate(path(T.channels), replace: true)
+      }, onSendAMessage: {
+        navigator.navigate(path(T.contacts), replace: true)
+      }))
     case .contacts:
       return AnyView(ContactsView(scrollToTop: $scrollToTop))
     case .settings:
@@ -82,7 +89,7 @@ public struct Tabs: View {
             if tab == t {
               scrollToTop += 1
             } else {
-              tab = t
+              navigator.navigate(path(t), replace: true)
             }
           } label: {
             ZStack {

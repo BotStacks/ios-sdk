@@ -6,13 +6,9 @@
 public extension Gql {
   class LogoutMutation: GraphQLMutation {
     public static let operationName: String = "Logout"
-    public static let document: Apollo.DocumentType = .notPersisted(
+    public static let operationDocument: Apollo.OperationDocument = .init(
       definition: .init(
-        #"""
-        mutation Logout {
-          logout
-        }
-        """#
+        #"mutation Logout { logout }"#
       ))
 
     public init() {}

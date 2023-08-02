@@ -34,7 +34,7 @@ public struct Assets {
     emptyThreads: EmptyScreenConfig? = nil,
     emptyAllChannels: EmptyScreenConfig? = nil
   ) {
-    self.group = group ?? Image("users-three-fill")
+    self.group = group ?? AssetImage("users-three-fill")
     self.emptyChannels =
       emptyChannels
       ?? EmptyScreenConfig(

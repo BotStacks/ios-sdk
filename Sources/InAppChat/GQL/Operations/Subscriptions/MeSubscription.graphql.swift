@@ -6,46 +6,10 @@
 public extension Gql {
   class MeSubscription: GraphQLSubscription {
     public static let operationName: String = "MeSubscription"
-    public static let document: Apollo.DocumentType = .notPersisted(
+    public static let operationDocument: Apollo.OperationDocument = .init(
       definition: .init(
-        #"""
-        subscription MeSubscription {
-          me {
-            __typename
-            ... on InviteEvent {
-              __typename
-              by {
-                __typename
-                ...FUser
-              }
-              to {
-                __typename
-                ...FChat
-              }
-            }
-            ... on ReplyEvent {
-              __typename
-              message {
-                __typename
-                ...FMessage
-              }
-            }
-            ... on ReactionEvent {
-              __typename
-              reaction
-              user {
-                __typename
-                ...FUser
-              }
-              message {
-                __typename
-                ...FMessage
-              }
-            }
-          }
-        }
-        """#,
-        fragments: [FUser.self, FDevice.self, FChat.self, FMember.self, FMessage.self]
+        #"subscription MeSubscription { me { __typename ... on InviteEvent { ...FInvite } ... on ReplyEvent { ...FReply } ... on ReactionEvent { ...FReaction } } }"#,
+        fragments: [FInvite.self, FUser.self, FDevice.self, FChat.self, FMember.self, FMessage.self, FReply.self, FReaction.self]
       ))
 
     public init() {}
@@ -90,12 +54,18 @@ public extension Gql {
           public typealias RootEntityType = MeSubscription.Data.Me
           public static var __parentType: Apollo.ParentType { Gql.Objects.InviteEvent }
           public static var __selections: [Apollo.Selection] { [
-            .field("by", By.self),
-            .field("to", To.self),
+            .fragment(FInvite.self),
           ] }
 
           public var by: By { __data["by"] }
           public var to: To { __data["to"] }
+
+          public struct Fragments: FragmentContainer {
+            public let __data: DataDict
+            public init(_dataDict: DataDict) { __data = _dataDict }
+
+            public var fInvite: FInvite { _toFragment() }
+          }
 
           /// Me.AsInviteEvent.By
           ///
@@ -105,10 +75,6 @@ public extension Gql {
             public init(_dataDict: DataDict) { __data = _dataDict }
 
             public static var __parentType: Apollo.ParentType { Gql.Objects.User }
-            public static var __selections: [Apollo.Selection] { [
-              .field("__typename", String.self),
-              .fragment(FUser.self),
-            ] }
 
             /// The ID of the User
             public var id: Gql.ID { __data["id"] }
@@ -130,6 +96,8 @@ public extension Gql {
             public var is_bot: Bool? { __data["is_bot"] }
             /// The online status of this user
             public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }
+            /// The Role of this User in their primary App
+            public var app_role: GraphQLEnum<Gql.AppUserRole> { __data["app_role"] }
             /// The User's devices
             public var devices: [Device] { __data["devices"] }
 
@@ -181,10 +149,6 @@ public extension Gql {
             public init(_dataDict: DataDict) { __data = _dataDict }
 
             public static var __parentType: Apollo.ParentType { Gql.Objects.Chat }
-            public static var __selections: [Apollo.Selection] { [
-              .field("__typename", String.self),
-              .fragment(FChat.self),
-            ] }
 
             /// The ID of this Chat
             public var id: Gql.ID { __data["id"] }
@@ -274,6 +238,8 @@ public extension Gql {
                 public var is_bot: Bool? { __data["is_bot"] }
                 /// The online status of this user
                 public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }
+                /// The Role of this User in their primary App
+                public var app_role: GraphQLEnum<Gql.AppUserRole> { __data["app_role"] }
                 /// The User's devices
                 public var devices: [Device] { __data["devices"] }
 
@@ -390,6 +356,8 @@ public extension Gql {
                 public var is_bot: Bool? { __data["is_bot"] }
                 /// The online status of this user
                 public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }
+                /// The Role of this User in their primary App
+                public var app_role: GraphQLEnum<Gql.AppUserRole> { __data["app_role"] }
                 /// The User's devices
                 public var devices: [Device] { __data["devices"] }
 
@@ -446,10 +414,17 @@ public extension Gql {
           public typealias RootEntityType = MeSubscription.Data.Me
           public static var __parentType: Apollo.ParentType { Gql.Objects.ReplyEvent }
           public static var __selections: [Apollo.Selection] { [
-            .field("message", Message.self),
+            .fragment(FReply.self),
           ] }
 
           public var message: Message { __data["message"] }
+
+          public struct Fragments: FragmentContainer {
+            public let __data: DataDict
+            public init(_dataDict: DataDict) { __data = _dataDict }
+
+            public var fReply: FReply { _toFragment() }
+          }
 
           /// Me.AsReplyEvent.Message
           ///
@@ -459,10 +434,6 @@ public extension Gql {
             public init(_dataDict: DataDict) { __data = _dataDict }
 
             public static var __parentType: Apollo.ParentType { Gql.Objects.Message }
-            public static var __selections: [Apollo.Selection] { [
-              .field("__typename", String.self),
-              .fragment(FMessage.self),
-            ] }
 
             /// The ID of the Message
             public var id: Gql.ID { __data["id"] }
@@ -527,6 +498,8 @@ public extension Gql {
               public var is_bot: Bool? { __data["is_bot"] }
               /// The online status of this user
               public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }
+              /// The Role of this User in their primary App
+              public var app_role: GraphQLEnum<Gql.AppUserRole> { __data["app_role"] }
               /// The User's devices
               public var devices: [Device] { __data["devices"] }
 
@@ -582,14 +555,19 @@ public extension Gql {
           public typealias RootEntityType = MeSubscription.Data.Me
           public static var __parentType: Apollo.ParentType { Gql.Objects.ReactionEvent }
           public static var __selections: [Apollo.Selection] { [
-            .field("reaction", String.self),
-            .field("user", User.self),
-            .field("message", Message.self),
+            .fragment(FReaction.self),
           ] }
 
           public var reaction: String { __data["reaction"] }
           public var user: User { __data["user"] }
           public var message: Message { __data["message"] }
+
+          public struct Fragments: FragmentContainer {
+            public let __data: DataDict
+            public init(_dataDict: DataDict) { __data = _dataDict }
+
+            public var fReaction: FReaction { _toFragment() }
+          }
 
           /// Me.AsReactionEvent.User
           ///
@@ -599,10 +577,6 @@ public extension Gql {
             public init(_dataDict: DataDict) { __data = _dataDict }
 
             public static var __parentType: Apollo.ParentType { Gql.Objects.User }
-            public static var __selections: [Apollo.Selection] { [
-              .field("__typename", String.self),
-              .fragment(FUser.self),
-            ] }
 
             /// The ID of the User
             public var id: Gql.ID { __data["id"] }
@@ -624,6 +598,8 @@ public extension Gql {
             public var is_bot: Bool? { __data["is_bot"] }
             /// The online status of this user
             public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }
+            /// The Role of this User in their primary App
+            public var app_role: GraphQLEnum<Gql.AppUserRole> { __data["app_role"] }
             /// The User's devices
             public var devices: [Device] { __data["devices"] }
 
@@ -675,10 +651,6 @@ public extension Gql {
             public init(_dataDict: DataDict) { __data = _dataDict }
 
             public static var __parentType: Apollo.ParentType { Gql.Objects.Message }
-            public static var __selections: [Apollo.Selection] { [
-              .field("__typename", String.self),
-              .fragment(FMessage.self),
-            ] }
 
             /// The ID of the Message
             public var id: Gql.ID { __data["id"] }
@@ -743,6 +715,8 @@ public extension Gql {
               public var is_bot: Bool? { __data["is_bot"] }
               /// The online status of this user
               public var status: GraphQLEnum<Gql.OnlineStatus> { __data["status"] }
+              /// The Role of this User in their primary App
+              public var app_role: GraphQLEnum<Gql.AppUserRole> { __data["app_role"] }
               /// The User's devices
               public var devices: [Device] { __data["devices"] }
 
