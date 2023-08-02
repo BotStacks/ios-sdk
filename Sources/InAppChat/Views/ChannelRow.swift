@@ -120,7 +120,7 @@ public struct ChatCount: View {
   @Environment(\.iacTheme) var theme
   
   public var body: some View {
-    Text("\(count))")
+    Text("\(count)")
       .foregroundColor(theme.colors.text)
   }
 }

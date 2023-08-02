@@ -53,7 +53,7 @@ public struct ChatRoute: View {
   
   func fetchMessage(_ id: String) {
     print("Fetch Message")
-    Task {
+    Task.detached {
       do {
         let m = try await api.get(message: id)
         await MainActor.run {
@@ -71,7 +71,7 @@ public struct ChatRoute: View {
   
   func fetchChat(_ id: String) {
     print("Fetch Chat")
-    Task {
+    Task.detached {
       do {
         print("Chat Route Fetch Chat")
         let t = try await api.get(chat: id)
@@ -89,7 +89,7 @@ public struct ChatRoute: View {
   
   func fetchUser(_ id: String) {
     print("Fetch user chat")
-    Task {
+    Task.detached {
       do {
         let chat = try await api.dm(user: id)
         await MainActor.run {

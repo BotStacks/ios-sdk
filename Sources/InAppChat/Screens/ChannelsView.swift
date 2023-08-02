@@ -26,8 +26,8 @@ public struct ChannelsView: View {
       ZStack(alignment: .topLeading) {
         PagerList(
           pager: chats.network,
-          topInset: geometry.insets.top + Header<EmptyView>.height,
-          bottomInset: geometry.insets.bottom + Tabs.height,
+          topInset: geometry.insets.top + Header<EmptyView>.height + 20.0,
+          bottomInset: geometry.insets.bottom + Tabs.height + 10.0,
           empty: {
             EmptyListView(
               loading: chats.network.loading,
