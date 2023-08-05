@@ -15,12 +15,12 @@ public struct MessageView: View {
   func topStack() -> some View {
     return HStack(alignment: .bottom, spacing: 8.0) {
       Text(message.user.username)
-        .font(theme.fonts.username)
+        .font(theme.fonts.username.font)
         .foregroundColor(theme.colors.username)
         .frame(maxWidth: 120.0)
         .truncationMode(.tail)
       Text(message.createdAt.toString(.time(.short)))
-        .font(theme.fonts.timestamp)
+        .font(theme.fonts.timestamp.font)
         .foregroundColor(theme.colors.timestamp)
     }.fixedSize()
   }
@@ -45,7 +45,7 @@ public struct MessageView: View {
             message.react(reaction.reaction)
           } label: {
             Text("\(reaction.reaction) \(reaction.uids.count)")
-              .font(theme.fonts.body)
+              .font(theme.fonts.body.font)
               .foregroundColor(theme.colors.text)
               .padding(theme.bubblePadding)
               .background(theme.colors.bubble.new())
@@ -69,13 +69,14 @@ public struct MessageView: View {
       ? Text("\(message.replyCount) replies")
         .foregroundColor(self.theme.colors.primary)
         .padding(4.0)
-        .font(theme.fonts.body.bold())
+        .font(theme.fonts.body.font.bold())
       : nil
   }
 
   func favorite() -> some View {
     ZStack {
       AssetImage("star-fill")
+        .image
         .resizable()
         .size(20.0)
         .foregroundColor(theme.colors.primary)

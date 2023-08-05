@@ -27,7 +27,7 @@ public struct ChatTabView: View {
       HStack(alignment: .top) {
         VStack(spacing: 2) {
           Text(tab.rawValue)
-            .font(theme.fonts.title2.bold())
+            .font(theme.fonts.title2.font.bold())
             .foregroundColor(selected ? theme.colors.primary : theme.colors.caption)
           if selected {
             RoundedRectangle(cornerRadius: 2)

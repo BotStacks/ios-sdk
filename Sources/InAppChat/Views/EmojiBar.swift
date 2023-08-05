@@ -59,7 +59,7 @@ public struct EmojiBar: View {
         onEmojiKeyboard()
       } label: {
         ZStack {
-          AssetImage("emoji-add")
+          AssetImage("emoji-add").image
             .resizable()
             .foregroundColor(theme.colors.text)
             .size(24.0)

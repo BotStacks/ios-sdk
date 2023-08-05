@@ -1,10 +1,10 @@
 import SwiftUI
 
 public struct EmptyScreenConfig {
-  let image: Image?
+  let image: UIImage?
   let caption: String?
 
-  public init(image: Image?, caption: String?) {
+  public init(image: UIImage?, caption: String?) {
     self.image = image
     self.caption = caption
   }
@@ -12,7 +12,7 @@ public struct EmptyScreenConfig {
 
 public struct Assets {
 
-  public let group: Image
+  public let group: UIImage
   public let emptyThreads: EmptyScreenConfig
   public let emptyChat: EmptyScreenConfig
   public let emptyChannels: EmptyScreenConfig
@@ -28,7 +28,7 @@ public struct Assets {
   }
 
   public init(
-    group: Image? = nil,
+    group: UIImage? = nil,
     emptyChannels: EmptyScreenConfig? = nil,
     emptyChat: EmptyScreenConfig? = nil,
     emptyThreads: EmptyScreenConfig? = nil,

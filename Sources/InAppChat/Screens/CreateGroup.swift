@@ -91,6 +91,7 @@ public struct CreateChat: View {
                   .circle(116, theme.colors.softBackground)
               } else {
                 AssetImage("plus-circle-fill")
+                  .image
                   .resizable()
                   .foregroundColor(theme.colors.softBackground)
                   .size(95)
@@ -101,11 +102,11 @@ public struct CreateChat: View {
             VStack {
               HStack {
                 Text("Channel Name")
-                  .font(theme.fonts.headline)
+                  .font(theme.fonts.headline.font)
                   .foregroundColor(theme.colors.text)
                 Spacer()
                 Text("\(state.name.count)/25")
-                  .font(theme.fonts.headline)
+                  .font(theme.fonts.headline.font)
                   .foregroundColor(
                     theme.colors.caption
                   )
@@ -113,13 +114,13 @@ public struct CreateChat: View {
               HStack {
                 TextField(
                   text: $state.name,
-                  prompt: Text("Type here").font(theme.fonts.headline)
+                  prompt: Text("Type here").font(theme.fonts.headline.font)
                     .foregroundColor(
                       theme.colors.caption),
                   label: {}
                 )
                 .background(.clear)
-                .font(theme.fonts.headline)
+                .font(theme.fonts.headline.font)
                 .foregroundColor(theme.colors.text)
                 .onChange(of: state.name) {
                   state.name = String($0.prefix(25))
@@ -139,11 +140,11 @@ public struct CreateChat: View {
             VStack {
               HStack {
                 Text("Description (Optional)")
-                  .font(theme.fonts.headline)
+                  .font(theme.fonts.headline.font)
                   .foregroundColor(theme.colors.text)
                 Spacer()
                 Text("\(state.description.count)/100")
-                  .font(theme.fonts.headline)
+                  .font(theme.fonts.headline.font)
                   .foregroundColor(
                     theme.colors.caption
                   )
@@ -152,7 +153,7 @@ public struct CreateChat: View {
                 let e = TextEditor(text: $state.description)
                   .background(.clear)
                   .grow()
-                  .font(theme.fonts.headline)
+                  .font(theme.fonts.headline.font)
                   .foregroundColor(theme.colors.text)
                   .focused($focus, equals: .description)
                   .onChange(
@@ -170,7 +171,7 @@ public struct CreateChat: View {
 
                 if state.description.isEmpty && focus != .description {
                   Text("Showcase what your channel is all about for everyone to see").font(
-                    theme.fonts.headline
+                    theme.fonts.headline.font
                   ).foregroundColor(theme.colors.caption)
                 }
               }.growX()
@@ -188,7 +189,7 @@ public struct CreateChat: View {
             }
             VStack(alignment: .leading) {
               Text("Privacy Setting")
-                .font(theme.fonts.headline)
+                .font(theme.fonts.headline.font)
                 .foregroundColor(theme.colors.text)
                 .padding(.leading, 8)
               ZStack {
@@ -209,7 +210,7 @@ public struct CreateChat: View {
                   } label: {
                     ZStack {
                       Text("Public")
-                        .font(theme.fonts.title3)
+                        .font(theme.fonts.title3.font)
                         .foregroundColor(
                           state._private ? theme.colors.text : theme.colors.background
                         )
@@ -220,7 +221,7 @@ public struct CreateChat: View {
                   } label: {
                     ZStack {
                       Text("Private")
-                        .font(theme.fonts.title3)
+                        .font(theme.fonts.title3.font)
                         .foregroundColor(
                           !state._private ? theme.colors.text : theme.colors.background)
                     }.grow()
@@ -238,7 +239,7 @@ public struct CreateChat: View {
                   ? "Public channels will be viewed by all and available for everyone to join."
                   : "Private channels will not be seen by anyone unless they are invited to join the channel."
               )
-              .font(theme.fonts.caption)
+              .font(theme.fonts.caption.font)
               .foregroundColor(theme.colors.text)
             }
             Spacer()
@@ -266,7 +267,7 @@ public struct CreateChat: View {
                           .foregroundColor(theme.colors.background)
                       }
                       Text("Save")
-                        .font(theme.fonts.headline)
+                        .font(theme.fonts.headline.font)
                         .foregroundColor(theme.colors.text)
                     }
                   }.growX()

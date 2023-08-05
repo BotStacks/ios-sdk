@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import UIKit
 
 public struct Header<Content>: View where Content: View {
 
@@ -60,7 +61,7 @@ public struct Header<Content>: View where Content: View {
           icon()
         }
         Text(title)
-          .font(theme.fonts.title.bold())
+          .font(theme.fonts.title.font.bold())
           .foregroundColor(theme.colors.text)
         Spacer(minLength: 44.0)
         if let addPath = addPath {
@@ -90,19 +91,19 @@ public struct Header<Content>: View where Content: View {
             .size(40)
           }
         }
-        if showStartMessage {
-          NavLink(to: "/chats/new") {
-            ZStack {
-              Circle().fill(theme.colors.button)
-              Image(
-                systemName: "message.fill"
-              ).resizable()
-                .scaledToFit()
-                .size(16.0)
-                .foregroundColor(theme.colors.text)
-            }.size(40)
-          }
-        }
+//        if showStartMessage {
+//          NavLink(to: "/chats/new") {
+//            ZStack {
+//              Circle().fill(theme.colors.button)
+//              Image(
+//                systemName: "message.fill"
+//              ).resizable()
+//                .scaledToFit()
+//                .size(16.0)
+//                .foregroundColor(theme.colors.text)
+//            }.size(40)
+//          }
+//        }
 
         if let onMenu = onMenu {
           Button {
@@ -112,7 +113,7 @@ public struct Header<Content>: View where Content: View {
               // Circle().fill(theme.colors.button)
               AssetImage(
                 "dots-three-vertical-fill"
-              ).resizable()
+              ).image.resizable()
                 .size(30.0)
                 .foregroundColor(theme.colors.text)
             }.size(40)

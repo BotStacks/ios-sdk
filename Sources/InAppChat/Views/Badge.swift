@@ -12,7 +12,7 @@ public struct Badge: View {
       Circle().fill(theme.colors.unread)
       Text("\(count)")
         .foregroundColor(.white)
-        .font(theme.fonts.body.bold())
+        .font(theme.fonts.body.font.bold())
     }.size(count < 10 ? 18.0 : count < 100 ? 24.0 : 30.0)
   }
 }

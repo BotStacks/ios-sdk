@@ -44,7 +44,11 @@ open class Pager<T>: ObservableObject where T: Identifiable {
     let items = await self._load(true)
     publish {
       if items.count > 0 {
-        self.items = items
+        items.reversed().forEach { it in
+          if !self.items.contains(where: {it.id == $0.id}) {
+            self.items.insert(it, at: 0)
+          }
+        }
       }
       self.hasMore = items.count >= self.pageSize
       self.loading = false

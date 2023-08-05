@@ -39,10 +39,10 @@ public struct GroupDrawer: View {
             }
             Spacer().height(12)
             Text(chat.displayName)
-              .font(theme.fonts.title2)
+              .font(theme.fonts.title2.font)
               .foregroundColor(theme.colors.text)
             Text(chat.description ?? "")
-              .font(theme.fonts.body)
+              .font(theme.fonts.body.font)
               .foregroundColor(theme.colors.caption)
             Spacer().height(26)
             Divider().overlay(theme.colors.text).opacity(0.1)
@@ -51,15 +51,16 @@ public struct GroupDrawer: View {
             .padding(.top, 24)
           HStack(spacing: 0) {
             Text("All Members")
-              .font(theme.fonts.headline)
+              .font(theme.fonts.headline.font)
               .foregroundColor(theme.colors.text)
             Spacer().width(14)
             AssetImage("users-three-fill")
+              .image
               .resizable()
               .size(16)
               .foregroundColor(theme.colors.caption)
             Text("\(chat.activeMembers.count)")
-              .font(theme.fonts.caption)
+              .font(theme.fonts.caption.font)
               .foregroundColor(theme.colors.caption)
           }
           header("Admin")
@@ -105,11 +106,12 @@ public struct GroupDrawer: View {
               ZStack {
                 VStack(spacing: 0) {
                   AssetImage("gear-fill")
+                    .image
                     .resizable()
                     .size(24)
                     .foregroundColor(theme.colors.border)
                   Text("Edit")
-                    .font(theme.fonts.mini)
+                    .font(theme.fonts.mini.font)
                     .foregroundColor(theme.colors.border)
                 }
               }.size(60)
@@ -122,11 +124,12 @@ public struct GroupDrawer: View {
             ZStack {
               VStack(spacing: 0) {
                 AssetImage("archive-box-fill")
+                  .image
                   .resizable()
                   .size(24)
                   .foregroundColor(theme.colors.border)
                 Text("Invite")
-                  .font(theme.fonts.mini)
+                  .font(theme.fonts.mini.font)
                   .foregroundColor(theme.colors.border)
               }
             }.size(60)
@@ -141,11 +144,12 @@ public struct GroupDrawer: View {
             ZStack {
               VStack(spacing: 0) {
                 AssetImage("trash-fill")
+                  .image
                   .resizable()
                   .size(24)
                   .foregroundColor(theme.colors.border)
                 Text(chat.isAdmin ? "Delete" : "Leave")
-                  .font(theme.fonts.mini)
+                  .font(theme.fonts.mini.font)
                   .foregroundColor(theme.colors.border)
               }
             }.size(60)
@@ -181,7 +185,7 @@ public struct GroupDrawer: View {
   func header(_ text: String) -> some View {
     return Text(text)
       .textCase(.uppercase)
-      .font(theme.fonts.caption.bold())
+      .font(theme.fonts.caption.font.bold())
       .foregroundColor(theme.colors.caption)
       .padding(.top, 24)
   }

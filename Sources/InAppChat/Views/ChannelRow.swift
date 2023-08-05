@@ -1,8 +1,60 @@
 import Foundation
 import SwiftUI
+import UIKit
+import SDWebImage
+import Combine
 
 func chatInvitesText(chat: Chat) -> String {
   return "**\(chat.invites.map({$0}).usernames)** invited you to join!"
+}
+
+public class UIChannelRow: UITableViewCell {
+  
+  var bag = Set<AnyCancellable>()
+
+  var chat: Chat! {
+    didSet {
+      bindUI()
+      bag.forEach { $0.cancel() }
+      bag.removeAll()
+      chat.objectWillChange.makeConnectable().autoconnect()
+        .sink { [weak self] _ in
+          self?.bindUI()
+        }.store(in: &bag)
+    }
+  }
+  
+  @IBOutlet var title: UILabel!
+  @IBOutlet var subtitle: UILabel!
+  @IBOutlet var count: UILabel!
+  @IBOutlet var join: UIButton!
+  @IBOutlet var pub: UIPrivacyPill!
+  @IBOutlet var placeholder: UIGroupPlaceholder!
+  @IBOutlet var avatar: SDAnimatedImageView!
+  
+  func bindUI() {
+    title.text = chat.displayName
+    subtitle.text = chat.description
+    count.text = String(chat.members.count)
+    join.backgroundColor = chat.isMember ? Theme.current.colors.caption.ui : Theme.current.colors.primary.ui
+    pub.bind(chat: chat)
+    if let url = chat.image {
+      avatar.isHidden = false
+      avatar.sd_setImage(with: url.url)
+      placeholder.isHidden = true
+    } else {
+      placeholder.isHidden = false
+      avatar.isHidden = true
+    }
+  }
+  
+  @IBAction func tapJoin() {
+    if chat.isMember {
+      chat.leave()
+    } else {
+      chat.join()
+    }
+  }
 }
 
 public struct ChannelRow: View {
@@ -38,7 +90,7 @@ public struct ChannelRow: View {
               Text(
                 .init(chatInvitesText(chat: chat))
               ).foregroundColor(.white)
-                .font(theme.fonts.body)
+                .font(theme.fonts.body.font)
                 .multilineTextAlignment(.leading)
               Spacer()
               Button {
@@ -71,12 +123,12 @@ public struct ChannelRow: View {
                 HStack(alignment: .center) {
                   Text(chat.displayName)
                     .lineLimit(1)
-                    .font(theme.fonts.title3)
+                    .font(theme.fonts.title3.font)
                   PrivacyPill(_private: chat._private)
                 }
                 Text(chat.description ?? "")
                   .lineLimit(2)
-                  .font(theme.fonts.body)
+                  .font(theme.fonts.body.font)
                   .foregroundColor(theme.colors.caption)
                   .multilineTextAlignment(.leading)
                 Spacer(minLength: 0)

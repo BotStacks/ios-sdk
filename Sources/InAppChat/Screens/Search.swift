@@ -27,7 +27,7 @@ public struct Search: View {
       HStack(spacing: 0) {
         TextField("Search messages...", text: $text)
           .background(.clear)
-          .font(theme.fonts.body)
+          .font(theme.fonts.body.font)
           .growX()
           .focused($focus)
       }

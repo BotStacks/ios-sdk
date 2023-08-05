@@ -73,7 +73,7 @@ public class LocationUtil: NSObject, CLLocationManagerDelegate {
         self.c = c
         publish {
           print("request location")
-          self.manager.requestLocation()
+          self.manager.startUpdatingLocation()
         }
       }
     } else {
@@ -91,6 +91,7 @@ public class LocationUtil: NSObject, CLLocationManagerDelegate {
     } else {
       c?.resume(throwing: APIError(msg: "No location received", critical: false))
     }
+    manager.stopUpdatingLocation()
     c = nil
   }
 

@@ -35,6 +35,7 @@ public struct Avatar: View {
             .grow()
         } else {
           AssetImage("user-fill")
+            .image
             .resizable()
             .scaledToFit()
             .size(18.0 * size / 35.0)

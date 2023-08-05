@@ -18,3 +18,23 @@ public struct PrivacyPill: View {
       .cornerRadius(.infinity)
   }
 }
+
+public class UIPrivacyPill: UIButton {
+  public override init(frame: CGRect) {
+    super.init(frame: frame)
+  }
+  
+  public required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+  
+  func bind(chat: Chat) {
+    if chat.isDM {
+      isHidden = true
+    } else {
+      isHidden = false
+      setTitle(chat._private ? "Private" : "Public", for: .normal)
+      backgroundColor = chat._private ? Theme.current.colors.public.ui : Theme.current.colors.private.ui
+    }
+  }
+}

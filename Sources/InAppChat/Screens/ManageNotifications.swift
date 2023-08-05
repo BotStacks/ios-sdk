@@ -20,7 +20,7 @@ public struct ManageNotifications: View {
       Header(title: "Manage Notifications")
       HStack {
         Text("Notification status")
-          .font(theme.fonts.body)
+          .font(theme.fonts.body.font)
           .foregroundColor(theme.colors.text)
       }.padding(.leading, 16.0)
       Spacer().height(20.0)
@@ -50,7 +50,7 @@ public struct ManageNotifications: View {
           Text("Update")
             .textCase(.uppercase)
             .foregroundColor(theme.colors.background)
-            .font(theme.fonts.headline)
+            .font(theme.fonts.headline.font)
         }
         .height(60)
         .growX()
@@ -70,7 +70,7 @@ private struct Option: View {
   var body: some View {
     HStack {
       Text(title)
-        .font(theme.fonts.headline)
+        .font(theme.fonts.headline.font)
         .foregroundColor(theme.colors.text)
       Spacer()
       IACRadio(selected: selected)

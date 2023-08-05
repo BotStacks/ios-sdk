@@ -8,7 +8,18 @@
 import Foundation
 import SwiftUI
 
-func AssetImage(_ name: String) -> Image {
-  return Image(name, bundle: assets)
+func AssetImage(_ name: String) -> UIImage {
+  return UIImage.init(named: name, in: assets, with: nil)!
 }
 
+extension UIImage {
+  public var image: Image {
+    return Image(uiImage: self)
+  }
+}
+
+public extension Color {
+  public var ui: UIColor {
+    return UIColor.init(self)
+  }
+}

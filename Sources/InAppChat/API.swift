@@ -2,6 +2,7 @@ import Apollo
 import CryptoKit
 import Foundation
 import SwiftyJSON
+import UIKit
 
 let servers = (
   prod: (
@@ -94,7 +95,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
   var subscriptions = Array<Cancellable>()
 
   func subscribe() {
-    if let client = client, authToken != nil {
+    if let client = client, authToken != nil, subscriptions.isEmpty {
       let sub = client.sub(subscription: Gql.CoreSubscription()) { data in
         Chats.current.onCoreEvent(data.core)
       }
@@ -156,6 +157,8 @@ class Api: InterceptorProvider, ApolloInterceptor {
   }
 
   
+//  private var cancelBag: Set<AnyCancellable> = []
+
   init(store: ApolloStore) {
     self.store = store
     if let deviceId = UserDefaults.standard.string(forKey: "iac-device-id") {
@@ -165,6 +168,14 @@ class Api: InterceptorProvider, ApolloInterceptor {
       UserDefaults.standard.set(deviceId, forKey: "iac-device-id")
     }
     self.client = makeClient()
+//    NotificationCenter.Publisher(center: .default, name: UIApplication.willEnterForegroundNotification)
+//      .sink { [weak self] _ in
+//        self?.subscribe()
+//      }.store(in: &cancelBag)
+//    NotificationCenter.Publisher(center: .default, name: UIApplication.willEnterForegroundNotification)
+//      .sink { [weak self] _ in
+//        self?.subscribe()
+//      }.store(in: &cancelBag)
   }
   
   func getGroups(skip: Int = 0, limit: Int = 20) async throws -> [Chat] {
@@ -498,9 +509,10 @@ class Api: InterceptorProvider, ApolloInterceptor {
     let res = try await self.client.performAsync(mutation: Gql.DMMutation(user: user))
     if let dm = res.dm {
       return await MainActor.run {
-        let chat = Chat.get(.init(_dataDict: dm.chat.__data))
-        let member = Member.fromGql(.init(_dataDict: dm.__data))
-        Chats.current.memberships.append(member)
+        let chat = Chat.get(.init(_dataDict: dm.__data))
+        if let member = chat.membership {
+          Chats.current.memberships.append(member)
+        }
         return chat
       }
       

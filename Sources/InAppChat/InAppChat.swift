@@ -30,6 +30,8 @@ public class InAppChat: ObservableObject {
     self.apiKey = apiKey
     Monitoring.start()
   }
+  
+  public var hideBackButton = false
 
   public func load() async throws {
     guard !didStartLoading else { return }

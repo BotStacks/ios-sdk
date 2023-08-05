@@ -7,7 +7,7 @@
 
 import Foundation
 import SwiftUI
-
+import UIKit
 
 public struct Tabs: View {
 
@@ -94,6 +94,7 @@ public struct Tabs: View {
           } label: {
             ZStack {
               AssetImage(t.rawValue)
+                .image
                 .resizable()
                 .scaledToFit()
                 .foregroundColor(t == tab ? theme.colors.primary : theme.colors.text)

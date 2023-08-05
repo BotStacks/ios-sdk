@@ -13,7 +13,7 @@ PODS:
   - Gifu (3.3.1)
   - Giphy (2.2.6):
     - libwebp
-  - InAppChat (1.0.13):
+  - InAppChat (1.0.14):
     - ActivityIndicatorView
     - AnyCodable-FlightSchool
     - Apollo
@@ -23,6 +23,7 @@ PODS:
     - Giphy
     - SDWebImageSwiftUI
     - Sentry
+    - SnapKit
     - SwiftDate
     - SwiftyJSON
   - JWTDecode (3.1.0)
@@ -43,13 +44,14 @@ PODS:
   - SDWebImage/Core (5.17.0)
   - SDWebImageSwiftUI (2.2.3):
     - SDWebImage (~> 5.10)
-  - Sentry (8.9.3):
-    - Sentry/Core (= 8.9.3)
-    - SentryPrivate (= 8.9.3)
-  - Sentry/Core (8.9.3):
-    - SentryPrivate (= 8.9.3)
-  - SentryPrivate (8.9.3)
+  - Sentry (8.9.4):
+    - Sentry/Core (= 8.9.4)
+    - SentryPrivate (= 8.9.4)
+  - Sentry/Core (8.9.4):
+    - SentryPrivate (= 8.9.4)
+  - SentryPrivate (8.9.4)
   - SimpleKeychain (1.1.0)
+  - SnapKit (5.6.0)
   - SwiftDate (7.0.0)
   - SwiftyJSON (5.0.1)
 
@@ -74,6 +76,7 @@ SPEC REPOS:
     - Sentry
     - SentryPrivate
     - SimpleKeychain
+    - SnapKit
     - SwiftDate
     - SwiftyJSON
 
@@ -89,14 +92,15 @@ SPEC CHECKSUMS:
   DynamicColor: d049834ef86d8ecf150b0ca1ebe54ee733a0ec22
   Gifu: 416d4e38c4c2fed012f019e0a1d3ffcb58e5b842
   Giphy: f64bff5937fbc4987b6a26c8ef625501c68a1e97
-  InAppChat: e30cea48611dd776cff7ae9cc8b0ea930a865a0b
+  InAppChat: 52a53ceb075b833281e4d3f4363decab35b3688b
   JWTDecode: 3eaab1e06b6f4dcbdd6716aff09ba4c2104ca8b7
   libwebp: 33dc822fbbf4503668d09f7885bbfedc76c45e96
   SDWebImage: 750adf017a315a280c60fde706ab1e552a3ae4e9
   SDWebImageSwiftUI: 17396b7889f9abc27231caaeb64c537564284aab
-  Sentry: 97161cac725da1ecbe77d1445bf8a61c1e5667f1
-  SentryPrivate: 9a76def09fb08f9501997b8df946e8097947b94f
+  Sentry: 56c76eed917f7dffd46db50906afbf5c9aa2673a
+  SentryPrivate: f3be34b5deb9fe676fdfb1f1ad5cdb1b740c5688
   SimpleKeychain: f8707c8e97b38c6a6e687b17732afc9bcef06439
+  SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
   SwiftDate: bbc26e26fc8c0c33fbee8c140c5e8a68293a148a
   SwiftyJSON: 2f33a42c6fbc52764d96f13368585094bfd8aa5e
 

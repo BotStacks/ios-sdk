@@ -32,19 +32,19 @@ public struct ContactsView: View {
                 VStack(alignment: .leading) {
                   Text("Find your friends")
                     .foregroundColor(theme.inverted.text)
-                    .font(theme.fonts.title3)
+                    .font(theme.fonts.title3.font)
                   Text(
                     "Sync your contacts to easily find people you know. Your contacts will only be to help you connect with friends."
                   )
                   .foregroundColor(theme.inverted.text)
-                  .font(theme.fonts.body.bold())
+                  .font(theme.fonts.body.font.bold())
                   Button {
                     contacts.requestContacts = false
                     contacts.request()
                   } label: {
                     HStack {
                       Text("Sync")
-                        .font(theme.fonts.body.bold())
+                        .font(theme.fonts.body.font.bold())
                         .foregroundColor(theme.colors.text)
                     }.height(26)
                       .padding(.horizontal, 20)

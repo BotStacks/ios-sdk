@@ -44,12 +44,12 @@ public struct EmptyListView: View {
         VStack {
           Spacer()
           if let image = config.image {
-            image
+            image.image
           }
           if let caption = config.caption {
             Text(.init(caption))
               .multilineTextAlignment(.center)
-              .font(theme.fonts.title2Regular)
+              .font(theme.fonts.title2Regular.font)
               .foregroundColor(theme.colors.text)
           }
           Spacer()
@@ -77,7 +77,7 @@ public struct EmptyListView: View {
           }
           Text(text)
             .textCase(.uppercase)
-            .font(theme.fonts.headline)
+            .font(theme.fonts.headline.font)
             .foregroundColor(theme.colors.text)
           Spacer()
         }.height(60.0)

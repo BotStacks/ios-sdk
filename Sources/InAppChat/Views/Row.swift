@@ -33,7 +33,7 @@ public struct Row: View {
               ? theme.colors.destructive : iconPrimary ? theme.colors.primary : theme.colors.caption
           )
         Text(.init(text))
-          .font(theme.fonts.title3.bold())
+          .font(theme.fonts.title3.font.bold())
           .foregroundColor(destructive ? theme.colors.destructive : theme.colors.text)
         Spacer()
         Image(systemName: "chevron.right")

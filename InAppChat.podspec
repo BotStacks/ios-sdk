@@ -20,7 +20,7 @@ Pod::Spec.new do |s|
   s.platform = :ios, '15.0'
   s.swift_version = "5.0"
   s.resource_bundles = {
-    "InAppChat": ["Sources/InAppChat/Media.xcassets"]
+    "InAppChat": ["Sources/InAppChat/Media.xcassets", "Sources/InAppChat/Screens/InAppChat.storyboard"]
   }
   s.source_files = 'Sources/InAppChat/**/*.swift'
   s.dependency        'AnyCodable-FlightSchool'
@@ -34,4 +34,5 @@ Pod::Spec.new do |s|
   s.dependency        'Sentry'
   s.dependency        'Apollo'
   s.dependency        'Apollo/WebSocket'
+  s.dependency        'SnapKit'
 end

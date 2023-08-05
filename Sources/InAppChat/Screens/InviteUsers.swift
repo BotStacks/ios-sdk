@@ -106,7 +106,7 @@ public struct InviteUsers: View {
                     .foregroundColor(.white)
                 }
                 Text(chat != nil ? "Send Invites" : "Create My Channel")
-                  .font(theme.fonts.headline)
+                  .font(theme.fonts.headline.font)
                   .foregroundColor(theme.colors.background)
               }
             }

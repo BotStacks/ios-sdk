@@ -19,7 +19,7 @@ public struct MessageContent: View {
   @ViewBuilder
   func text(_ text: String) -> some View {
     Text(.init(text))
-      .font(theme.fonts.body)
+      .font(theme.fonts.body.font)
       .foregroundColor(
         message.user.isCurrent  ? theme.colors.senderText : theme.colors.text
       )
@@ -44,6 +44,7 @@ public struct MessageContent: View {
               AudioView(attachment.url)
             } else if attachment.type == .file {
               AssetImage("file-arrow-down-fill")
+                .image
                 .resizable()
                 .foregroundColor(
                   message.user.isCurrent ? theme.colors.senderText : theme.colors.text

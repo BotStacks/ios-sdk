@@ -55,12 +55,12 @@ public struct ChatRoom: View {
         }
       }.padding(.horizontal, 16.0)
         .padding(.top, 12.0)
-      ActionItem(image: AssetImage("chat-dots"), text: "Reply in chat") {
+      ActionItem(image: AssetImage("chat-dots").image, text: "Reply in chat") {
         navigator.navigate(messageForAction!.path)
         messageForAction = nil
       }
       ActionItem(
-        image: AssetImage("star"),
+        image: AssetImage("star").image,
         text: messageForAction?.favorite == true ? "Remove from favorites" : "Save to favorites"
       ) {
         messageForAction?.toggleFavorite()
@@ -68,7 +68,7 @@ public struct ChatRoom: View {
       }
       if let text = messageForAction?.text, !text.isEmpty {
         ActionItem(
-          image: AssetImage("copy"),
+          image: AssetImage("copy").image,
           text: "Copy"
         ) {
           UIPasteboard.general.string = text
@@ -87,26 +87,26 @@ public struct ChatRoom: View {
 
   var attachmentActions: some View {
     ActionSheet {
-      ActionItem(image: AssetImage("image-square"), text: "Upload Photo", divider: false) {
+      ActionItem(image: AssetImage("image-square").image, text: "Upload Photo", divider: false) {
         self.selectMedia(.pickPhoto)
       }
-      ActionItem(image: AssetImage("camera"), text: "Take Photo", divider: true) {
+      ActionItem(image: AssetImage("camera").image, text: "Take Photo", divider: true) {
         self.selectMedia(.recordPhoto)
       }
-      ActionItem(image: AssetImage("file-video"), text: "Upload Video", divider: false) {
+      ActionItem(image: AssetImage("file-video").image, text: "Upload Video", divider: false) {
         self.selectMedia(.pickVideo)
       }
-      ActionItem(image: AssetImage("video-camera"), text: "Video Camera", divider: true) {
+      ActionItem(image: AssetImage("video-camera").image, text: "Video Camera", divider: true) {
         self.selectMedia(.recordVideo)
       }
-      ActionItem(image: AssetImage("gif"), text: "Send a GIF", divider: true) {
+      ActionItem(image: AssetImage("gif").image, text: "Send a GIF", divider: true) {
         self.selectMedia(.gif)
       }
-      ActionItem(image: AssetImage("map-pin"), text: "Send Location", divider: true) {
+      ActionItem(image: AssetImage("map-pin").image, text: "Send Location", divider: true) {
         media = false
         self.chat.sendLocation(inReplyTo: message)
       }
-      ActionItem(image: AssetImage("address-book"), text: "Share Contact", divider: true) {
+      ActionItem(image: AssetImage("address-book").image, text: "Share Contact", divider: true) {
         media = false
         self.selectMedia(.contact)
       }
@@ -184,10 +184,11 @@ public struct ChatRoom: View {
         HStack {
           Avatar(url: chat.image, size: 35, group: chat.isGroup)
           VStack(alignment: .leading, spacing: 0) {
-            Text(chat.displayName)
+            Text(chat.displayName.maxLength(15))
               .lineLimit(1)
-              .font(theme.fonts.title2)
+              .font(theme.fonts.title2.font)
               .foregroundColor(theme.colors.text)
+              .frame(maxWidth: geometry.width - 140.0)
             if chat.isGroup {
               GroupCount(count: chat.activeMembers.count)
             }
@@ -203,15 +204,15 @@ public struct ChatRoom: View {
       }
     }
     .sheet(isPresented: $media) {
-      attachmentActions
+      attachmentActions.background(TransparentBackground())
     }.sheet(isPresented: $messageForAction.mappedToBool()) {
-      messageAction
+      messageAction.background(TransparentBackground())
     }
     .sheet(isPresented: $selectMedia.mappedToBool()) {
-      pickers
+      pickers.background(TransparentBackground())
     }.sheet(isPresented: $menu) {
       if chat.isGroup {
-        GroupDrawer(chat)
+        GroupDrawer(chat).background(TransparentBackground())
       }
     }.onAppear {
       chat.markRead()
@@ -232,4 +233,40 @@ public struct ChatRoom: View {
       type: .image,
       inReplyTo: message)
   }
+}
+
+
+struct TransparentBackground: UIViewRepresentable {
+  @MainActor
+  private static var backgroundColor: UIColor?
+  
+  func makeUIView(context: Context) -> UIView {
+    let view = UIView()
+    Task {
+      Self.backgroundColor = view.superview?.superview?.backgroundColor
+      view.superview?.superview?.backgroundColor = .clear
+    }
+    return view
+  }
+  
+  static func dismantleUIView(_ uiView: UIView, coordinator: ()) {
+    uiView.superview?.superview?.backgroundColor = Self.backgroundColor
+  }
+  
+  func updateUIView(_ uiView: UIView, context: Context) {}
+}
+
+extension String {
+  func maxLength(_ l: Int) -> String {
+    if self.count > l {
+      return self[startIndex..<self.index(startIndex, offsetBy: l)] + "..."
+    } else {
+      return self
+    }
+  }
+}
+
+
+public class UIChatRoom: UIViewController {
+  var chat: Chat!
 }

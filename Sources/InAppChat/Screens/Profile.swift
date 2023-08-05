@@ -40,7 +40,7 @@ public struct UserProfile: View {
         Avatar(url: user.avatar, size: 150.0)
         Text(user.displayNameFb)
           .foregroundColor(theme.colors.text)
-          .font(theme.fonts.headline)
+          .font(theme.fonts.headline.font)
         ZStack {
           Text(user.status == .online ? "Online" : user.lastSeen?.timeAgo() ?? "")
             .foregroundColor(user.status == .online ? theme.colors.primary : theme.colors.text)
@@ -60,7 +60,7 @@ public struct UserProfile: View {
 //      HStack {
 //        Text("Shared Media")
 //          .foregroundColor(theme.colors.text)
-//          .font(theme.fonts.body)
+//          .font(theme.fonts.body.font)
 //        Spacer()
 //      }.padding(.top, 8.0)
 //        .padding(.leading, 16.0)

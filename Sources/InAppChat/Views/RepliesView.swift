@@ -22,10 +22,10 @@ public struct RepliesView: View {
     NavLink(to: message.path) {
       VStack {
         Text("#\(message.chat.displayName)")
-          .font(theme.fonts.title3)
+          .font(theme.fonts.title3.font)
           .foregroundColor(theme.colors.text)
         Text(message.chat.activeMembers.map(\.user).usernames)
-          .font(theme.fonts.body)
+          .font(theme.fonts.body.font)
           .foregroundColor(
             theme.colors.caption
           )

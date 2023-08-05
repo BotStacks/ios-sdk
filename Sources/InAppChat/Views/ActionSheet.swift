@@ -29,7 +29,7 @@ public struct ActionItem: View {
               .foregroundColor(theme.colors.text)
           }
           Text(.init(text))
-            .font(theme.fonts.headline)
+            .font(theme.fonts.headline.font)
             .foregroundColor(theme.colors.text)
           Spacer()
         }

@@ -8,36 +8,51 @@
 import DynamicColor
 import Foundation
 import SwiftUI
+import UIKit
 
 let darkMode = true
 
-public func base(size: CGFloat, weight: Font.Weight = .regular) -> Font {
-  return .system(size: size, weight: weight)
+public func base(size: CGFloat, weight: UIFont.Weight = .regular) -> UIFont {
+  return .systemFont(ofSize: size, weight: weight)
+}
+
+extension UIFont {
+  var font: Font {
+    return Font(self)
+  }
+  
+  var bold: UIFont {
+    guard let boldDescriptor = fontDescriptor.withSymbolicTraits(.traitBold) else {
+      return self
+    }
+    
+    return UIFont(descriptor: boldDescriptor, size: pointSize)
+  }
 }
 
 public struct Fonts {
-  public let title: Font
-  public let title2: Font
-  public let title2Regular: Font
-  public let title3: Font
-  public let headline: Font
-  public let body: Font
-  public let caption: Font
-  public let username: Font
-  public let timestamp: Font
-  public let mini: Font
+  public let title: UIFont
+  public let title2: UIFont
+  public let title2Regular: UIFont
+  public let title3: UIFont
+  public let headline: UIFont
+  public let body: UIFont
+  public let caption: UIFont
+  public let username: UIFont
+  public let timestamp: UIFont
+  public let mini: UIFont
 
   public init(
-    title: Font = .title,
-    title2: Font = .title2,
-    title2Regular: Font = base(size: 22),
-    title3: Font = .title3,
-    headline: Font = .headline,
-    body: Font = .body,
-    caption: Font = .caption,
-    username: Font = base(size: 12.0, weight: .heavy),
-    timestamp: Font = base(size: 12.0),
-    mini: Font = base(size: 10.0)
+    title: UIFont = .preferredFont(forTextStyle: .title1),
+    title2: UIFont = .preferredFont(forTextStyle: .title2),
+    title2Regular: UIFont = base(size: 22),
+    title3: UIFont = .preferredFont(forTextStyle: .title3),
+    headline: UIFont = .preferredFont(forTextStyle: .headline),
+    body: UIFont = .preferredFont(forTextStyle: .body),
+    caption: UIFont = .preferredFont(forTextStyle: .caption1),
+    username: UIFont = base(size: 12.0, weight: .heavy),
+    timestamp: UIFont = base(size: 12.0),
+    mini: UIFont = base(size: 10.0)
   ) {
     self.title = title
     self.title2 = title2
@@ -144,8 +159,10 @@ public class Theme {
     return current == .light ? dark : light
   }
 
-  func with(_ colorScheme: ColorScheme) -> Theme {
-    self.current = colorScheme
+  func with(_ colorScheme: ColorScheme? = nil) -> Theme {
+    if let colorScheme = colorScheme {
+      self.current = colorScheme
+    }
     return self
   }
 
@@ -180,4 +197,5 @@ public class Theme {
   }
 
   public static let `default`: Theme = Theme()
+  public static var current: Theme = .default
 }

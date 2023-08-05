@@ -1,13 +1,8 @@
 import Foundation
 import SwiftUI
 import UIKit
-
-public class ChannelsController: UITableViewController {
-  
-  
-  
-}
-
+import SDWebImage
+import SnapKit
 
 public struct ChannelsView: View {
 

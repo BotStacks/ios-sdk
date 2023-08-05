@@ -5,6 +5,7 @@ public struct MyProfile: View {
 
   @Environment(\.iacTheme) var theme
   let onBack: (() -> Void)?
+  @Environment(\.geometry) var geometry
 
   @State var logout = false
 
@@ -48,7 +49,7 @@ public struct MyProfile: View {
         } label: {
           Text("Cancel")
             .foregroundColor(theme.colors.caption)
-            .font(theme.fonts.headline)
+            .font(theme.fonts.headline.font)
         }
 
         Button {
@@ -56,8 +57,8 @@ public struct MyProfile: View {
         } label: {
           Text("Log Out")
             .foregroundColor(theme.colors.primary)
-            .font(theme.fonts.headline)
+            .font(theme.fonts.headline.font)
         }
-      }
+      }.padding(.bottom, 70.0 + geometry.insets.bottom)
   }
 }

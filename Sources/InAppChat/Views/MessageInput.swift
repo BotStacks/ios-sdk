@@ -42,7 +42,7 @@ public struct MessageInput: View {
         HStack(spacing: 0) {
           TextField("Send a chat...", text: $text)
             .background(.clear)
-            .font(theme.fonts.body)
+            .font(theme.fonts.body.font)
             .foregroundColor(theme.colors.text)
             .growX()
             .focused($focus)
@@ -51,6 +51,7 @@ public struct MessageInput: View {
           } label: {
             ZStack {
               AssetImage("paperclip-fill")
+                .image
                 .resizable()
                 .size(20.0)
                 .foregroundColor(theme.colors.caption)
@@ -64,7 +65,7 @@ public struct MessageInput: View {
               speech.toggle()
             } label: {
               ZStack {
-                AssetImage(speech.transcribing ? "microphone-slash-fill" : "microphone-fill")
+                AssetImage(speech.transcribing ? "microphone-slash-fill" : "microphone-fill").image
                   .resizable()
                   .size(20.0)
                   .foregroundColor(
@@ -86,6 +87,7 @@ public struct MessageInput: View {
         } label: {
           ZStack {
             AssetImage("paper-plane-tilt-fill")
+              .image
               .resizable()
               .size(20.0)
               .foregroundColor(theme.colors.primary)

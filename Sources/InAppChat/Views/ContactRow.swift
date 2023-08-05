@@ -23,17 +23,18 @@ public struct ContactRow: View {
         HStack {
           Text(user.username)
             .lineLimit(1)
-            .font(theme.fonts.title3)
+            .font(theme.fonts.title3.font)
             .foregroundColor(theme.colors.text)
           if user.haveContact {
             AssetImage("address-book-fill")
+              .image
               .resizable()
               .foregroundColor(ContactRow.blue)
               .size(18.0)
           }
         }
         Text(user.status.rawValue.capitalized)
-          .font(theme.fonts.body)
+          .font(theme.fonts.body.font)
           .foregroundColor(user.status == .online ? theme.colors.primary : theme.colors.text)
       }
       Spacer()

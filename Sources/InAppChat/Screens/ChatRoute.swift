@@ -122,7 +122,7 @@ public struct ChatRoute: View {
         ZStack {
           if failed {
             Text("Chat not found")
-              .font(theme.fonts.title2Regular)
+              .font(theme.fonts.title2Regular.font)
               .multilineTextAlignment(
                 .center
               )

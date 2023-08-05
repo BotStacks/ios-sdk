@@ -19,8 +19,7 @@ public struct MessageList: View {
     ScrollViewReader { proxy in
       ScrollView {
         LazyVStack {
-          Spacer()
-          Spacer().height(geometry.insets.top + Header<Image>.height)
+          Spacer().height(geometry.height)
           ForEach(items,  id: \.id) { message in
             MessageView(message: message)
               .onLongPressGesture {
@@ -34,13 +33,19 @@ public struct MessageList: View {
       }
         .height(geometry.height)
         .onChange(of: items.last?.id) { newValue in
-          if let id = newValue {
+          if newValue != nil {
             withAnimation {
               proxy.scrollTo("bottom", anchor: .bottom)
             }
           }
         }.onAppear {
-          chat.loadMoreIfEmpty()
+          if chat.items.isEmpty {
+            chat.loadMore()
+          } else {
+            Task.detached {
+              try await chat.refresh()
+            }
+          }
           proxy.scrollTo("bottom", anchor: .bottom)
         }.edgesIgnoringSafeArea(.all)
     }
@@ -69,7 +74,7 @@ public struct RepliesList: View {
       VStack {
         Text("Reply Thread")
           .foregroundColor(theme.colors.caption)
-          .font(theme.fonts.headline)
+          .font(theme.fonts.headline.font)
         MessageView(message: message).background(.thinMaterial)
         PagerList(
           pager: replies,
