@@ -1,5 +1,39 @@
 import Foundation
 import SwiftUI
+import Combine
+
+public class UIProfile: UIMyProfile {
+  var user: User! {
+    didSet {
+      bag.forEach {$0.cancel()}
+      bag.removeAll()
+      user.objectWillChange.makeConnectable().autoconnect()
+        .sink { [weak self] _ in
+          DispatchQueue.main.async {
+            self?.updateUI()
+          }
+        }.store(in: &bag)
+      updateUI()
+    }
+  }
+    
+  override func getUser() -> User {
+    return user
+  }
+  
+  deinit {
+    bag.forEach { $0.cancel() }
+    bag.removeAll()
+  }
+  
+  @IBAction func block() {
+    user.block()
+  }
+  
+  override var isTabController: Bool {
+    return false
+  }
+}
 
 public struct Profile: View {
 

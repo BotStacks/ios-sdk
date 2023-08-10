@@ -17,11 +17,11 @@ public func base(size: CGFloat, weight: UIFont.Weight = .regular) -> UIFont {
 }
 
 extension UIFont {
-  var font: Font {
+  public var font: Font {
     return Font(self)
   }
   
-  var bold: UIFont {
+  public var bold: UIFont {
     guard let boldDescriptor = fontDescriptor.withSymbolicTraits(.traitBold) else {
       return self
     }

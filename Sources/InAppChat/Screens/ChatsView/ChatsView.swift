@@ -19,7 +19,7 @@ public class ChatsController: UIViewController, UITableViewDelegate, UITableView
       underlineChannels.isHidden = !isChannels
       lblChats.textColor = !isChannels ? Theme.current.colors.primary.ui : Theme.current.colors.caption.ui
       underlineChats.isHidden = isChannels
-      tableView.reloadData()
+      updateUI()
     }
   }
   
@@ -30,8 +30,9 @@ public class ChatsController: UIViewController, UITableViewDelegate, UITableView
   @IBOutlet var underlineChats: UIView!
   @IBOutlet var tableView: UITableView!
   @IBOutlet var back: UIButton!
-  @IBOutlet var chatsUnread: UIButton!
-  @IBOutlet var channelsUnread: UIButton!
+  @IBOutlet var dmsBadge: BadgeSwift!
+  @IBOutlet var channelsBadge: BadgeSwift!
+  @IBOutlet var emptyView: UIEmptyView!
   
   var bag = Set<AnyCancellable>()
   
@@ -40,17 +41,20 @@ public class ChatsController: UIViewController, UITableViewDelegate, UITableView
     lblChannels.textColor = Theme.current.colors.primary.ui
     lblChats.textColor = Theme.current.colors.caption.ui
     lblChats.font = Theme.current.fonts.title2.bold
-    lblTitle.font = Theme.current.fonts.title.bold
-    chatsUnread.backgroundColor = Theme.current.colors.unread.ui
-    channelsUnread.backgroundColor = Theme.current.colors.unread.ui
-    if InAppChat.shared.hideBackButton {
-      lblTitle.snp.updateConstraints { make in
-        make.width.equalTo(0)
-      }
-      lblTitle.layer.opacity = 0
-    }
+    dmsBadge.badgeColor = c().unread.ui
+    channelsBadge.badgeColor = c().unread.ui
     underlineChats.backgroundColor = Theme.current.colors.primary.ui
     underlineChannels.backgroundColor = Theme.current.colors.primary.ui
+    lblTitle.font = Theme.current.fonts.title.bold
+    if InAppChat.shared.hideBackButton {
+      self.back.snp.updateConstraints { make in
+        make.width.equalTo(0)
+      }
+      self.back.layer.opacity = 0
+      self.lblTitle.snp.updateConstraints { make in
+        make.left.equalToSuperview().inset(24.0)
+      }
+    }
     Chats.current.objectWillChange.makeConnectable().autoconnect().sink { [weak self] _ in
       DispatchQueue.main.async {
         self?.updateUI()
@@ -63,25 +67,32 @@ public class ChatsController: UIViewController, UITableViewDelegate, UITableView
     return Chats.current.dms.reduce(0, {$1.unreadCount + $0})
   }
   var groupsUnreadCount: Int {
-    return Chats.current.dms.reduce(0, {$1.unreadCount + $0})
+    return Chats.current.groups.reduce(0, {$1.unreadCount + $0})
+  }
+  
+  func updateEmpty() {
+    if chats.isEmpty {
+      self.emptyView.isHidden = false
+      let cfg = self.currentEmpty()
+      self.emptyView.apply(cfg.0, cta: cfg.1)
+    } else {
+      self.emptyView.isHidden = true
+    }
   }
   
   func updateUI() {
     tableView.reloadData()
     let dmsUnreadCount = self.dmsUnreadCount
-    if dmsUnreadCount > 0 {
-      chatsUnread.isHidden = false
-      chatsUnread.setTitle(String(dmsUnreadCount), for: .normal)
-    } else {
-      chatsUnread.isHidden = true
+    dmsBadge.text = String(dmsUnreadCount)
+    if dmsUnreadCount == 0 {
+      dmsBadge.isHidden = true
     }
     let groupsUnreadCount = self.groupsUnreadCount
-    if groupsUnreadCount > 0 {
-      channelsUnread.isHidden = false
-      channelsUnread.setTitle(String(groupsUnreadCount), for: .normal)
-    } else {
-      channelsUnread.isHidden = true
+    channelsBadge.text = String(groupsUnreadCount)
+    if groupsUnreadCount == 0 {
+      channelsBadge.isHidden = true
     }
+    updateEmpty()
     let totalUnread = groupsUnreadCount + dmsUnreadCount
     if (totalUnread > 0) {
       self.tabBarItem.badgeValue = String(totalUnread)
@@ -111,13 +122,35 @@ public class ChatsController: UIViewController, UITableViewDelegate, UITableView
   
   public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let chat = chats[indexPath.row]
-    self.performSegue(withIdentifier: "chat", sender: chat)
+//    self.performSegue(withIdentifier: "chat", sender: chat)
   }
   
   public override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
     if segue.identifier == "chat" {
       let dest = segue.destination as! UIChatRoom
       dest.chat = sender as! Chat
+    }
+  }
+  
+  func currentEmpty() -> (EmptyScreenConfig, CTA) {
+    if isChannels {
+      return (Theme.current.assets.emptyChannels, CTA(
+        icon: nil,
+        text: "Explore Channels",
+        action: {
+          self.openNetworks()
+        }
+      ))
+    } else {
+      return (
+        Theme.current.assets.emptyChat,
+        CTA(
+          icon: UIImage(systemName: "paperplane.fill"),
+          text: "Send a Message",
+          action: {
+            self.openContacts()
+          }
+      ))
     }
   }
   
@@ -171,7 +204,7 @@ public struct ChatsView: View {
       )
     case .users:
       return CTA(
-        icon: AssetImage("paper-plane-tilt-fill").image,
+        icon: AssetImage("paper-plane-tilt-fill"),
         text: "Send a Message",
         action: onSendAMessage
       )

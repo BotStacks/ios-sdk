@@ -27,14 +27,14 @@ import SwiftUI
 /// via `NavLink` or programmatically.
 ///
 /// - Note: A Router's base path (root) is always `/`.
-struct Router<Content: View>: View {
+public struct Router<Content: View>: View {
   @StateObject private var navigator: Navigator
   private let content: Content
 
   /// Initialize a Router environment.
   /// - Parameter initialPath: The initial path the `Router` should start at once initialized.
   /// - Parameter content: Content views to render inside the Router environment.
-  init(initialPath: String = "/", @ViewBuilder content: () -> Content) {
+  public init(initialPath: String = "/", @ViewBuilder content: () -> Content) {
     _navigator = StateObject(wrappedValue: Navigator(initialPath: initialPath))
     self.content = content()
   }
@@ -48,17 +48,17 @@ struct Router<Content: View>: View {
   ///
   /// - Parameter navigator: A pre-initialized instance of `Navigator`.
   /// - Parameter content: Content views to render inside the Router environment.
-  init(navigator: Navigator, @ViewBuilder content: () -> Content) {
+  public init(navigator: Navigator, @ViewBuilder content: () -> Content) {
     _navigator = StateObject(wrappedValue: navigator)
     self.content = content()
   }
   
-  var logStack: some View {
+  public var logStack: some View {
     print("Stacks", navigator.historyStack, navigator.forwardStack)
     return EmptyView()
   }
 
-  var body: some View {
+  public var body: some View {
     logStack
     ZStack {
       if let route = navigator.historyStack.last {
@@ -74,15 +74,15 @@ struct Router<Content: View>: View {
 }
 
 // MARK: - Relative path environment key
-struct RelativeRouteEnvironment: EnvironmentKey {
-  static var defaultValue = "/"
+public struct RelativeRouteEnvironment: EnvironmentKey {
+  public static var defaultValue = "/"
 }
 
-struct PathEnvironment: EnvironmentKey {
-  static var defaultValue = "/"
+public struct PathEnvironment: EnvironmentKey {
+  public static var defaultValue = "/"
 }
 
-extension EnvironmentValues {
+public extension EnvironmentValues {
   /// The current relative path of the closest `Route`.
   var relativePath: String {
     get { self[RelativeRouteEnvironment.self] }

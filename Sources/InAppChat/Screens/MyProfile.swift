@@ -1,5 +1,90 @@
 import Foundation
 import SwiftUI
+import UIKit
+import Combine
+import SDWebImage
+
+public class UIBaseController: UIViewController {
+  @IBOutlet var lblTitle: UILabel!
+  @IBOutlet var btnBack: UIButton!
+  
+  var isTabController: Bool {
+    return false
+  }
+  
+  override public func viewDidLoad() {
+    lblTitle.font = Theme.current.fonts.title.bold
+    if isTabController && InAppChat.shared.hideBackButton {
+      btnBack.snp.updateConstraints { make in
+        make.width.equalTo(0)
+      }
+      btnBack.layer.opacity = 0
+      self.lblTitle.snp.updateConstraints { make in
+        make.left.equalToSuperview().inset(24.0)
+      }
+    }
+  }
+  
+  @IBAction func back() {
+    self.navigationController?.popViewController(animated: true)
+  }
+}
+
+
+public class UIMyProfile: UIBaseController {
+  
+  @IBOutlet var displayName: UILabel!
+  @IBOutlet var image: SDAnimatedImageView!
+  
+  var bag = Set<AnyCancellable>()
+  
+  override var isTabController: Bool {
+    return true
+  }
+  
+  override public func viewDidLoad() {
+    super.viewDidLoad()
+    getUser().objectWillChange.makeConnectable().autoconnect().sink { [weak self] _ in
+      DispatchQueue.main.async {
+        self?.updateUI()
+      }
+    }.store(in: &bag)
+    updateUI()
+  }
+  
+  func getUser() -> User {
+    return Chats.current.user!
+  }
+    
+  deinit {
+    bag.forEach { $0.cancel() }
+    bag.removeAll()
+  }
+  
+  func updateUI() {
+    let user = getUser()
+    if let image = user.avatar {
+      self.image.sd_setImage(with: image.url)
+    } else {
+      image.image = AssetImage("user-fill")
+    }
+  }
+  
+  @IBAction func logout() {
+    let alert = UIAlertController(title: "Logout", message: "Are you sure you want to logout?", preferredStyle: .alert)
+    alert.addAction(
+      .init(title: "No", style: .cancel)
+    )
+    alert.addAction(
+      .init(title: "Yes", style: .destructive, handler: { _ in
+        InAppChat.logout()
+        self.navigationController?.popViewController(animated: true)
+      }
+           )
+    )
+    self.present(alert, animated: true)
+  }
+}
 
 public struct MyProfile: View {
 

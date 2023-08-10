@@ -62,16 +62,16 @@ public class UIGroupPlaceholder: UIView {
   
   func build() {
     let g = GradientView()
-    g.startColor = .red
-    g.endColor = .green
+    g.startColor = DynamicColor(c().primary).adjustedHue(amount: -25.0)
+    g.endColor = DynamicColor(c().primary).adjustedHue(amount: 25.0)
     g.translatesAutoresizingMaskIntoConstraints = false
     addSubview(g)
     g.snp.makeConstraints { make in
       make.edges.equalToSuperview()
     }
-    let icon = Theme.current.assets.group
     let image = UIImageView(image: Theme.current.assets.group)
     addSubview(image)
+    image.tintColor = .white
     image.snp.makeConstraints { make in
       make.centerX.equalToSuperview()
       make.centerY.equalToSuperview()

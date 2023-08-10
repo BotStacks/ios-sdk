@@ -25,7 +25,7 @@ public struct InAppChatUI<Content>: View where Content: View {
   ) {
     self.theme = theme
     self.content = content
-    
+    Theme.current = theme
     UITableView.appearance().backgroundColor = .clear
     UITableView.appearance().separatorStyle = .none
     UICollectionView.appearance().backgroundColor = .clear

@@ -11,7 +11,6 @@ import UIKit
 import SDWebImage
 import Combine
 
-
 private let formatter = RelativeDateTimeFormatter()
 
 public struct ThreadRow: View {
@@ -107,7 +106,7 @@ public class UIThreadRow: UITableViewCell {
   
   @IBOutlet var timestamp: UILabel!
   
-  @IBOutlet var unreadCount: UIButton!
+  @IBOutlet var unreadCount: BadgeSwift!
   
   @IBOutlet var unreadCircle: UIView!
   
@@ -124,7 +123,6 @@ public class UIThreadRow: UITableViewCell {
           self?.bindUI()
         }
       }.store(in: &bag)
-      bindTheme()
       bindUI()
     }
   }
@@ -134,23 +132,26 @@ public class UIThreadRow: UITableViewCell {
     bag.removeAll()
   }
   
+  override public func awakeFromNib() {
+    bindTheme()
+  }
+  
   func bindTheme() {
     unreadCircle.layer.borderColor = Theme.current.colors.unread.cgColor
     title.textColor = Theme.current.colors.text.ui
     subtitle.textColor = Theme.current.colors.text.ui
-    unreadCount.backgroundColor = Theme.current.colors.unread.ui
+    unreadCount.badgeColor = c().unread.ui
+    publicPrivate.titleLabel?.font = Theme.current.fonts.mini
   }
   
   func bindUI() {
     title.text = chat.displayName
     subtitle.text = chat.latestMessage?.summary
     if chat.unreadCount > 0 {
-      unreadCount.isHidden = false
-      unreadCount.setTitle(String(chat.unreadCount), for: .normal)
+      unreadCount.text = String(chat.unreadCount)
       unreadCircle.layer.borderWidth = 2.0
       subtitle.textColor = Theme.current.colors.text.ui
     } else {
-      unreadCount.isHidden = true
       unreadCircle.layer.borderWidth = 0.0
       subtitle.textColor = Theme.current.colors.caption.ui
     }

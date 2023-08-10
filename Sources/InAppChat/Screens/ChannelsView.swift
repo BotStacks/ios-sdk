@@ -3,6 +3,83 @@ import SwiftUI
 import UIKit
 import SDWebImage
 import SnapKit
+import Combine
+
+public class UIChannelsController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+  
+  @IBOutlet var tableView: UITableView!
+  @IBOutlet var lblTitle: UILabel!
+  @IBOutlet var btnBack: UIButton!
+  @IBOutlet var emptyView: UIEmptyView!
+  
+  var bag = Set<AnyCancellable>()
+  
+  override public func viewDidLoad() {
+    lblTitle.font = Theme.current.fonts.title.bold
+    tableView.rowHeight = UITableView.automaticDimension
+    if InAppChat.shared.hideBackButton {
+      btnBack.snp.updateConstraints { make in
+        make.width.equalTo(0)
+      }
+      btnBack.layer.opacity = 0
+      self.lblTitle.snp.updateConstraints { make in
+        make.left.equalToSuperview().inset(24.0)
+      }
+    }
+    Chats
+      .current
+      .network
+      .objectWillChange
+      .makeConnectable()
+      .autoconnect()
+      .sink { [weak self] _ in
+      DispatchQueue.main.async {
+        self?.updateUI()
+      }
+    }.store(in: &bag)
+    self.updateUI()
+    Chats.current.network.loadMoreIfEmpty()
+    self.emptyView.apply(Theme.current.assets.emptyAllChannels, cta: CTA(
+      icon: nil, text: "Create A Channel", action: {
+        self.performSegue(withIdentifier: "create", sender: nil)
+    }))
+  }
+  
+  var chats: [Chat] {
+    return Chats.current.network.items
+  }
+  
+  func updateUI() {
+    if chats.isEmpty {
+      self.emptyView.isHidden = false
+    } else {
+      self.emptyView.isHidden = true
+    }
+    self.tableView.reloadData()
+  }
+  
+  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    return Chats.current.network.items.count
+  }
+  
+  public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let cell = tableView.dequeueReusableCell(withIdentifier: "channel") as! UIChannelRow
+    cell.chat = Chats.current.network.items[indexPath.row]
+    return cell
+  }
+  
+  public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    return UITableView.automaticDimension
+  }
+  
+  public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    Chats.current.network.loadMoreIfNeeded(Chats.current.network.items[indexPath.row])
+  }
+  
+  @IBAction func back() {
+    self.navigationController?.popViewController(animated: true)
+  }
+}
 
 public struct ChannelsView: View {
 

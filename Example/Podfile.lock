@@ -9,6 +9,7 @@ PODS:
   - Auth0 (2.5.0):
     - JWTDecode (~> 3.1)
     - SimpleKeychain (~> 1.1)
+  - BadgeHub (1.0.0)
   - DynamicColor (5.0.1)
   - Gifu (3.3.1)
   - Giphy (2.2.6):
@@ -18,6 +19,7 @@ PODS:
     - AnyCodable-FlightSchool
     - Apollo
     - Apollo/WebSocket
+    - BadgeHub
     - DynamicColor
     - Gifu
     - Giphy
@@ -66,6 +68,7 @@ SPEC REPOS:
     - AnyCodable-FlightSchool
     - Apollo
     - Auth0
+    - BadgeHub
     - DynamicColor
     - Gifu
     - Giphy
@@ -89,10 +92,11 @@ SPEC CHECKSUMS:
   AnyCodable-FlightSchool: 261cbe76757802b17d471b9059b21e6fa5edf57b
   Apollo: ccc6fac4c9d8fcc93f6fb917f58f7b62b7101d56
   Auth0: 72f19ad566fdf57f07bf37f828afd0c1570769a5
+  BadgeHub: b227771329f78c37a2dae7502607ec6d00a50bd4
   DynamicColor: d049834ef86d8ecf150b0ca1ebe54ee733a0ec22
   Gifu: 416d4e38c4c2fed012f019e0a1d3ffcb58e5b842
   Giphy: f64bff5937fbc4987b6a26c8ef625501c68a1e97
-  InAppChat: 52a53ceb075b833281e4d3f4363decab35b3688b
+  InAppChat: 938beb81ec755f342d0b95c246ca72ba89fc016f
   JWTDecode: 3eaab1e06b6f4dcbdd6716aff09ba4c2104ca8b7
   libwebp: 33dc822fbbf4503668d09f7885bbfedc76c45e96
   SDWebImage: 750adf017a315a280c60fde706ab1e552a3ae4e9

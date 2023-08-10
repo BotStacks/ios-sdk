@@ -7,6 +7,34 @@
 
 import Foundation
 import SwiftUI
+import UIKit
+
+public class UIRow: UIView {
+  
+  override public func awakeFromNib() {
+    buildUI()
+  }
+  
+  @IBOutlet var icon: UIImageView!
+  @IBOutlet var indicator: UIImageView!
+  @IBOutlet var title: UILabel!
+  var destructive: Bool = false {
+    didSet {
+      if (destructive) {
+        icon?.tintColor = Theme.current.colors.destructive.ui
+        title?.tintColor = Theme.current.colors.destructive.ui
+      } else {
+        icon?.tintColor = Theme.current.colors.text.ui
+        title?.tintColor = Theme.current.colors.text.ui
+      }
+    }
+  }
+  
+  func buildUI() {
+    self.destructive = destructive ? true : false
+    title.font = Theme.current.fonts.title3.bold
+  }
+}
 
 public struct Row: View {
 

@@ -4,9 +4,55 @@ import SwiftUI
 import UIKit
 
 struct CTA  {
-  let icon: Image?
+  let icon: UIImage?
   let text: String
   let action: () -> Void
+}
+
+public class UIEmptyView: UIView {
+  
+  public required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+  
+  public override init(frame: CGRect) {
+    super.init(frame: frame)
+  }
+  
+  @IBOutlet var image: UIImageView!
+  @IBOutlet var caption: UILabel!
+  @IBOutlet var button: UIButton!
+  
+  override public func awakeFromNib() {
+    self.caption.font = Theme.current.fonts.title2Regular
+    self.caption.textColor = c().text.ui
+    self.button.setTitleColor(c().text.ui, for: .normal)
+    self.button.layer.borderColor = c().text.cgColor
+    self.button.titleLabel?.font = Theme.current.fonts.headline
+  }
+  
+  var cta: CTA?
+  
+  func apply(_ config: EmptyScreenConfig, cta: CTA?) {
+    image.image = config.image
+    if let text = config.caption {
+      caption.attributedText = NSAttributedString(try! AttributedString(markdown: text))
+    } else {
+      caption.attributedText = .init("")
+    }
+    self.cta = cta
+    if let cta = cta {
+      button.setTitle(cta.text, for: .normal)
+      button.setImage(cta.icon, for: .normal)
+      button.isHidden = false
+    } else {
+      button.isHidden = true
+    }
+  }
+  
+  @IBAction func onClick() {
+    cta?.action()
+  }
 }
 
 
@@ -54,7 +100,7 @@ public struct EmptyListView: View {
           }
           Spacer()
           if let cta = cta {
-            CTAView(icon: cta.icon, text: cta.text, action: cta.action)
+            CTAView(icon: cta.icon?.image, text: cta.text, action: cta.action)
           }
             
         }
@@ -90,6 +136,4 @@ public struct EmptyListView: View {
   }
   
 }
-
-
 

@@ -14,14 +14,20 @@ public class UIChannelRow: UITableViewCell {
 
   var chat: Chat! {
     didSet {
-      bindUI()
       bag.forEach { $0.cancel() }
       bag.removeAll()
       chat.objectWillChange.makeConnectable().autoconnect()
         .sink { [weak self] _ in
           self?.bindUI()
         }.store(in: &bag)
+      bindUI()
+      bindTheme()
     }
+  }
+  
+  deinit {
+    bag.forEach {$0.cancel()}
+    bag.removeAll()
   }
   
   @IBOutlet var title: UILabel!
@@ -31,6 +37,18 @@ public class UIChannelRow: UITableViewCell {
   @IBOutlet var pub: UIPrivacyPill!
   @IBOutlet var placeholder: UIGroupPlaceholder!
   @IBOutlet var avatar: SDAnimatedImageView!
+  @IBOutlet var invites: UILabel!
+  @IBOutlet var buttonDismissInvites: UIButton!
+  @IBOutlet var invitesContainer: UIView!
+  @IBOutlet var invitesContainerHeight: NSLayoutConstraint!
+  
+  func bindTheme() {
+    title.font = Theme.current.fonts.title3
+    subtitle.font = Theme.current.fonts.body
+    subtitle.textColor = Theme.current.colors.caption.ui
+    count.textColor = Theme.current.colors.text.ui
+    contentView.subviews.first?.backgroundColor = Theme.current.colors.bubble.ui
+  }
   
   func bindUI() {
     title.text = chat.displayName
@@ -46,6 +64,19 @@ public class UIChannelRow: UITableViewCell {
       placeholder.isHidden = false
       avatar.isHidden = true
     }
+    join.backgroundColor = chat.isMember ? Theme.current.colors.caption.ui : Theme.current.colors.primary.ui
+    if chat.isInvited {
+      invites.attributedText = NSAttributedString(try! AttributedString(markdown: chatInvitesText(chat: chat)))
+      if invites.superview == nil {
+        invitesContainer.addSubview(invites)
+        invitesContainer.addSubview(buttonDismissInvites)
+      }
+      invitesContainerHeight.isActive = false
+    } else {
+      invites.removeFromSuperview()
+      buttonDismissInvites.removeFromSuperview()
+      invitesContainerHeight.isActive = true
+    }
   }
   
   @IBAction func tapJoin() {
@@ -54,6 +85,10 @@ public class UIChannelRow: UITableViewCell {
     } else {
       chat.join()
     }
+  }
+  
+  @IBAction func dismissInvites() {
+    chat.dismissInvites()
   }
 }
 

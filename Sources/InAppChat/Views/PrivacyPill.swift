@@ -20,20 +20,18 @@ public struct PrivacyPill: View {
 }
 
 public class UIPrivacyPill: UIButton {
-  public override init(frame: CGRect) {
-    super.init(frame: frame)
-  }
   
-  public required init?(coder: NSCoder) {
-    super.init(coder: coder)
+  override public func awakeFromNib() {
+    self.titleLabel?.font = .boldSystemFont(ofSize: 10.0)
   }
   
   func bind(chat: Chat) {
+    self.layer.cornerRadius = self.frame.height / 2.0
     if chat.isDM {
       isHidden = true
     } else {
       isHidden = false
-      setTitle(chat._private ? "Private" : "Public", for: .normal)
+      setTitle(chat._private ? "PRIVATE" : "PUBLIC", for: .normal)
       backgroundColor = chat._private ? Theme.current.colors.public.ui : Theme.current.colors.private.ui
     }
   }

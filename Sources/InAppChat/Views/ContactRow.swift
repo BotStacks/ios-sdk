@@ -7,6 +7,48 @@
 
 import Foundation
 import SwiftUI
+import UIKit
+import Combine
+
+
+
+public class UIContactRow: UITableViewCell {
+
+  @IBOutlet var avatar: UIImageView!
+  @IBOutlet var icon: UIImageView!
+  @IBOutlet var title: UILabel!
+  @IBOutlet var contact: UIImageView!
+  @IBOutlet var status: UILabel!
+  
+  var bag = Set<AnyCancellable>()
+  
+  var user: User! {
+    didSet {
+      bag.forEach {$0.cancel()}
+      bag.removeAll()
+      user.objectWillChange.makeConnectable().autoconnect()
+        .sink { [weak self] _ in
+          self?.bindUI()
+        }.store(in: &bag)
+      bindUI()
+    }
+  }
+  
+  func bindUI() {
+    if let image = user.avatar {
+      avatar.sd_setImage(with: image.url)
+      icon.isHidden = true
+      avatar.isHidden = false
+    } else {
+      icon.isHidden = false
+      avatar.isHidden = true
+    }
+    title.text = user.displayNameFb
+    contact.isHidden = user.haveContact
+    status.text = user.status.rawValue
+    status.textColor = user.status == .online ? Theme.current.colors.primary.ui : Theme.current.colors.text.ui
+  }
+}
 
 public struct ContactRow: View {
 

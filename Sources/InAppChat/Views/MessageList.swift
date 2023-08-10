@@ -7,6 +7,89 @@
 
 import Foundation
 import SwiftUI
+import UIKit
+
+public class UIMessageCell: UITableViewCell {
+  
+  var message: Message! {
+    didSet {
+      bindUI()
+    }
+  }
+  
+  weak var label: UILabel?
+  
+  func bindUI() {
+    var md = message.markdownText
+    for at in message.attachments ?? [] {
+      switch at.type {
+      case .image:
+        
+        break
+      case .audio:
+        break
+      case .file:
+        
+        break
+      case .location:
+        md = at.loc?.markdownLink ?? ""
+        break
+      case .vcard:
+        md = at.contact?.markdown ?? ""
+        break
+      case .video:
+        break
+      default:
+        break
+      }
+    }
+    if !md.isEmpty {
+      
+    }
+  }
+}
+
+
+public class UIMessageList: UIViewController, UITableViewDelegate, UITableViewDataSource {
+  
+  @IBOutlet var tableView: UITableView!
+  
+  var chat: Chat? {
+    didSet {
+      if let chat = chat {
+        messages = chat.sending + chat.items
+      }
+    }
+  }
+
+  var onLongPress: (Message) -> Void = {
+    message in
+    
+  }
+  
+  var messages = Chats.current.favorites.items {
+    didSet {
+      tableView.reloadData()
+    }
+  }
+  
+  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    return messages.count
+  }
+
+  
+  public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let msg = messages[indexPath.row]
+    let cell = tableView.dequeueReusableCell(withIdentifier: "message")! as! UIMessageCell
+    cell.message = msg
+    return cell
+  }
+  
+  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    
+  }
+  
+}
 
 public struct MessageList: View {
 

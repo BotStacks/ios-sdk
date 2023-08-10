@@ -7,6 +7,69 @@
 
 import Foundation
 import SwiftUI
+import UIKit
+import Combine
+
+func c() -> Colors {
+  return Theme.current.colors
+}
+
+public class UIManageNotifications: UIBaseController {
+  
+  @IBOutlet var all: UIView!
+  @IBOutlet var mentions: UIView!
+  @IBOutlet var none: UIView!
+  
+  @IBOutlet var update: UIButton!
+  
+  let settings = Chats.current.settings
+  
+  var bag = Set<AnyCancellable>()
+  
+  override public func viewDidLoad() {
+    super.viewDidLoad()
+    settings.objectWillChange.makeConnectable().autoconnect().sink { [weak self] _ in
+      self?.updateUI()
+    }.store(in: &bag)
+    setTheme()
+    updateUI()
+  }
+  
+  func setTheme() {
+    update.tintColor = c().primary.ui
+    [all, mentions, none].forEach { it in
+      it?.backgroundColor = c().primary.ui
+      it?.superview?.layer.borderColor = c().primary.cgColor
+      let label = (it?.superview?.superview?.subviews.first as? UILabel)
+      label?.font = Theme.current.fonts.headline
+      label?.textColor = c().text.ui
+    }
+  }
+  
+  func updateUI() {
+    let n = settings.notifications
+    all.isHidden = n != .all
+    mentions.isHidden = n != .mentions
+    none.isHidden = n != .none
+  }
+  
+  @IBAction func tapAll() {
+    settings.notifications = .all
+  }
+  
+  @IBAction func tapMentions() {
+    settings.notifications = .mentions
+  }
+  
+  @IBAction func tapNone() {
+    settings.notifications = .none
+  }
+  
+  @IBAction func save() {
+    settings.setNotification(settings.notifications)
+    self.navigationController?.popViewController(animated: true)
+  }
+}
 
 public struct ManageNotifications: View {
 
