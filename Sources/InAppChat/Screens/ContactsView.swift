@@ -46,25 +46,28 @@ public class UIContactsController: UIViewController, UITableViewDataSource, UITa
     Chats.current.contacts.loadMoreIfEmpty()
   }
   
-  public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-    if Chats.current.contacts.requestContacts {
-      return tableView.dequeueReusableHeaderFooterView(withIdentifier: "request")
-    }
-    return nil
+  let ct = Chats.current.contacts
+  
+  func contact(at index: IndexPath) -> User {
+    return ct.items[index.row - (ct.requestContacts ? 1 : 0)]
   }
   
   public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return Chats.current.contacts.items.count
+    return ct.items.count + (ct.requestContacts ? 1 : 0)
   }
   
   public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCell(withIdentifier: "channel") as! UIContactRow
-    cell.user = Chats.current.contacts.items[indexPath.row]
+    if ct.requestContacts && indexPath.row == 0 {
+      return tableView.dequeueReusableCell(withIdentifier: "requestContacts", for: indexPath)
+    }
+    let cell = tableView.dequeueReusableCell(withIdentifier: "contact") as! UIContactRow
+    cell.user = contact(at: indexPath)
     return cell
   }
   
   public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    let user = Chats.current.contacts.items[indexPath.row]
+    if ct.requestContacts && indexPath.row == 0 { return }
+    let user = contact(at: indexPath)
     self.performSegue(withIdentifier: "user", sender: user)
   }
   
@@ -76,7 +79,8 @@ public class UIContactsController: UIViewController, UITableViewDataSource, UITa
   }
   
   public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-    Chats.current.contacts.loadMoreIfNeeded(Chats.current.contacts.items[indexPath.row])
+    if ct.requestContacts && indexPath.row == 0 { return }
+    Chats.current.contacts.loadMoreIfNeeded(contact(at: indexPath))
   }
   
   @IBAction func back() {

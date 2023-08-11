@@ -50,7 +50,7 @@ public class UIChannelsController: UIViewController, UITableViewDelegate, UITabl
   }
   
   func updateUI() {
-    if chats.isEmpty {
+    if chats.isEmpty && !Chats.current.network.loading {
       self.emptyView.isHidden = false
     } else {
       self.emptyView.isHidden = true

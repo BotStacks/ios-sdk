@@ -49,15 +49,22 @@ public class Chats: ObservableObject {
       self.loading = false
     }
   }
+  
+  private func loadMe() async throws {
+    let (user, memberships) = try await api.start()
+    print("loaded current user")
+    await MainActor.run {
+      self.user = user
+      self.memberships.append(contentsOf: memberships)
+      InAppChat.shared.isUserLoggedIn = true
+      User.current = user
+      api.subscribe()
+    }
+  }
 
   public func loadAsync() async throws {
     if api.authToken != nil {
-      let (user, memberships) = try await api.start()
-      print("loaded current user")
-      await MainActor.run {
-        self.user = user
-        self.memberships.append(contentsOf: memberships)
-      }
+      try await loadMe()
       print("got active threads")
       if let pushToken = pushToken {
         Task.detached {
@@ -105,6 +112,7 @@ public class Chats: ObservableObject {
   func startSession(user: User) {
     self.user = user
     Task.detached {
+      try await self.loadMe()
       try await self.loadGroupInvites()
     }
   }

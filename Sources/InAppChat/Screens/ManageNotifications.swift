@@ -29,7 +29,9 @@ public class UIManageNotifications: UIBaseController {
   override public func viewDidLoad() {
     super.viewDidLoad()
     settings.objectWillChange.makeConnectable().autoconnect().sink { [weak self] _ in
-      self?.updateUI()
+      DispatchQueue.main.async {
+        self?.updateUI()
+      }
     }.store(in: &bag)
     setTheme()
     updateUI()
@@ -40,6 +42,7 @@ public class UIManageNotifications: UIBaseController {
     [all, mentions, none].forEach { it in
       it?.backgroundColor = c().primary.ui
       it?.superview?.layer.borderColor = c().primary.cgColor
+      it?.superview?.layer.borderWidth = 1.0
       let label = (it?.superview?.superview?.subviews.first as? UILabel)
       label?.font = Theme.current.fonts.headline
       label?.textColor = c().text.ui

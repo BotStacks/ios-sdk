@@ -62,12 +62,14 @@ public class UIMyProfile: UIBaseController {
   }
   
   func updateUI() {
+    let _ = self.view
     let user = getUser()
     if let image = user.avatar {
       self.image.sd_setImage(with: image.url)
     } else {
       image.image = AssetImage("user-fill")
     }
+    displayName.text = user.displayNameFb
   }
   
   @IBAction func logout() {

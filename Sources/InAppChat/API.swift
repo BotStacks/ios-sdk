@@ -371,14 +371,6 @@ class Api: InterceptorProvider, ApolloInterceptor {
 
   func onLogin(_ token: String, user: User) async throws {
     onToken(token)
-    try await onUser(user)
-  }
-
-  func onUser(_ user: User) {
-    Chats.current.startSession(user:user)
-    User.current = user
-    InAppChat.shared.isUserLoggedIn = true
-    subscribe()
   }
 
   func onToken(_ token: String) {
@@ -451,6 +443,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
   
   func loggedOut() {
     self.authToken = nil
+    InAppChat.shared.onLogout?()
   }
 
   func block(user: String) async throws -> Bool {
@@ -543,7 +536,6 @@ class Api: InterceptorProvider, ApolloInterceptor {
     let res = try await client.fetchAsync(query: Gql.GetMeQuery())
     return await MainActor.run {
       let user = User.get(.init(_dataDict:res.me.__data))
-      onUser(user)
       Chats.current.settings.blocked.append(contentsOf: res.me.blocks ?? [])
       let mraw = res.memberships
       let memberships = mraw.map { it in

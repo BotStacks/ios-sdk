@@ -19,7 +19,9 @@ public class InAppChatController: UINavigationController {
 
 public struct InAppChatView: UIViewControllerRepresentable {
   
-  public init() {}
+  public init(onLogout: @escaping () -> Void) {
+    InAppChat.shared.onLogout = onLogout
+  }
   
   public func makeUIViewController(context: Context) -> InAppChatController {
     return InAppChatController.instance
@@ -29,6 +31,10 @@ public struct InAppChatView: UIViewControllerRepresentable {
     
   }
   
+  public static func dismantleUIViewController(_ uiViewController: InAppChatController, coordinator: Void) {
+    InAppChat.shared.onLogout = nil
+  }
+
   public typealias UIViewControllerType = InAppChatController
   
 }

@@ -21,6 +21,8 @@ public class InAppChat: ObservableObject {
   @Published public var loaded: Bool = false
   @Published public var isUserLoggedIn: Bool = false
   @Published public var appMeta: [String: Any] = [:]
+  public var hideBackButton = false
+  public var onLogout: (() -> Void)? = nil
   
   var user: User? {
     return Chats.current.user
@@ -31,7 +33,6 @@ public class InAppChat: ObservableObject {
     Monitoring.start()
   }
   
-  public var hideBackButton = false
 
   public func load() async throws {
     guard !didStartLoading else { return }

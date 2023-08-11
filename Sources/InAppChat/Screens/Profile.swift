@@ -1,8 +1,16 @@
 import Foundation
 import SwiftUI
 import Combine
+import SDWebImage
 
 public class UIProfile: UIMyProfile {
+  
+  @IBOutlet var headerImage: SDAnimatedImageView!
+  @IBOutlet var blockTitle: UILabel!
+  @IBOutlet var status: UIButton!
+  @IBOutlet var blockRow: UIView!
+  @IBOutlet var messageRow: UIView!
+  
   var user: User! {
     didSet {
       bag.forEach {$0.cancel()}
@@ -18,7 +26,7 @@ public class UIProfile: UIMyProfile {
   }
     
   override func getUser() -> User {
-    return user
+    return user ?? Chats.current.user!
   }
   
   deinit {
@@ -32,6 +40,22 @@ public class UIProfile: UIMyProfile {
   
   override var isTabController: Bool {
     return false
+  }
+  
+  override func updateUI() {
+    super.updateUI()
+    let user = getUser()
+    self.blockTitle.text = (getUser().blocked ? "Unblock" : "Block") + " \(getUser().username)"
+    self.lblTitle.text = getUser().username
+    self.blockRow.isHidden = getUser().isCurrent
+    self.messageRow.isHidden = self.blockRow.isHidden
+    if let img = user.avatar {
+      headerImage.sd_setImage(with: img.url)
+    } else {
+      headerImage.image = AssetImage("user-fill")
+    }
+    status.setTitle(user.status == .online ? "Online" : user.lastSeen?.timeAgo() ?? "", for: .normal)
+    status.setTitleColor((user.status == .online ? c().primary : c().text).ui, for: .normal)
   }
 }
 

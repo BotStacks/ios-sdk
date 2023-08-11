@@ -8,61 +8,36 @@
 import Foundation
 import SwiftUI
 import UIKit
-
-public class UIMessageCell: UITableViewCell {
-  
-  var message: Message! {
-    didSet {
-      bindUI()
-    }
-  }
-  
-  weak var label: UILabel?
-  
-  func bindUI() {
-    var md = message.markdownText
-    for at in message.attachments ?? [] {
-      switch at.type {
-      case .image:
-        
-        break
-      case .audio:
-        break
-      case .file:
-        
-        break
-      case .location:
-        md = at.loc?.markdownLink ?? ""
-        break
-      case .vcard:
-        md = at.contact?.markdown ?? ""
-        break
-      case .video:
-        break
-      default:
-        break
-      }
-    }
-    if !md.isEmpty {
-      
-    }
-  }
-}
-
+import Combine
 
 public class UIMessageList: UIViewController, UITableViewDelegate, UITableViewDataSource {
   
   @IBOutlet var tableView: UITableView!
   
+  var sub: AnyCancellable? = nil
+  
   var chat: Chat? {
     didSet {
+      sub?.cancel()
       if let chat = chat {
+        sub = chat.objectWillChange.makeConnectable()
+          .autoconnect()
+          .sink(receiveValue: { [weak self] _ in
+            DispatchQueue.main.async {
+              self?.messages = chat.sending + chat.items
+            }
+          })
         messages = chat.sending + chat.items
       }
     }
   }
 
   var onLongPress: (Message) -> Void = {
+    message in
+    
+  }
+  
+  var onPress: (Message) -> Void = {
     message in
     
   }
@@ -80,15 +55,21 @@ public class UIMessageList: UIViewController, UITableViewDelegate, UITableViewDa
   
   public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let msg = messages[indexPath.row]
-    let cell = tableView.dequeueReusableCell(withIdentifier: "message")! as! UIMessageCell
+    let cell = tableView.dequeueReusableCell(withIdentifier: "message")! as! UIMessageRow
     cell.message = msg
     return cell
   }
   
   public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    
+    onPress(messages[indexPath.row])
   }
   
+  @IBAction func handleLongPress(_ sender: UILongPressGestureRecognizer) {
+    let p = sender.location(in: tableView)
+    if let i = tableView.indexPathForRow(at: p) {
+      onLongPress(messages[i.row])
+    }
+  }
 }
 
 public struct MessageList: View {
@@ -126,7 +107,7 @@ public struct MessageList: View {
             chat.loadMore()
           } else {
             Task.detached {
-              try await chat.refresh()
+              await chat.refresh()
             }
           }
           proxy.scrollTo("bottom", anchor: .bottom)

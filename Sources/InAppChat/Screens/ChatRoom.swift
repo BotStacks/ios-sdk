@@ -8,6 +8,32 @@
 import Foundation
 import SwiftUI
 import UIKit
+import SDWebImage
+
+public class UIChatRoom: UIViewController {
+  
+  var chat: Chat! {
+    didSet {
+      
+    }
+  }
+  
+  @IBOutlet var groupCount: UILabel!
+  @IBOutlet var lblTitle: UILabel!
+  @IBOutlet var btnBack: UIButton!
+  @IBOutlet var headerImage: SDAnimatedImageView!
+  @IBOutlet var btnMore: UIButton!
+  @IBOutlet var btnMic: UIButton!
+  @IBOutlet var btnSend: UIButton!
+  @IBOutlet var inputRightConstraint: NSLayoutConstraint!
+  @IBOutlet var inputHeightConstraint: NSLayoutConstraint!
+  
+  @IBOutlet var input: UITextView!
+  
+  
+  
+  
+}
 
 public struct ChatRoom: View {
 
@@ -264,9 +290,4 @@ extension String {
       return self
     }
   }
-}
-
-
-public class UIChatRoom: UIViewController {
-  var chat: Chat!
 }

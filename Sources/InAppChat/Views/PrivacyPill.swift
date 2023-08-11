@@ -22,7 +22,7 @@ public struct PrivacyPill: View {
 public class UIPrivacyPill: UIButton {
   
   override public func awakeFromNib() {
-    self.titleLabel?.font = .boldSystemFont(ofSize: 10.0)
+    self.titleLabel?.font = .boldSystemFont(ofSize: 8.0)
   }
   
   func bind(chat: Chat) {

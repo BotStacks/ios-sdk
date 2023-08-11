@@ -54,7 +54,7 @@ public class UIChannelRow: UITableViewCell {
     title.text = chat.displayName
     subtitle.text = chat.description
     count.text = String(chat.members.count)
-    join.backgroundColor = chat.isMember ? Theme.current.colors.caption.ui : Theme.current.colors.primary.ui
+//    join.backgroundColor = chat.isMember ? Theme.current.colors.caption.ui : Theme.current.colors.primary.ui
     pub.bind(chat: chat)
     if let url = chat.image {
       avatar.isHidden = false
@@ -64,7 +64,7 @@ public class UIChannelRow: UITableViewCell {
       placeholder.isHidden = false
       avatar.isHidden = true
     }
-    join.backgroundColor = chat.isMember ? Theme.current.colors.caption.ui : Theme.current.colors.primary.ui
+    join.tintColor = chat.isMember ? Theme.current.colors.caption.ui : Theme.current.colors.primary.ui
     if chat.isInvited {
       invites.attributedText = NSAttributedString(try! AttributedString(markdown: chatInvitesText(chat: chat)))
       if invites.superview == nil {
@@ -72,10 +72,12 @@ public class UIChannelRow: UITableViewCell {
         invitesContainer.addSubview(buttonDismissInvites)
       }
       invitesContainerHeight.isActive = false
+      invitesContainer.backgroundColor = c().unread.ui
     } else {
       invites.removeFromSuperview()
       buttonDismissInvites.removeFromSuperview()
       invitesContainerHeight.isActive = true
+      invitesContainer.backgroundColor = .clear
     }
   }
   
