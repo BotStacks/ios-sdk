@@ -32,7 +32,7 @@ public struct GroupPlaceholder: View {
   }
 }
 
-public class GradientView: UIView {
+public class UIGradientView: UIView {
   var startColor: UIColor?
   var endColor: UIColor?
   
@@ -61,7 +61,7 @@ public class UIGroupPlaceholder: UIView {
   }
   
   func build() {
-    let g = GradientView()
+    let g = UIGradientView()
     g.startColor = DynamicColor(c().primary).adjustedHue(amount: -25.0)
     g.endColor = DynamicColor(c().primary).adjustedHue(amount: 25.0)
     g.translatesAutoresizingMaskIntoConstraints = false

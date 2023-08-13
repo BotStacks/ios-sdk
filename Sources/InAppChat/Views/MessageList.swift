@@ -20,8 +20,10 @@ public class UIMessageList: UIViewController, UITableViewDelegate, UITableViewDa
     didSet {
       sub?.cancel()
       if let chat = chat {
+        print("MessageList did set chat")
         sub = chat.objectWillChange.makeConnectable()
           .autoconnect()
+          .throttle(for: 0.1, scheduler: RunLoop.main, latest: true)
           .sink(receiveValue: { [weak self] _ in
             DispatchQueue.main.async {
               self?.messages = chat.sending + chat.items
@@ -30,6 +32,10 @@ public class UIMessageList: UIViewController, UITableViewDelegate, UITableViewDa
         messages = chat.sending + chat.items
       }
     }
+  }
+  
+  var pager: Pager<Message> {
+    return chat ?? Chats.current.favorites
   }
 
   var onLongPress: (Message) -> Void = {
@@ -44,19 +50,39 @@ public class UIMessageList: UIViewController, UITableViewDelegate, UITableViewDa
   
   var messages = Chats.current.favorites.items {
     didSet {
-      tableView.reloadData()
+      if viewIfLoaded != nil {
+        tableView.reloadData()
+      }
     }
   }
   
+  override public func viewDidLoad() {
+    super.viewDidLoad()
+    if chat != nil {
+      tableView.transform = CGAffineTransform(rotationAngle: -CGFloat.pi);
+    }
+  }
+  
+  public override func viewDidLayoutSubviews() {
+    tableView.scrollIndicatorInsets = .init(top: 0.0, left: 0.0, bottom: 0.0, right: tableView.bounds.size.width - 8.0)
+  }
+  
+  override public func viewDidAppear(_ animated: Bool) {
+    self.pager.loadMoreIfEmpty()
+  }
+  
   public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    print("Message LIst number of row \(messages.count)")
     return messages.count
   }
-
   
   public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let msg = messages[indexPath.row]
-    let cell = tableView.dequeueReusableCell(withIdentifier: "message")! as! UIMessageRow
+    let cell = tableView.dequeueReusableCell(withIdentifier: UIMessageRow.identifier(for: msg))! as! UIMessageRow
     cell.message = msg
+    if chat != nil {
+      cell.transform = CGAffineTransform(rotationAngle: CGFloat.pi);
+    }
     return cell
   }
   
@@ -69,6 +95,11 @@ public class UIMessageList: UIViewController, UITableViewDelegate, UITableViewDa
     if let i = tableView.indexPathForRow(at: p) {
       onLongPress(messages[i.row])
     }
+  }
+  
+  public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    let m = messages[indexPath.row]
+    pager.loadMoreIfNeeded(m)
   }
 }
 

@@ -38,11 +38,11 @@ open class Pager<T>: ObservableObject where T: Identifiable {
     if self.refreshing {
       return
     }
-    publish {
+    await MainActor.run {
       self.refreshing = true
     }
     let items = await self._load(true)
-    publish {
+    await MainActor.run {
       if items.count > 0 {
         items.reversed().forEach { it in
           if !self.items.contains(where: {it.id == $0.id}) {
@@ -66,7 +66,7 @@ open class Pager<T>: ObservableObject where T: Identifiable {
       let items = await self._load(false)
       publish {
         if items.count > 0 {
-          self.items = items
+          self.items.append(contentsOf: items)
         }
         self.hasMore = items.count >= self.pageSize
         self.loading = false

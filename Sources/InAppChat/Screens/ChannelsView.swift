@@ -76,23 +76,36 @@ public class UIChannelsController: UIViewController, UITableViewDelegate, UITabl
     Chats.current.network.loadMoreIfNeeded(Chats.current.network.items[indexPath.row])
   }
   
+  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    let chat = chats[indexPath.row]
+    self.performSegue(withIdentifier: "chat", sender: chat)
+  }
+  
+  public override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    if segue.identifier == "chat" {
+      let chat = segue.destination as? UIChatRoom
+      chat?.chat = sender as? Chat
+    }
+  }
+  
   @IBAction func back() {
     self.navigationController?.popViewController(animated: true)
   }
 }
 
-public struct ChannelsView: View {
 
+public struct ChannelsView: View {
+  
   @Environment(\.iacTheme) var theme
   @ObservedObject var chats = Chats.current
   @Environment(\.geometry) var geometry
   @EnvironmentObject var navigator: Navigator
-
+  
   @Binding var scrollToTop: Int
   public init(scrollToTop: Binding<Int>) {
     self._scrollToTop = scrollToTop
   }
-
+  
   public var body: some View {
     ScrollViewReader { proxy in
       ZStack(alignment: .topLeading) {

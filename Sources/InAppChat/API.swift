@@ -536,6 +536,8 @@ class Api: InterceptorProvider, ApolloInterceptor {
     let res = try await client.fetchAsync(query: Gql.GetMeQuery())
     return await MainActor.run {
       let user = User.get(.init(_dataDict:res.me.__data))
+      User.current = user
+      Chats.current.user = user
       Chats.current.settings.blocked.append(contentsOf: res.me.blocks ?? [])
       let mraw = res.memberships
       let memberships = mraw.map { it in

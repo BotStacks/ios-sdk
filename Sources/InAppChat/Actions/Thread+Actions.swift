@@ -23,9 +23,11 @@ extension Chat {
           to: self.id,
           inReplyTo: inReplyTo?.id
         )
-        publish {
+        await MainActor.run {
           self.sending.remove(element: m)
-          self.items.insert(newMessage, at: 0)
+          if !self.items.contains(where: {$0.id == newMessage.id}) {
+            self.items.insert(newMessage, at: 0)
+          }
         }
       } catch let err {
         Monitoring.error(err)

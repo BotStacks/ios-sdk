@@ -8,6 +8,71 @@
 import Foundation
 import SwiftUI
 
+public class UIMessageActions: UIViewController {
+  
+  @IBOutlet var emoji1: UIButton!
+  @IBOutlet var emoji2: UIButton!
+  @IBOutlet var emoji3: UIButton!
+  @IBOutlet var emoji4: UIButton!
+  @IBOutlet var emoji5: UIButton!
+  @IBOutlet var more: UIButton!
+  @IBOutlet var favoritesLabel: UILabel!
+  
+  var room: UIChatRoom!
+  
+  static let defaults = ["😀", "🤟", "❤️", "🔥", "🤣"]
+
+  var buttons: [UIButton] {
+    return [emoji1, emoji2, emoji3, emoji4, emoji5]
+  }
+  
+  var emojis: [String] = []
+  
+  override public func viewDidLoad() {
+    var emojis = Chats.current.lastUsedReactions
+    if let current = room.messageForAction?.currentReaction {
+      emojis.insert(current, at: 0)
+      emojis = emojis.unique()
+      if emojis.count > 5 {
+        emojis.removeLast()
+      }
+    }
+    for (i, btn) in buttons.enumerated() {
+      let e = emojis[i]
+      btn.setTitle(e, for: .normal)
+      btn.layer.cornerRadius = 20.0
+      if e == room.messageForAction?.currentReaction {
+        btn.layer.borderWidth = 2.0
+        btn.layer.borderColor = c().primary.cgColor
+      }
+    }
+    self.emojis = emojis
+    favoritesLabel.text = room.messageForAction?.favorite == true ? "Remove from favorites" : "Save to favorites"
+  }
+  
+  @IBAction func tapEmoji(_ sender: UIButton) {
+    if let i = buttons.firstIndex(of: sender) {
+      room.messageForAction?.react(emojis[i])
+      self.dismiss(animated: true)
+    }
+  }
+  
+  @IBAction func tapMore() {
+    self.dismiss(animated: true)
+    room.emojiKeyboard()
+  }
+  
+  @IBAction func reply() {
+    self.dismiss(animated: true)
+    room.replyingTo = room.messageForAction
+  }
+  
+  @IBAction func favorites() {
+    room.messageForAction?.toggleFavorite()
+    dismiss(animated: true)
+  }
+}
+
 public struct EmojiBar: View {
 
   static let defaults = ["😀", "🤟", "❤️", "🔥", "🤣"]

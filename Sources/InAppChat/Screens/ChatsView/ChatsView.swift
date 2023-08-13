@@ -102,8 +102,7 @@ public class ChatsController: UIViewController, UITableViewDelegate, UITableView
   }
   
   deinit {
-    bag.forEach { $0.cancel()
-    }
+    bag.forEach { $0.cancel() }
   }
   
   public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -122,7 +121,7 @@ public class ChatsController: UIViewController, UITableViewDelegate, UITableView
   
   public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let chat = chats[indexPath.row]
-//    self.performSegue(withIdentifier: "chat", sender: chat)
+    self.performSegue(withIdentifier: "chat", sender: chat)
   }
   
   public override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

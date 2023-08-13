@@ -8,6 +8,13 @@
 import Foundation
 import SwiftUI
 
+public class UIGroupDrawer: UIViewController {
+  var chat: Chat!
+  
+  override public func viewDidLoad() {
+    
+  }
+}
 
 public struct GroupDrawer: View {
 

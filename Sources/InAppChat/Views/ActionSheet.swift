@@ -1,6 +1,17 @@
 import Combine
 import SwiftUI
 
+public class UIActionItem: UIView  {
+  @IBOutlet var icon: UIImageView!
+  @IBOutlet var title: UILabel!
+  
+  override public func awakeFromNib() {
+    icon.tintColor = c().text.ui
+    title.font = Theme.current.fonts.headline
+    title.textColor = c().text.ui
+  }
+}
+
 public struct ActionItem: View {
 
   @Environment(\.iacTheme) var theme

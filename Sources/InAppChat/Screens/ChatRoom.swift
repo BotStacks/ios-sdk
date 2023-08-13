@@ -9,12 +9,56 @@ import Foundation
 import SwiftUI
 import UIKit
 import SDWebImage
+import Combine
+import Photos
+import PhotosUI
+import ContactsUI
+import GiphyUISDK
+import ISEmojiView
 
-public class UIChatRoom: UIViewController {
+public class UIChatRoom: UIViewController, UITextViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, PHPickerViewControllerDelegate, CNContactPickerDelegate, UIDocumentPickerDelegate, GiphyDelegate, EmojiViewDelegate  {
   
-  var chat: Chat! {
+  var bag = Set<AnyCancellable>()
+  
+  var chat: Chat? {
     didSet {
-      
+      if let chat = chat {
+        chat.objectWillChange.makeConnectable().autoconnect()
+          .sink(receiveValue: { [weak self] _ in
+            DispatchQueue.main.async {
+              if self?.viewIfLoaded != nil {
+                self?.bind(chat: chat)
+              }
+            }
+          }).store(in: &bag)
+        if self.viewIfLoaded != nil {
+          self.bind(chat: chat)
+        }
+      }
+    }
+  }
+  
+  var user: User? {
+    didSet {
+      if let user = user {
+        if let chat = Chat.get(uid: user.id) {
+          self.chat = chat
+        } else {
+          Task.detached {
+            do {
+              let chat = try await api.dm(user: user.id)
+              await MainActor.run {
+                self.chat = chat
+              }
+            } catch let err {
+              Monitoring.error(err)
+              await MainActor.run {
+                self.notFound()
+              }
+            }
+          }
+        }
+      }
     }
   }
   
@@ -22,15 +66,408 @@ public class UIChatRoom: UIViewController {
   @IBOutlet var lblTitle: UILabel!
   @IBOutlet var btnBack: UIButton!
   @IBOutlet var headerImage: SDAnimatedImageView!
+  @IBOutlet var groupPlaceholder: UIGroupPlaceholder!
   @IBOutlet var btnMore: UIButton!
   @IBOutlet var btnMic: UIButton!
   @IBOutlet var btnSend: UIButton!
   @IBOutlet var inputRightConstraint: NSLayoutConstraint!
   @IBOutlet var inputHeightConstraint: NSLayoutConstraint!
-  
+  @IBOutlet var placeholder: UILabel!
   @IBOutlet var input: UITextView!
+  @IBOutlet var messages: UIMessageList!
+  @IBOutlet var spinner: UIActivityIndicatorView!
+  @IBOutlet var inputContainerBottom: NSLayoutConstraint!
+  
+  var speechRecognizer = SpeechRecognizer()
+  
+  var replyingTo: Message? = nil
   
   
+  override public func viewDidLoad() {
+    super.viewDidLoad()
+    let t = Theme.current
+    let c = t.colors
+    let f = t.fonts
+    groupCount.textColor = c.caption.ui
+    groupCount.superview?.subviews.first?.tintColor = c.caption.ui
+    lblTitle.font = f.title2
+    lblTitle.textColor = c.text.ui
+    headerImage.tintColor = c.text.ui
+    placeholder.font = f.body
+    input.font = f.body
+    btnSend.tintColor = c.primary.ui
+    self.spinner = UIActivityIndicatorView.init(style: .large)
+    self.view.addSubview(spinner)
+    spinner.snp.makeConstraints { make in
+      make.center.equalTo(view.snp.center)
+    }
+    speechRecognizer.objectWillChange
+      .makeConnectable()
+      .autoconnect()
+      .sink { [weak self] _ in
+        self?.updateSpeech()
+      }.store(in: &bag)
+    if let chat = chat {
+      bind(chat: chat)
+    } else if let user = user {
+      bind(user: user)
+    }
+    
+  }
+  
+  var initialInputHeight: CGFloat = 0.0
+  override public func viewDidAppear(_ animated: Bool) {
+    self.initialInputHeight = inputHeightConstraint.constant
+  }
+  
+  func updateSpeech() {
+    if !speechRecognizer.transcript.isEmpty {
+      input.text = (input.text ?? "") + speechRecognizer.transcript
+      speechRecognizer.transcript = ""
+    }
+  }
+  
+  deinit {
+    bag.forEach {$0.cancel()}
+    bag.removeAll()
+  }
+  
+  func bind(user: User) {
+    lblTitle.text = user.displayNameFb
+    groupCount.superview?.removeFromSuperview()
+    if let img = user.avatar {
+      headerImage.sd_setImage(with: img.url)
+      headerImage.isHidden = false
+      groupPlaceholder.isHidden = true
+    } else {
+      headerImage.image = AssetImage("user-fill")
+      headerImage.isHidden = false
+      groupPlaceholder.isHidden = true
+    }
+    self.spinner.isHidden = false
+    self.input.isEditable = false
+    self.messages.view.isHidden = true
+  }
+  
+  func notFound() {
+    self.spinner.isHidden = true
+    let label = UILabel(frame: .zero)
+    self.view.addSubview(label)
+    label.snp.makeConstraints { make in
+      make.center.equalTo(self.messages.view.snp.center)
+    }
+    label.text = "Chat not found"
+  }
+  
+  func bind(chat: Chat) {
+//    self.messages.view.isHidden = false
+    self.spinner.isHidden = true
+    lblTitle.text = chat.displayName
+    if chat.isDM {
+      groupCount.superview?.removeFromSuperview()
+    } else {
+      if let g = groupCount.superview, g.superview == nil {
+        (lblTitle.superview as? UIStackView)?.addArrangedSubview(g)
+      }
+      groupCount.text = String(chat.activeMembers.count)
+    }
+    if let img = chat.displayImage {
+      headerImage.sd_setImage(with: img.url)
+      headerImage.isHidden = false
+      groupPlaceholder.isHidden = true
+    } else if chat.isDM {
+      headerImage.image = AssetImage("user-fill")
+      headerImage.isHidden = false
+      groupPlaceholder.isHidden = true
+    } else  {
+      headerImage.isHidden = true
+      groupPlaceholder.isHidden = false
+    }
+  }
+  
+  @IBAction func mic() {
+    if speechRecognizer.transcribing {
+      input.text += speechRecognizer.transcript
+    }
+    speechRecognizer.toggle()
+    btnMic.setImage(UIImage(systemName: speechRecognizer.transcribing ? "mic.slash.fill" : "mic.fill"), for: .normal)
+  }
+  
+  @IBAction func send() {
+    if let text = input.text, !text.isEmpty {
+      chat?.send(text, inReplyTo: replyingTo)
+      input.text = ""
+      replyingTo = nil
+      onEmptyInput()
+      inputHeightConstraint.constant = initialInputHeight
+      placeholder.isHidden = false
+    }
+  }
+  
+  var video = false
+  @IBAction func camera(video: Bool = false) {
+    self.video = video
+    let imagePicker = UIImagePickerController()
+    imagePicker.allowsEditing = false
+    imagePicker.sourceType = .camera
+    imagePicker.mediaTypes = video ? [UTType.movie.identifier] : [UTType.image.identifier]
+    imagePicker.delegate = self
+    self.present(imagePicker, animated: true)
+  }
+  
+  @IBAction func library(video: Bool = false) {
+    self.video = video
+    var config = PHPickerConfiguration(photoLibrary: .shared())
+    config.filter = video ? .videos : .images
+    config.preferredAssetRepresentationMode = .current
+    let picker = PHPickerViewController(configuration: config)
+    picker.delegate = self
+    self.present(picker, animated: true)
+  }
+  
+  @IBAction func contact() {
+    let picker = CNContactPickerViewController()
+    picker.delegate = self
+    self.present(picker, animated: true)
+  }
+  
+  public func contactPicker(_ picker: CNContactPickerViewController, didSelect contact: CNContact) {
+    chat?.send(contact: contact, inReplyTo: replyingTo)
+    replyingTo = nil
+    self.dismiss(animated: true)
+  }
+  
+  public func contactPickerDidCancel(_ picker: CNContactPickerViewController) {
+    self.dismiss(animated: true)
+  }
+  
+  @IBAction func document(_ audio: Bool) {
+    let picker = UIDocumentPickerViewController(
+      forOpeningContentTypes: audio ? [.audio] : [.fileURL], asCopy: true)
+    picker.allowsMultipleSelection = false
+    picker.delegate = self
+    self.present(picker, animated: true)
+  }
+  
+  public func documentPicker(
+    _ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]
+  ) {
+    print("Selected files", urls)
+    if let fileURL = urls.first {
+      do {
+        let tmp = try copyFileToTemp(url: fileURL)
+        publish {
+          self.chat?.send(file: File(url: tmp), type: .file, inReplyTo: self.replyingTo)
+          self.replyingTo = nil
+        }
+      } catch let err {
+        print("err failed to copy doc", err)
+      }
+    } else {
+      print("No files picked")
+    }
+    print("")
+  }
+  
+  @IBAction func giphy() {
+    let picker = GiphyViewController()
+    picker.delegate = self
+    picker.mediaTypeConfig = [.gifs]
+    self.present(picker, animated: true)
+  }
+  
+  @objc public func didSelectMedia(giphyViewController: GiphyViewController, media: GPHMedia) {
+    if let gifURL = media.url(rendition: .fixedWidth, fileType: .gif),
+       let url = URL(string: gifURL) {
+      chat?.send(attachment: .init(id: UUID().uuidString, type: .case(.image), url: url.absoluteString), inReplyTo: replyingTo)
+      replyingTo = nil
+    }
+    self.dismiss(animated: true)
+  }
+  
+  @objc public func didDismiss(controller: GiphyViewController?) {
+    self.dismiss(animated: true)
+  }
+  
+  @IBAction func location() {
+    self.chat?.sendLocation(inReplyTo:replyingTo)
+    replyingTo = nil
+  }
+  
+  func onEmptyInput() {
+    inputRightConstraint.constant = 16.0
+    btnSend.isHidden = true
+  }
+  
+  var emojiMessage: Message? = nil
+  func emojiKeyboard() {
+    let keyboardSettings = KeyboardSettings(bottomType: .categories)
+    keyboardSettings.needToShowDeleteButton = false
+    keyboardSettings.needToShowAbcButton = false
+    let emojiView = EmojiView(keyboardSettings: keyboardSettings)
+//    emojiView.translatesAutoresizingMaskIntoConstraints = false
+    emojiView.delegate = self
+    input.inputView = emojiView
+    input.becomeFirstResponder()
+  }
+  
+  public func emojiViewDidSelectEmoji(_ emoji: String, emojiView: EmojiView) {
+    emojiMessage?.react(emoji)
+    input.resignFirstResponder()
+    messageForAction = nil
+  }
+  
+  public func emojiViewDidPressDismissKeyboardButton(_ emojiView: EmojiView) {
+    input.resignFirstResponder()
+    messageForAction = nil
+  }
+  
+  @IBAction func back() {
+    self.navigationController?.popViewController(animated: true)
+  }
+  
+  @IBAction func more() {
+    if let chat = chat {
+      if chat.isDM == true, let user = chat.friend {
+        self.performSegue(withIdentifier: "user", sender: user)
+      } else {
+        self.performSegue(withIdentifier: "group", sender: chat)
+      }
+    }
+  }
+  
+  var messageForAction: Message? = nil
+  override public func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    if segue.identifier == "messages" {
+      messages = segue.destination as? UIMessageList
+      messages.chat = chat
+      if chat == nil {
+        messages.view.isHidden = true
+      }
+      messages.onLongPress = { [weak self] message in
+        self?.messageForAction = message
+        self?.performSegue(withIdentifier: "message-action", sender: message)
+      }
+    } else if segue.identifier == "group" {
+      let group = segue.destination as? UIGroupDrawer
+      group?.chat = sender as? Chat
+    } else if segue.identifier == "user" {
+      let user = segue.destination as? UIProfile
+      user?.user = sender as? User
+    } else if segue.identifier == "media" {
+      (segue.destination as? UIPickAttachment)?.p = self
+    } else if segue.identifier == "message-action" {
+      let ma = segue.destination as? UIMessageActions
+      ma?.room = self
+    } 
+  }
+  
+  var isShift = false
+  public override func pressesBegan(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
+    guard let key = presses.first?.key else { return }
+    switch key.keyCode {
+    case .keyboardReturn:
+      if key.modifierFlags == .shift {
+        isShift = true
+      } else {
+        isShift = false
+      }
+      super.pressesBegan(presses, with: event)
+      break
+    default:
+      super.pressesBegan(presses, with: event)
+    }
+  }
+  
+  public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+    if text == "\n" && !isShift {
+      send()
+      return false
+    }
+    return true
+  }
+  
+  public func textViewDidChange(_ textView: UITextView) {
+    let text = textView.text ?? ""
+    let oldHeight = textView.frame.height
+    let maxHeight: CGFloat = 100.0
+    let newHeight = ceil(min(textView.sizeThatFits(CGSize(width: textView.frame.width, height: CGFloat.greatestFiniteMagnitude)).height, maxHeight))
+    var didChange = false
+    if newHeight != oldHeight {
+      inputHeightConstraint.constant = newHeight
+      didChange = true
+    }
+    placeholder.isHidden = !text.isEmpty
+    if !text.isEmpty && inputRightConstraint.constant == 16.0 {
+      didChange = true
+      inputRightConstraint.constant = 68.0
+      btnSend.isHidden = false
+    } else if text.isEmpty && inputRightConstraint.constant == 68.0 {
+      onEmptyInput()
+      didChange = true
+    }
+    if didChange {
+      input.setNeedsLayout()
+      input.layoutIfNeeded()
+    }
+  }
+  
+  func onVideo(_ url: URL) {
+    print("On Video", url.absoluteString)
+    chat?.send(
+      file: File(url: url),
+      type: .video,
+      inReplyTo: replyingTo)
+    replyingTo = nil
+  }
+  
+  func onImage(_ url: URL) {
+    chat?.send(
+      file: File(url: url),
+      type: .image,
+      inReplyTo: replyingTo)
+    replyingTo = nil
+  }
+  
+  public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+    self.dismiss(animated: true)
+    let identifier =
+    self.video
+    ? [UTType.video.identifier, UTType.movie.identifier, UTType.mpeg.identifier]
+    : [UTType.image.identifier]
+    print("picker did finsih picking", results)
+    if let result = results.first,
+       let match = identifier.first(where: {
+         result.itemProvider.hasItemConformingToTypeIdentifier($0)
+       })
+    {
+      print("Getting file for ", match)
+      let progress = result.itemProvider.loadFileRepresentation(forTypeIdentifier: match) {
+        url, err in
+        if let err = err {
+          print("Error Loading File", err)
+        } else if let url = url {
+          do {
+            let tmp = try tmpFile()
+            print("Copy from url", url.absoluteString, "to", tmp.absoluteString)
+            try FileManager.default.copyItem(
+              at: url, to: tmp)
+            publish {
+              if self.video {
+                self.onVideo(tmp)
+              } else {
+                self.onImage(tmp)
+              }
+            }
+          } catch let err {
+            print("Failed to copy file", err)
+          }
+        }
+      }
+    } else {
+      print("No picker results")
+    }
+  }
   
   
 }
@@ -244,6 +681,7 @@ public struct ChatRoom: View {
       chat.markRead()
     }
   }
+  
 
   func onVideo(_ url: URL) {
     print("On Video", url.absoluteString)
@@ -289,5 +727,48 @@ extension String {
     } else {
       return self
     }
+  }
+}
+
+public class UIPickAttachment: UIViewController {
+  
+  var _p: UIChatRoom!
+  
+  var p: UIChatRoom! {
+    get {
+      _p.dismiss(animated: true)
+      return _p
+    }
+    set {
+      _p = newValue
+    }
+  }
+  
+  @IBAction func pickPhoto() {
+    p.library()
+  }
+  
+  @IBAction func takePhoto() {
+    p.camera()
+  }
+  
+  @IBAction func pickVideo() {
+    p.library(video: true)
+  }
+  
+  @IBAction func takeVideo() {
+    p.camera(video: true)
+  }
+  
+  @IBAction func gif() {
+    p.giphy()
+  }
+  
+  @IBAction func location() {
+    p.location()
+  }
+  
+  @IBAction func contact() {
+    p.contact()
   }
 }

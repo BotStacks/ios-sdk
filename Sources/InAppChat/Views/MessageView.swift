@@ -14,7 +14,6 @@ public class UIVideo: UIView {
     }
   }
   
-  
   func update() {
     self.subviews.forEach { $0.removeFromSuperview() }
     if let url = url?.url {
@@ -39,17 +38,29 @@ public class UIMessageRow: UITableViewCell {
   
   var onTapReplies: ((Message) -> Void)!
   
+  static func identifier(for message: Message) -> String {
+    if let at = message.attachments?.first {
+      if at.type == .image || at.type == .file {
+        return "image"
+      } else if at.type == .video || at.type == .audio {
+        return "audio"
+      }
+    }
+    return "markdown"
+  }
+  
   @IBOutlet var avatar: SDAnimatedImageView!
   @IBOutlet var icon: UIImageView!
   @IBOutlet var username: UILabel!
   @IBOutlet var timestamp: UILabel!
   @IBOutlet var content: UIView!
-  @IBOutlet var markdown: UILabel!
-  @IBOutlet var img: SDAnimatedImageView!
-  @IBOutlet var video: UIVideo!
+  @IBOutlet var markdown: UILabel?
+  @IBOutlet var img: SDAnimatedImageView?
+  @IBOutlet var video: UIVideo?
   @IBOutlet var reactions: UIReactionsView!
   @IBOutlet var replies: UILabel!
   @IBOutlet var repliesBottom: NSLayoutConstraint!
+  @IBOutlet var repliesHeight: NSLayoutConstraint!
   @IBOutlet var reactionsBottom: NSLayoutConstraint!
   @IBOutlet var favorite: UIImageView!
   @IBOutlet var avatarLeft: NSLayoutConstraint!
@@ -91,13 +102,17 @@ public class UIMessageRow: UITableViewCell {
     timestamp.textColor = c.timestamp.ui
     timestamp.font = f.timestamp
     content.backgroundColor = c.bubble.ui
-    markdown.textColor = c.bubbleText.ui
-    apply(size: t.imagePreviewSize, to: img.constraints)
-    apply(size: t.videoPreviewSize, to: video.constraints)
     replies.font = f.body.bold
     replies.textColor = c.primary.ui
     favorite.tintColor = c.primary.ui
     replies.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapReplies)))
+    markdown?.font = Theme.current.fonts.body
+    if let img = img {
+      apply(size: t.imagePreviewSize, to: img.constraints)
+    }
+    if let video = video {
+      apply(size: t.videoPreviewSize, to: video.constraints)
+    }
     self.setNeedsLayout()
   }
   
@@ -113,32 +128,27 @@ public class UIMessageRow: UITableViewCell {
     }
     username.text = m.user.displayNameFb
     timestamp.text = m.createdAt.toString(.time(.short))
-    let at = message.attachments?.first
     if message.favorite {
       avatarLeft.constant = 24.0
     } else {
       avatarLeft.constant = 0.0
     }
     var md = message.markdownText
-    for at in message.attachments ?? [] {
+    if let at = m.attachments?.first {
       switch at.type {
       case .image:
         fallthrough
       case .file:
-        self.video.isHidden = true
-        self.video.url = nil
         if at.type == .file {
-          img.image = AssetImage("file-arrow-down-fill")
+          img?.image = AssetImage("file-arrow-down-fill")
         } else {
-          img.sd_setImage(with: at.url.url)
+          img?.sd_setImage(with: at.url.url)
         }
         break
       case .audio:
         fallthrough
       case .video:
-        self.video.isHidden = false
-        self.img.isHidden = true
-        self.video.url = at.url
+        video?.url = at.url
         break
       case .location:
         md = at.loc?.markdownLink ?? ""
@@ -150,7 +160,7 @@ public class UIMessageRow: UITableViewCell {
         break
       }
     }
-    markdown.attributedText = md.isEmpty ? .init(string: "") :  .init((try? AttributedString(markdown: md)) ?? AttributedString(""))
+    markdown?.attributedText = md.isEmpty ? .init(string: "") :  .init((try? AttributedString(markdown: md)) ?? AttributedString(""))
     reactions.message = m
     if m.reactions == nil || m.reactions?.isEmpty == true {
       self.reactionsBottom.constant = 0
@@ -160,10 +170,14 @@ public class UIMessageRow: UITableViewCell {
     if m.replyCount > 0 {
       self.repliesBottom.constant = 8
       self.replies.text = "\(m.replyCount) repl\(m.replyCount == 1 ? "y" : "ies")"
+      self.repliesHeight.isActive = false
     } else {
       self.repliesBottom.constant = 0
       self.replies.text = ""
+      self.repliesHeight.isActive = true
     }
+    self.setNeedsLayout()
+    self.layoutIfNeeded()
   }
   
   @IBAction func tapReplies() {
@@ -185,18 +199,18 @@ public class UIReactionsView: UIView {
       for (i, r) in reactions.enumerated() {
         let old = i < subviews.count
         let pill = old ? subviews[i] as! UIReactionPill : UIReactionPill(frame: .zero)
-        pill.set(reaction: r.reaction, count: r.uids.count)
+        pill.set(reaction: r.reaction, count: r.uids.count, isCurrent: r.reaction == message.currentReaction)
         if !old {
           addSubview(pill)
-          rights.last?.deactivate()
+          pill.setContentHuggingPriority(.required, for: .horizontal)
           pill.snp.makeConstraints { make in
-            if i == 0 {
-              make.left.equalTo(subviews[i - 1].snp.right)
+            if i > 0 {
+              make.left.equalTo(subviews[i - 1].snp.right).inset(8.0)
             } else {
               make.left.equalToSuperview()
             }
             make.verticalEdges.equalToSuperview().priority(.low)
-            rights.append(make.right.equalToSuperview().inset(8.0).constraint)
+            make.height.equalTo(30.0)
           }
         }
       }
@@ -205,7 +219,13 @@ public class UIReactionsView: UIView {
           subviews[i].isHidden = true
         }
       }
+    } else {
+      for subview in subviews {
+        subview.isHidden = true
+      }
     }
+    self.setNeedsLayout()
+    self.layoutIfNeeded()
   }
 }
 
@@ -227,15 +247,23 @@ public class UIReactionPill: UIView {
     label = UILabel(frame: .zero)
     label.font = Theme.current.fonts.body
     label.textColor =  c().text.ui
+    label.setContentHuggingPriority(.required, for: .horizontal)
+    addSubview(label)
     label.snp.makeConstraints { make in
       make.horizontalEdges.equalToSuperview().inset(8.0)
       make.verticalEdges.equalToSuperview().inset(5.0)
     }
     backgroundColor = c().bubble.ui
+    self.layer.borderColor = c().primary.cgColor
   }
   
-  func set(reaction: String, count: Int) {
+  func set(reaction: String, count: Int, isCurrent: Bool) {
     label.text = "\(reaction) \(count)"
+    if isCurrent {
+      self.layer.borderWidth = 2.0
+    } else {
+      self.layer.borderWidth = 0.0
+    }
   }
   
   public override func layoutSubviews() {

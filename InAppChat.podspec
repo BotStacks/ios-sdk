@@ -35,4 +35,5 @@ Pod::Spec.new do |s|
   s.dependency        'Apollo'
   s.dependency        'Apollo/WebSocket'
   s.dependency        'SnapKit'
+  s.dependency        'ISEmojiView'
 end

@@ -55,9 +55,9 @@ public class Chats: ObservableObject {
     print("loaded current user")
     await MainActor.run {
       self.user = user
+      User.current = user
       self.memberships.append(contentsOf: memberships)
       InAppChat.shared.isUserLoggedIn = true
-      User.current = user
       api.subscribe()
     }
   }
