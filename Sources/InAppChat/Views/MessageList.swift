@@ -14,22 +14,57 @@ public class UIMessageList: UIViewController, UITableViewDelegate, UITableViewDa
   
   @IBOutlet var tableView: UITableView!
   
-  var sub: AnyCancellable? = nil
+  var bag = Set<AnyCancellable>()
   
   var chat: Chat? {
     didSet {
-      sub?.cancel()
+      bag.forEach({$0.cancel()})
+      bag.removeAll()
       if let chat = chat {
         print("MessageList did set chat")
-        sub = chat.objectWillChange.makeConnectable()
+        chat.objectWillChange.makeConnectable()
           .autoconnect()
           .throttle(for: 0.1, scheduler: RunLoop.main, latest: true)
           .sink(receiveValue: { [weak self] _ in
             DispatchQueue.main.async {
               self?.messages = chat.sending + chat.items
             }
-          })
+          }).store(in: &bag)
         messages = chat.sending + chat.items
+        chat.sub.sink { [weak self] _ in
+          
+        } receiveValue: { [weak self] id in
+          DispatchQueue.main.async {
+            if let id = id as? String {
+              self?.updateReactionsForMessage(id)
+            }
+          }
+        }.store(in: &bag)
+
+      }
+    }
+  }
+  
+  func updateReactionsForMessage(_ id: String) {
+    print("Update reactions for message", id)
+    if let i = cells.lastIndex(where: {$0.1.id == id}) {
+      if i > 0 {
+        if cells[i - 1].0 == "reactions" {
+          let ip = IndexPath(row: i - 1, section: 0)
+          if cells[i].1.reactions == nil || cells[i].1.reactions?.isEmpty == true {
+            cells.remove(at: ip.row)
+            tableView.deleteRows(at: [ip], with: .fade)
+          } else {
+            tableView.reloadRows(at: [ip], with: .fade)
+          }
+        } else {
+          cells.insert(("reactions", cells[i].1), at: i)
+          tableView.insertRows(at: [IndexPath(row: i, section: 0)], with: .fade)
+        }
+      } else {
+        cells.insert(("reactions", cells[i].1), at: 0)
+        let ip = IndexPath(row: 0, section: 0)
+        tableView.insertRows(at: [ip], with: .fade)
       }
     }
   }
@@ -48,13 +83,35 @@ public class UIMessageList: UIViewController, UITableViewDelegate, UITableViewDa
     
   }
   
+  var onPressUser: (User) -> Void = {
+    user in
+
+  }
+  
+  var onTapReplies: (Message) -> Void = {
+    message in
+  }
+  
   var messages = Chats.current.favorites.items {
     didSet {
+      cells = messages.flatMap({ message in
+        var ret: [(String, Message)] = []
+        if message.replyCount > 0 {
+          ret.append(("replies", message))
+        }
+        if message.reactions?.isEmpty == false {
+          ret.append(("reactions", message))
+        }
+        ret.append( ("message", message))
+        return ret
+      })
       if viewIfLoaded != nil {
         tableView.reloadData()
       }
     }
   }
+
+  var cells: [(String, Message)] = []
   
   override public func viewDidLoad() {
     super.viewDidLoad()
@@ -73,13 +130,69 @@ public class UIMessageList: UIViewController, UITableViewDelegate, UITableViewDa
   
   public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     print("Message LIst number of row \(messages.count)")
-    return messages.count
+    return cells.count
+  }
+  
+  public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    let cell = cells[indexPath.row]
+    if cell.0 == "reactions" {
+      return 34.0
+    } else if cell.0 == "replies" {
+      return 28.0
+    } else {
+      let m = cell.1
+      var md = m.text ?? ""
+      if let at = m.attachments?.first {
+        switch at.type {
+        case .image:
+        fallthrough
+        case .file:
+          return Theme.current.imagePreviewSize.height + 46.0
+        case .video:
+          fallthrough
+        case .audio:
+          return Theme.current.videoPreviewSize.height + 46.0
+        case .location:
+          if let loc = at.loc?.markdownLink {
+            md = loc
+          }
+        case .vcard:
+          if let contact = at.contact?.markdown {
+            md = contact
+          }
+        default:
+          print("unknown cell type")
+        }
+      }
+      let str = NSAttributedString((try? AttributedString(markdown: md)) ?? AttributedString(md))
+      let width = tableView.frame.size.width - 32.0 - (m.favorite ? 24.0 : 0.0) - 35.0 - 8.0
+      let rect = str.boundingRect(with: .init(width: width, height: CGFloat.greatestFiniteMagnitude), context: nil)
+      return rect.height + 58.0
+    }
   }
   
   public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let msg = messages[indexPath.row]
+    let data = cells[indexPath.row]
+    if data.0 == "reactions" {
+      let cell = tableView.dequeueReusableCell(withIdentifier: "reactions") as! UIReactionsView
+      cell.message = data.1
+      if chat != nil {
+        cell.transform = CGAffineTransform(rotationAngle: CGFloat.pi);
+      }
+      return cell
+    } else if data.0 == "replies" {
+      let cell = tableView.dequeueReusableCell(withIdentifier: "replies") as! UIRepliesCell
+      cell.message = data.1
+      if chat != nil {
+        cell.transform = CGAffineTransform(rotationAngle: CGFloat.pi);
+      }
+      return cell
+    }
+    let msg = data.1
     let cell = tableView.dequeueReusableCell(withIdentifier: UIMessageRow.identifier(for: msg))! as! UIMessageRow
     cell.message = msg
+    cell.onPressUser = onPressUser
+    cell.onTapReplies = onTapReplies
     if chat != nil {
       cell.transform = CGAffineTransform(rotationAngle: CGFloat.pi);
     }
@@ -87,19 +200,30 @@ public class UIMessageList: UIViewController, UITableViewDelegate, UITableViewDa
   }
   
   public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    onPress(messages[indexPath.row])
+    let cell = cells[indexPath.row]
+    if cell.0 == "reactions" {
+      return
+    }
+    if cell.0 == "replies" {
+      onTapReplies(cell.1)
+    } else {
+      onPress(cell.1)
+    }
   }
   
   @IBAction func handleLongPress(_ sender: UILongPressGestureRecognizer) {
     let p = sender.location(in: tableView)
     if let i = tableView.indexPathForRow(at: p) {
-      onLongPress(messages[i.row])
+      let cell = cells[i.row]
+      onLongPress(cell.1)
     }
   }
   
   public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-    let m = messages[indexPath.row]
-    pager.loadMoreIfNeeded(m)
+    let m = cells[indexPath.row]
+    if m.0 == "message" {
+      pager.loadMoreIfNeeded(m.1)
+    }
   }
 }
 

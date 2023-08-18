@@ -20,8 +20,8 @@ extension Message {
     if reacting {
       return
     }
+    print("React to \(text) with \(reaction)")
     self.reacting = true
-    let isSet = reaction != currentReaction
     self.reactions = self.reactions ?? []
     let og = self.reactions ?? []
     let ogCurrent = self.currentReaction

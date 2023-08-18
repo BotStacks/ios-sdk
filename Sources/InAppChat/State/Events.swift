@@ -68,6 +68,9 @@ extension Chats {
         if !isUpdate && (chat.latestMessage == nil || chat.latestMessage!.createdAt < message.createdAt) {
           chat.latestMessage = message
         }
+        if isUpdate {
+          chat.sub.send(message.id)
+        }
       }
     }
   }

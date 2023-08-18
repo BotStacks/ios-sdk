@@ -53,7 +53,17 @@ public final class Member: ObservableObject {
       return false
     }
   }
-
+  
+  var isAdmin: Bool {
+    switch self.role {
+    case .admin:
+      return true
+    case .owner:
+      return true
+    default:
+      return false
+    }
+  }
 }
 
 extension Member: Equatable {

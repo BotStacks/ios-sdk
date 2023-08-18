@@ -77,9 +77,16 @@ extension Chat {
 
   func send(file: File, type: Gql.AttachmentType, inReplyTo: Message?) {
     Task.detached {
-      let url = try await api.uploadFile(file: file)
-      DispatchQueue.main.async {
-        self.send(attachment: .init(id: UUID().uuidString, type: .case(type), url: url), inReplyTo: inReplyTo)
+      do {
+        print("upload file \(file.url)")
+        let url = try await api.uploadFile(file: file)
+        print("Result \(url)")
+        DispatchQueue.main.async {
+          self.send(attachment: .init(id: UUID().uuidString, type: .case(type), url: url), inReplyTo: inReplyTo)
+        }
+      } catch let err {
+        Monitoring.error(err)
+        print("Failed to upload image")
       }
     }
   }

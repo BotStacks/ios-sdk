@@ -77,6 +77,7 @@ public class UIChatRoom: UIViewController, UITextViewDelegate, UIImagePickerCont
   @IBOutlet var messages: UIMessageList!
   @IBOutlet var spinner: UIActivityIndicatorView!
   @IBOutlet var inputContainerBottom: NSLayoutConstraint!
+  @IBOutlet var privateChat: UILabel!
   
   var speechRecognizer = SpeechRecognizer()
   
@@ -118,6 +119,7 @@ public class UIChatRoom: UIViewController, UITextViewDelegate, UIImagePickerCont
   var initialInputHeight: CGFloat = 0.0
   override public func viewDidAppear(_ animated: Bool) {
     self.initialInputHeight = inputHeightConstraint.constant
+    chat?.markRead()
   }
   
   func updateSpeech() {
@@ -182,6 +184,21 @@ public class UIChatRoom: UIViewController, UITextViewDelegate, UIImagePickerCont
     } else  {
       headerImage.isHidden = true
       groupPlaceholder.isHidden = false
+    }
+    if chat._private && !chat.isMember {
+      if privateChat == nil {
+        privateChat = UILabel()
+        view.addSubview(privateChat)
+        privateChat.numberOfLines = 0
+        privateChat.snp.makeConstraints { make in
+          make.horizontalEdges.equalToSuperview().inset(54)
+          make.centerY.equalToSuperview()
+        }
+      }
+      privateChat.isHidden = false
+      privateChat.text = "This is a private chat. Gain membership in order to view messages."
+    } else {
+      privateChat?.isHidden = true
     }
   }
   
@@ -324,6 +341,7 @@ public class UIChatRoom: UIViewController, UITextViewDelegate, UIImagePickerCont
   
   @IBAction func back() {
     self.navigationController?.popViewController(animated: true)
+    chat?.markRead()
   }
   
   @IBAction func more() {
@@ -348,6 +366,12 @@ public class UIChatRoom: UIViewController, UITextViewDelegate, UIImagePickerCont
         self?.messageForAction = message
         self?.performSegue(withIdentifier: "message-action", sender: message)
       }
+      messages.onPressUser = {[weak self] user in
+        self?.performSegue(withIdentifier: "user", sender: user)
+      }
+      if chat?._private == true && chat?.isMember == false {
+        messages.view.isHidden = true
+      }
     } else if segue.identifier == "group" {
       let group = segue.destination as? UIGroupDrawer
       group?.chat = sender as? Chat
@@ -359,7 +383,13 @@ public class UIChatRoom: UIViewController, UITextViewDelegate, UIImagePickerCont
     } else if segue.identifier == "message-action" {
       let ma = segue.destination as? UIMessageActions
       ma?.room = self
-    } 
+    } else if segue.identifier == "edit" {
+      let d = segue.destination as? UICreateChat
+      d?.chat = chat
+    } else if segue.identifier == "invite" {
+      let d = segue.destination as? UIInviteUsers
+      d?.chat = chat
+    }
   }
   
   var isShift = false
@@ -422,6 +452,7 @@ public class UIChatRoom: UIViewController, UITextViewDelegate, UIImagePickerCont
   }
   
   func onImage(_ url: URL) {
+    print("on Image \(url)")
     chat?.send(
       file: File(url: url),
       type: .image,
@@ -452,7 +483,7 @@ public class UIChatRoom: UIViewController, UITextViewDelegate, UIImagePickerCont
             print("Copy from url", url.absoluteString, "to", tmp.absoluteString)
             try FileManager.default.copyItem(
               at: url, to: tmp)
-            publish {
+            DispatchQueue.main.async {
               if self.video {
                 self.onVideo(tmp)
               } else {
@@ -469,7 +500,9 @@ public class UIChatRoom: UIViewController, UITextViewDelegate, UIImagePickerCont
     }
   }
   
-  
+  static func instance() -> UIChatRoom {
+    return UIStoryboard(name: "InAppChat", bundle: assets).instantiateViewController(withIdentifier: "chat") as! UIChatRoom
+  }
 }
 
 public struct ChatRoom: View {

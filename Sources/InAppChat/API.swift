@@ -369,7 +369,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
     return []
   }
 
-  func onLogin(_ token: String, user: User) async throws {
+  func onLogin(_ token: String, user: User) {
     onToken(token)
   }
 
@@ -398,6 +398,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
     if let login = res.login {
       let user = User.get(.init(_dataDict: login.user.__data))
       try await onLogin(login.token, user: user)
+      try await Chats.current.loadAsync()
       return user
     } else {
       throw APIError(msg: "Failed to login. No result.", critical: true)
@@ -421,6 +422,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
     if let login = res.ethLogin {
       let user = User.get(.init(_dataDict: login.user.__data))
       try await onLogin(login.token, user: user)
+      try await Chats.current.loadAsync()
       return user
     } else {
       throw APIError(msg: "Eth login failed. No response data", critical: true)

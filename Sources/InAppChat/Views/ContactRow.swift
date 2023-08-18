@@ -19,6 +19,7 @@ public class UIContactRow: UITableViewCell {
   @IBOutlet var title: UILabel!
   @IBOutlet var contact: UIImageView!
   @IBOutlet var status: UILabel!
+  @IBOutlet var select: UIButton?
   
   var bag = Set<AnyCancellable>()
   
@@ -32,6 +33,16 @@ public class UIContactRow: UITableViewCell {
         }.store(in: &bag)
       bindUI()
     }
+  }
+  
+  override public func awakeFromNib() {
+    title.font = Theme.current.fonts.title3
+    status.font = Theme.current.fonts.body
+    select?.backgroundColor = c().caption.ui
+  }
+  
+  func setSelect(_ bool: Bool) {
+    select?.backgroundColor = bool ? c().primary.ui : c().caption.ui
   }
   
   func bindUI() {

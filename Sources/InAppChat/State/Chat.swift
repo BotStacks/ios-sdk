@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 
 public final class Chat: Pager<Message>, Identifiable {
 
@@ -39,6 +40,8 @@ public final class Chat: Pager<Message>, Identifiable {
   var membership: Member? {
     return self.members.first(where: {$0.user_id == User.current?.id})
   }
+  
+  var sub = PassthroughSubject<Any, Error>()
 
   @Published  var _private: Bool
 

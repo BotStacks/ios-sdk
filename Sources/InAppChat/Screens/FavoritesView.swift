@@ -8,6 +8,21 @@
 import Foundation
 import SwiftUI
 
+public class UIFavoritesController: UIBaseController {
+  
+  public override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    if segue.identifier == "messages" {
+      let list = segue.destination as! UIMessageList
+      list.onPress = {
+        message in
+        self.performSegue(withIdentifier: "chat", sender: message.chat)
+      }
+    }
+  }
+}
+
+
+
 public struct FavoritesView: View {
 
   let favorites = Chats.current.favorites

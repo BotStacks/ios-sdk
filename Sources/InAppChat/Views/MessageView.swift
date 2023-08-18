@@ -37,6 +37,7 @@ public class UIVideo: UIView {
 public class UIMessageRow: UITableViewCell {
   
   var onTapReplies: ((Message) -> Void)!
+  var onPressUser: ((User) -> Void)!
   
   static func identifier(for message: Message) -> String {
     if let at = message.attachments?.first {
@@ -57,11 +58,6 @@ public class UIMessageRow: UITableViewCell {
   @IBOutlet var markdown: UILabel?
   @IBOutlet var img: SDAnimatedImageView?
   @IBOutlet var video: UIVideo?
-  @IBOutlet var reactions: UIReactionsView!
-  @IBOutlet var replies: UILabel!
-  @IBOutlet var repliesBottom: NSLayoutConstraint!
-  @IBOutlet var repliesHeight: NSLayoutConstraint!
-  @IBOutlet var reactionsBottom: NSLayoutConstraint!
   @IBOutlet var favorite: UIImageView!
   @IBOutlet var avatarLeft: NSLayoutConstraint!
   
@@ -102,10 +98,7 @@ public class UIMessageRow: UITableViewCell {
     timestamp.textColor = c.timestamp.ui
     timestamp.font = f.timestamp
     content.backgroundColor = c.bubble.ui
-    replies.font = f.body.bold
-    replies.textColor = c.primary.ui
     favorite.tintColor = c.primary.ui
-    replies.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapReplies)))
     markdown?.font = Theme.current.fonts.body
     if let img = img {
       apply(size: t.imagePreviewSize, to: img.constraints)
@@ -161,21 +154,6 @@ public class UIMessageRow: UITableViewCell {
       }
     }
     markdown?.attributedText = md.isEmpty ? .init(string: "") :  .init((try? AttributedString(markdown: md)) ?? AttributedString(""))
-    reactions.message = m
-    if m.reactions == nil || m.reactions?.isEmpty == true {
-      self.reactionsBottom.constant = 0
-    } else {
-      self.reactionsBottom.constant = 8
-    }
-    if m.replyCount > 0 {
-      self.repliesBottom.constant = 8
-      self.replies.text = "\(m.replyCount) repl\(m.replyCount == 1 ? "y" : "ies")"
-      self.repliesHeight.isActive = false
-    } else {
-      self.repliesBottom.constant = 0
-      self.replies.text = ""
-      self.repliesHeight.isActive = true
-    }
     self.setNeedsLayout()
     self.layoutIfNeeded()
   }
@@ -183,40 +161,35 @@ public class UIMessageRow: UITableViewCell {
   @IBAction func tapReplies() {
     onTapReplies(message)
   }
+  
+  @IBAction func tapUser() {
+    onPressUser(message.user)
+  }
 }
 
-public class UIReactionsView: UIView {
+public class UIReactionsView: UITableViewCell {
+  
+  @IBOutlet var content: UIStackView!
+  
   var message: Message! {
     didSet {
       render()
     }
   }
   
-  var rights: [Constraint] = []
-  
   func render() {
     if let reactions = message.reactions {
       for (i, r) in reactions.enumerated() {
-        let old = i < subviews.count
-        let pill = old ? subviews[i] as! UIReactionPill : UIReactionPill(frame: .zero)
-        pill.set(reaction: r.reaction, count: r.uids.count, isCurrent: r.reaction == message.currentReaction)
+        let old = i < content.subviews.count
+        let pill = old ? content.subviews[i] as! UIReactionPill : UIReactionPill(frame: .zero)
+        pill.set(message: message, reaction: r.reaction, count: r.uids.count, isCurrent: r.reaction == message.currentReaction)
         if !old {
-          addSubview(pill)
-          pill.setContentHuggingPriority(.required, for: .horizontal)
-          pill.snp.makeConstraints { make in
-            if i > 0 {
-              make.left.equalTo(subviews[i - 1].snp.right).inset(8.0)
-            } else {
-              make.left.equalToSuperview()
-            }
-            make.verticalEdges.equalToSuperview().priority(.low)
-            make.height.equalTo(30.0)
-          }
+          content.addArrangedSubview(pill)
         }
       }
-      if reactions.count < subviews.count {
-        for i in reactions.count..<subviews.count {
-          subviews[i].isHidden = true
+      if reactions.count < content.subviews.count {
+        for i in reactions.count..<content.subviews.count {
+          content.subviews[i].isHidden = true
         }
       }
     } else {
@@ -255,9 +228,20 @@ public class UIReactionPill: UIView {
     }
     backgroundColor = c().bubble.ui
     self.layer.borderColor = c().primary.cgColor
+    self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(react)))
   }
   
-  func set(reaction: String, count: Int, isCurrent: Bool) {
+  var reaction: String = "❤️"
+  
+  var message: Message!
+  
+  @objc func react() {
+    message.react(reaction)
+  }
+  
+  func set(message: Message, reaction: String, count: Int, isCurrent: Bool) {
+    self.reaction = reaction
+    self.message = message
     label.text = "\(reaction) \(count)"
     if isCurrent {
       self.layer.borderWidth = 2.0
@@ -273,6 +257,21 @@ public class UIReactionPill: UIView {
   
   
   
+}
+
+public class UIRepliesCell: UITableViewCell {
+  @IBOutlet var label: UILabel!
+  
+  var message: Message! {
+    didSet {
+      label.text = "\(message.replyCount) repl\(message.replyCount > 1 ? "ies" : "y")"
+    }
+  }
+  
+  override public func awakeFromNib() {
+    label.font = Theme.current.fonts.body.bold
+    label.textColor = c().primary.ui
+  }
 }
 
 public struct MessageView: View {

@@ -86,7 +86,7 @@ extension Chat {
     description: String?,
     image: URL?,
     _private: Bool?
-  ) async {
+  ) async throws {
     if updating {
       return
     }
@@ -119,12 +119,15 @@ extension Chat {
       )
     } catch let err {
       Monitoring.error(err)
+      
       await MainActor.run {
         self.name = ogName
         self.description = ogDescription
         self.image = ogImage
         self._private = ogPrivate
+        self.updating = false
       }
+      throw err
     }
     await MainActor.run {
       updating = false
@@ -132,7 +135,7 @@ extension Chat {
   }
 
   func delete() async throws {
-    try await api.delete(group: self.id)
+    let _ = try await api.delete(group: self.id)
     await MainActor.run {
       Chats.current.cache.chats.removeValue(forKey: self.id)
       if let m = self.membership {

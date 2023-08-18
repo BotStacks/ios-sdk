@@ -7,13 +7,184 @@
 
 import Foundation
 import SwiftUI
+import SDWebImage
+import Combine
 
-public class UIGroupDrawer: UIViewController {
-  var chat: Chat!
+public class UIGroupDrawer: UIViewController, UITableViewDelegate, UITableViewDataSource {
+  
+  var sub: AnyCancellable? = nil
+  
+  var chat: Chat! {
+    didSet {
+      sub?.cancel()
+      sub = chat.objectWillChange
+        .makeConnectable()
+        .autoconnect()
+        .sink(receiveValue: { [weak self] _ in
+          DispatchQueue.main.async {
+            if self?.viewIfLoaded != nil {
+              self?.bindUI()
+            }
+          }
+        })
+      if self.viewIfLoaded != nil {
+        self.bindUI()
+      }
+    }
+  }
+  
+  @IBOutlet var content: UIView!
+  @IBOutlet var placeholder: UIGroupPlaceholder!
+  @IBOutlet var image: SDAnimatedImageView!
+  @IBOutlet var name: UILabel!
+  @IBOutlet var desc: UILabel!
+  @IBOutlet var allmembers: UILabel!
+  @IBOutlet var countImage: UIImageView!
+  @IBOutlet var count: UILabel!
+  @IBOutlet var tableView: UITableView!
+  @IBOutlet var edit: UIButton!
+  @IBOutlet var invite: UIButton!
+  @IBOutlet var leave: UIButton!
+  
   
   override public func viewDidLoad() {
+    content.backgroundColor = c().background.ui
+    if let i = chat.image {
+      placeholder.isHidden = true
+      image.sd_setImage(with: i.url)
+    } else {
+      placeholder.isHidden = false
+      image.isHidden = true
+    }
+    let t = Theme.current
+    let c = t.colors
+    let f = t.fonts
+    name.font = f.title2
+    name.textColor = c.text.ui
+    desc.font = f.body
+    desc.textColor = c.caption.ui
+    allmembers.font = f.headline
+    allmembers.textColor = c.text.ui
+    countImage.tintColor = c.caption.ui
+    count.textColor = c.caption.ui
+    count.font = f.caption
     
+    edit.titleLabel?.font = f.mini
+    invite.titleLabel?.font = f.mini
+    leave.titleLabel?.font = f.mini
+    
+    tableView.separatorStyle = .none
+    bindUI()
   }
+  
+  func bindUI() {
+    name.text = chat.displayName
+    desc.text = chat.description
+    count.text = String(chat.activeMembers.count)
+    if let membership = chat.membership {
+      if !membership.isAdmin {
+        edit.removeFromSuperview()
+      } else if edit.superview == nil {
+        (invite.superview as? UIStackView)?.insertArrangedSubview(edit, at: 0)
+      }
+    } else {
+      edit.removeFromSuperview()
+    }
+    var cells = [(String, User?)]()
+    cells.append(("ADMIN", nil))
+    cells.append(contentsOf: chat.admins.map({("user", $0)}))
+    if !chat.onlineNotAdminUsers.isEmpty {
+      cells.append(("MEMBERS - ONLINE", nil))
+      cells.append(contentsOf: chat.onlineNotAdminUsers.map({("user", $0)}))
+    }
+    if !chat.offlineUsers.isEmpty {
+      cells.append(("MEMBERS", nil))
+      cells.append(contentsOf: chat.offlineUsers.map({("user", $0)}))
+    }
+    self.cells = cells
+    if chat.isMember {
+      leave.setTitle("Leave", for: .normal)
+      leave.setImage(UIImage(systemName: "trash.fill"), for: .normal)
+    } else {
+      leave.setTitle("Join", for: .normal)
+      leave.setImage(UIImage(systemName: "plus"), for: .normal)
+      
+    }
+    leave.titleLabel?.font = Theme.current.fonts.mini
+  }
+  
+  @IBAction func leaveChat() {
+    if chat.isMember {
+      chat.leave()
+      self.dismiss(animated: true)
+      self.presentingViewController?.navigationController?.popViewController(animated: true)
+    } else {
+      if !chat._private || chat.hasInvite {
+        chat.join()
+      } else {
+        self.view.makeToast("This is a private chat. You must be invited in order to join.")
+      }
+    }
+  }
+  
+  @IBAction func editChat() {
+    self.dismiss(animated: true)
+    self.presentingViewController?.performSegue(withIdentifier: "edit", sender: chat)
+  }
+  
+  @IBAction func inviteFriends() {
+    self.dismiss(animated: true)
+    self.presentingViewController?.performSegue(withIdentifier: "invite", sender: chat)
+  }
+  
+  func select(user: User) {
+    self.dismiss(animated: true)
+    self.presentingViewController?.performSegue(withIdentifier: "user", sender: user)
+  }
+  
+  var cells: [(String, User?)] = [] {
+    didSet {
+      tableView?.reloadData()
+    }
+  }
+  
+  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    return cells.count
+  }
+  
+  public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let data = cells[indexPath.row]
+    if data.0 != "user" {
+      let header = tableView.dequeueReusableCell(withIdentifier: "header") as! UIGroupHeaderCell
+      header.label.text = data.0
+      return header
+    } else {
+      let cell = tableView.dequeueReusableCell(withIdentifier: "contact") as! UIContactRow
+      cell.user = data.1
+      return cell
+    }
+  }
+  
+  public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    let cell = cells[indexPath.row]
+    if cell.0 != "user" {
+      return 40.0
+    } else {
+      return 84.0
+    }
+  }
+  
+  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    let cell = cells[indexPath.row]
+    if cell.0 == "user", let user = cell.1 {
+      select(user: user)
+    }
+  }
+  
+}
+
+public class UIGroupHeaderCell: UITableViewCell {
+  @IBOutlet var label: UILabel!
 }
 
 public struct GroupDrawer: View {

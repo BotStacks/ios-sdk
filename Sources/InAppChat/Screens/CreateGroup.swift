@@ -7,6 +7,9 @@
 
 import Foundation
 import SwiftUI
+import SDWebImage
+import Combine
+import PhotosUI
 
 
 class CreateChatState: ObservableObject {
@@ -28,12 +31,16 @@ class CreateChatState: ObservableObject {
   }
 
   func commit() async {
-    await self.chat?.update(
+    do {
+      try await self.chat?.update(
       name: name != chat?.name ? name : nil,
       description: chat?.description != description ? description : nil,
       image: chat?.image != image?.absoluteString ? image : nil,
       _private: chat?._private != _private ? _private : nil
     )
+    } catch {
+      
+    }
   }
 
   static var current: CreateChatState? = nil
@@ -43,6 +50,310 @@ class CreateChatState: ObservableObject {
       current = CreateChatState()
     }
     return current!
+  }
+}
+
+public class UICreateChat: UIBaseController, UITextFieldDelegate, UITextViewDelegate, PHPickerViewControllerDelegate {
+  
+  @IBOutlet var addImage: UIImageView!
+  @IBOutlet var image: SDAnimatedImageView!
+  @IBOutlet var lblChannel: UILabel!
+  @IBOutlet var lblChannelCount: UILabel!
+  @IBOutlet var contChannel: UIView!
+  @IBOutlet var txtChannel: UITextField!
+  @IBOutlet var lblChannelError: UILabel!
+  @IBOutlet var lblDesc: UILabel!
+  @IBOutlet var lblDescCount: UILabel!
+  @IBOutlet var contDesc: UIView!
+  @IBOutlet var lblDescPlaceholder: UILabel!
+  @IBOutlet var txtDesc: UITextView!
+  @IBOutlet var lblPrivacy: UILabel!
+  @IBOutlet var contPrivacy: UIView!
+  @IBOutlet var pillPublic: UIView!
+  @IBOutlet var pillLblPublic: UILabel!
+  @IBOutlet var pillPrivate: UIView!
+  @IBOutlet var pillLblPrivate: UILabel!
+  @IBOutlet var lblPrivacyDescription: UILabel!
+  @IBOutlet var btnNext: UIButton!
+  @IBOutlet var imageIndicator: UIActivityIndicatorView!
+  @IBOutlet var nextIndicator: UIActivityIndicatorView!
+  
+  var chat: Chat?
+    
+  override public func viewDidLoad() {
+    super.viewDidLoad()
+    let t = Theme.current
+    let c = t.colors
+    let f = t.fonts
+    
+    addImage.tintColor = c.softBackground.ui
+    lblChannel.textColor = c.text.ui
+    lblChannel.font = f.headline
+    lblChannelCount.font = f.headline
+    lblChannelCount.textColor = c.caption.ui
+    contChannel.backgroundColor = c.softBackground.ui
+    contChannel.layer.borderColor = c.border.cgColor
+    txtChannel.font = f.headline
+    lblDesc.textColor = c.text.ui
+    lblDesc.font = f.headline
+    lblDescCount.font = f.headline
+    lblDescCount.textColor = c.caption.ui
+    contDesc.backgroundColor = c.softBackground.ui
+    contDesc.layer.borderColor = c.border.cgColor
+    lblDescPlaceholder.font = f.headline
+    lblDescPlaceholder.textColor = c.caption.ui
+    lblDescPlaceholder.isHidden = true
+    txtDesc.font = f.headline
+    txtDesc.textColor = c.text.ui
+    lblPrivacy.font = f.headline
+    lblPrivacy.textColor = c.text.ui
+    contPrivacy.backgroundColor = c.softBackground.ui
+    contPrivacy.layer.borderColor = c.border.cgColor
+    pillPublic.backgroundColor = c.primary.ui
+    pillPrivate.backgroundColor = .clear
+    pillLblPublic.font = f.headline
+    pillLblPrivate.font = f.headline
+    pillLblPublic.textColor = c.background.ui
+    pillLblPrivate.textColor = c.text.ui
+    lblPrivacyDescription.font = f.caption
+    lblPrivacyDescription.textColor = c.text.ui
+    nextIndicator.color = c.text.ui
+    imageIndicator.color = .white
+    bindUI()
+  }
+  
+  var img: URL? {
+    didSet {
+      if let image = img {
+        self.image.sd_setImage(with: image)
+        self.image.isHidden = false
+      } else {
+        self.image.isHidden = true
+      }
+    }
+  }
+  var _private = false {
+    didSet {
+      if _private {
+        pillPublic.backgroundColor = .clear
+        pillPrivate.backgroundColor = c().primary.ui
+        pillLblPublic.textColor = c().text.ui
+        pillLblPrivate.textColor = c().background.ui
+        lblPrivacyDescription.text = "Private channels will not be seen by anyone unless they invited to join the channel."
+      } else {
+        pillPrivate.backgroundColor = .clear
+        pillPublic.backgroundColor = c().primary.ui
+        pillLblPrivate.textColor = c().text.ui
+        pillLblPublic.textColor = c().background.ui
+        lblPrivacyDescription.text = "Public channels will be viewed by all and available for everyone to join."
+      }
+    }
+  }
+  
+  func bindUI() {
+    if let chat = chat {
+      img = chat.image?.url
+      _private = chat._private
+      txtChannel.text = chat.displayName
+      updateChannel()
+      txtDesc.text = chat.description
+      updateDesc()
+    }
+  }
+  
+  func updateChannel() {
+    let txt = txtChannel.text ?? ""
+    lblChannelCount.text = "\(txt.count)/25"
+    if txt.count > 25 {
+      lblChannelCount.textColor = .red
+    } else {
+      lblChannelCount.textColor = c().caption.ui
+    }
+    updateNext()
+  }
+  
+  func updateNext() {
+    let name = txtChannel.text ?? ""
+    if name.count >= 3 {
+      btnNext.tintColor = c().primary.ui
+    } else {
+      btnNext.tintColor = c().caption.ui
+    }
+  }
+  
+  public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+    if string == "\n" {
+      txtDesc.becomeFirstResponder()
+      return false
+    }
+    DispatchQueue.main.async {
+      self.updateChannel()
+    }
+    self.lblChannelError.isHidden = true
+   return true
+  }
+  
+  func updateDesc() {
+    let d = txtDesc.text ?? ""
+    lblDescCount.text = "\(d.count)/100"
+    if txtDesc.text.count > 100 {
+      lblDescCount.textColor = .red
+    } else {
+      lblDescCount.textColor = c().caption.ui
+    }
+  }
+  
+  public func textViewDidChange(_ textView: UITextView) {
+    self.updateDesc()
+  }
+  
+  @IBAction func tapPublic() {
+    _private = false
+  }
+  
+  @IBAction func tapPrivate() {
+    _private = true
+  }
+  
+  @IBAction func tapImage() {
+    var config = PHPickerConfiguration(photoLibrary: .shared())
+    config.filter = .images
+    config.preferredAssetRepresentationMode = .current
+    let picker = PHPickerViewController(configuration: config)
+    picker.delegate = self
+    self.present(picker, animated: true)
+  }
+  
+  var loading = false
+  
+  @IBAction func next() {
+    if loading {return}
+    loading = true
+    let name = txtChannel.text ?? ""
+    if name.count < 3 {
+      self.lblChannelError.isHidden = false
+      return
+    }
+    if loadingImage {
+      nextOnUpload = true
+      self.nextIndicator.startAnimating()
+      self.nextIndicator.isHidden = false
+      return
+    }
+    if let chat = chat {
+      self.nextIndicator.startAnimating()
+      self.nextIndicator.isHidden = false
+      let name = self.txtChannel.text ?? ""
+      let description = self.txtDesc.text ?? ""
+      let image = self.uploadedImageUrl
+      let _private = self._private
+      Task.detached {
+        do {
+          try await chat.update( name: name != chat.name ? name : nil,
+                                 description: chat.description != description ? description : nil,
+                                 image: chat.image != image?.absoluteString ? image : nil,
+                                 _private: chat._private != _private ? _private : nil)
+          DispatchQueue.main.async {
+            self.onUpdate()
+          }
+        } catch {
+          DispatchQueue.main.async {
+            self.onUpdateFailed()
+          }
+        }
+      }
+    } else {
+      self.performSegue(withIdentifier: "invite", sender: nil)
+    }
+  }
+  
+  func onUpdate() {
+    self.navigationController?.popViewController(animated: true)
+  }
+  
+  func onUpdateFailed() {
+    self.view.makeToast("Failed to update Chat. Try again or contact support if the issue persists.")
+    loading = false
+    self.nextIndicator.stopAnimating()
+    self.nextIndicator.isHidden = true
+  }
+  
+  var loadingImage = false
+  var uploadedImageUrl: URL? = nil
+  var nextOnUpload = false
+  
+  func onImageFile(_ tmp: URL) {
+    loadingImage = true
+    self.imageIndicator.startAnimating()
+    self.imageIndicator.isHidden = false
+    self.image.sd_setImage(with: tmp)
+    Task.detached {
+      do {
+        let url = try await api.uploadFile(file:.init(url: tmp))
+        DispatchQueue.main.async {
+          if let url = url.url {
+            self.onUpload(url)
+          }
+        }
+      } catch let err {
+        Monitoring.error(err)
+        DispatchQueue.main.async {
+          self.onUploadError()
+        }
+      }
+    }
+  }
+  
+  func onUpload(_ url: URL) {
+    self.uploadedImageUrl = url
+    self.loadingImage = false
+    if nextOnUpload {
+      next()
+    }
+  }
+  
+  func onUploadError() {
+    self.view.makeToast("The image failed to upload. Try again or skip adding one for now")
+  }
+  
+  public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+    self.dismiss(animated: true)
+    let identifier =  [UTType.image.identifier]
+    print("picker did finsih picking", results)
+    if let result = results.first,
+       let match = identifier.first(where: {
+         result.itemProvider.hasItemConformingToTypeIdentifier($0)
+       })
+    {
+      print("Getting file for ", match)
+      let progress = result.itemProvider.loadFileRepresentation(forTypeIdentifier: match) {
+        url, err in
+        if let err = err {
+          print("Error Loading File", err)
+        } else if let url = url {
+          do {
+            let tmp = try tmpFile()
+            print("Copy from url", url.absoluteString, "to", tmp.absoluteString)
+            try FileManager.default.copyItem(
+              at: url, to: tmp)
+            DispatchQueue.main.async {
+              self.onImageFile(tmp)
+            }
+          } catch let err {
+            print("Failed to copy file", err)
+          }
+        }
+      }
+    } else {
+      print("No picker results")
+    }
+  }
+  
+  override public func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    if segue.identifier == "invite" {
+      let invite = segue.destination as! UIInviteUsers
+      invite.create = (uploadedImageUrl, txtChannel.text ?? "", txtDesc.text, _private)
+    }
   }
 }
 
