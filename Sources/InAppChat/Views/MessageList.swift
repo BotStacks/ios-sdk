@@ -147,11 +147,11 @@ public class UIMessageList: UIViewController, UITableViewDelegate, UITableViewDa
         case .image:
         fallthrough
         case .file:
-          return Theme.current.imagePreviewSize.height + 46.0
+          return Theme.current.imagePreviewSize.height + 38.0
         case .video:
           fallthrough
         case .audio:
-          return Theme.current.videoPreviewSize.height + 46.0
+          return Theme.current.videoPreviewSize.height + 38.0
         case .location:
           if let loc = at.loc?.markdownLink {
             md = loc

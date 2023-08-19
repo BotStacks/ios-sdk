@@ -31,7 +31,7 @@ public class UIPrivacyPill: UIButton {
       isHidden = true
     } else {
       isHidden = false
-      setTitle(chat._private ? "PRIVATE" : "PUBLIC", for: .normal)
+      setAttributedTitle(.init(string: chat._private ? "PRIVATE" : "PUBLIC", attributes: [.font: UIFont.boldSystemFont(ofSize: 8.0)]), for: .normal)
       backgroundColor = chat._private ? Theme.current.colors.public.ui : Theme.current.colors.private.ui
     }
   }

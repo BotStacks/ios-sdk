@@ -151,9 +151,11 @@ public class UIThreadRow: UITableViewCell {
       unreadCount.text = String(chat.unreadCount)
       unreadCircle.layer.borderWidth = 2.0
       subtitle.textColor = Theme.current.colors.text.ui
+      unreadCount.isHidden = false
     } else {
       unreadCircle.layer.borderWidth = 0.0
       subtitle.textColor = Theme.current.colors.caption.ui
+      unreadCount.isHidden = true
     }
     if let image = chat.image {
       avatar.sd_setImage(with: image.url)

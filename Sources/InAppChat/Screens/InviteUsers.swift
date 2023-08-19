@@ -39,18 +39,18 @@ public class UIInviteUsers: UIBaseController, UITableViewDelegate, UITableViewDa
   
   public override func viewDidLoad() {
     super.viewDidLoad()
+    Chats.current.contacts.loadMoreIfEmpty()
     btnBackBottom.tintColor = Theme.current.inverted.softBackground.ui
 //    btnBackBottom.titleLabel?.textColor = Theme.current.inverted.text.ui
     btnSubmit.tintColor = Theme.current.colors.primary.ui
-    btnSubmit.setTitle(chat != nil ? "Send Invites" : "Create My Channel", for: .normal)
-    btnSubmit.titleLabel?.font = Theme.current.fonts.headline
+    btnSubmit.setAttributedTitle(.init(string:chat != nil ? "Send Invites" : "Create My Channel", attributes: [.font: Theme.current.fonts.headline]), for: .normal)
     btnSubmit.setTitleColor(c().background.ui, for: .normal)
     
     Chats.current.contacts.objectWillChange.makeConnectable()
       .autoconnect()
       .sink { [weak self] _ in
         DispatchQueue.main.async {
-          self?.tableView?.reloadData()
+          self?.users = self?.loadUsers() ?? []
         }
       }.store(in: &bag)
     activityIndicator.isHidden = true

@@ -102,22 +102,21 @@ public class UIGroupDrawer: UIViewController, UITableViewDelegate, UITableViewDa
       cells.append(contentsOf: chat.offlineUsers.map({("user", $0)}))
     }
     self.cells = cells
+    
     if chat.isMember {
-      leave.setTitle("Leave", for: .normal)
+      leave.setAttributedTitle(.init(string: "Leave", attributes: [.font: Theme.current.fonts.mini]), for: .normal)
       leave.setImage(UIImage(systemName: "trash.fill"), for: .normal)
     } else {
-      leave.setTitle("Join", for: .normal)
+      leave.setAttributedTitle(.init(string: "Join", attributes: [.font: Theme.current.fonts.mini]), for: .normal)
       leave.setImage(UIImage(systemName: "plus"), for: .normal)
-      
     }
-    leave.titleLabel?.font = Theme.current.fonts.mini
   }
   
   @IBAction func leaveChat() {
     if chat.isMember {
       chat.leave()
       self.dismiss(animated: true)
-      self.presentingViewController?.navigationController?.popViewController(animated: true)
+      self.room?.navigationController?.popViewController(animated: true)
     } else {
       if !chat._private || chat.hasInvite {
         chat.join()
@@ -127,19 +126,21 @@ public class UIGroupDrawer: UIViewController, UITableViewDelegate, UITableViewDa
     }
   }
   
+  var room: UIViewController!
+  
   @IBAction func editChat() {
     self.dismiss(animated: true)
-    self.presentingViewController?.performSegue(withIdentifier: "edit", sender: chat)
+    self.room?.performSegue(withIdentifier: "edit", sender: chat)
   }
   
   @IBAction func inviteFriends() {
     self.dismiss(animated: true)
-    self.presentingViewController?.performSegue(withIdentifier: "invite", sender: chat)
+    self.room?.performSegue(withIdentifier: "invite", sender: chat)
   }
   
   func select(user: User) {
     self.dismiss(animated: true)
-    self.presentingViewController?.performSegue(withIdentifier: "user", sender: user)
+    self.room?.performSegue(withIdentifier: "user", sender: user)
   }
   
   var cells: [(String, User?)] = [] {

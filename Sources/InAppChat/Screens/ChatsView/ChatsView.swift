@@ -37,6 +37,7 @@ public class ChatsController: UIViewController, UITableViewDelegate, UITableView
   var bag = Set<AnyCancellable>()
   
   public override func viewDidLoad() {
+    let _ = Theme.current.with(traitCollection.userInterfaceStyle == .dark ? .dark : .light)
     lblChannels.font = Theme.current.fonts.title2.bold
     lblChannels.textColor = Theme.current.colors.primary.ui
     lblChats.textColor = Theme.current.colors.caption.ui
@@ -121,6 +122,7 @@ public class ChatsController: UIViewController, UITableViewDelegate, UITableView
   
   public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let chat = chats[indexPath.row]
+    chat.loadMoreIfEmpty()
     self.performSegue(withIdentifier: "chat", sender: chat)
   }
   

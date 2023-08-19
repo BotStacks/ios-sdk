@@ -71,7 +71,7 @@ public final class Chat: Pager<Message>, Identifiable {
   }
   
   var displayImage: String? {
-    return self.image ?? self.friend?.avatar
+    return self.image ?? (self.isDM ? self.friend?.avatar : nil)
   }
   
   var isUnread: Bool {
@@ -145,6 +145,7 @@ public final class Chat: Pager<Message>, Identifiable {
     self.kind = kind
     self.members = members
     self.unreadCount = unreadCount
+    print("Chat get with unread count \(unreadCount)")
     self.latestMessage = latestMessage
     self._private = _private
     self.invites = Set(invites)

@@ -78,6 +78,7 @@ public class UIChannelsController: UIViewController, UITableViewDelegate, UITabl
   
   public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let chat = chats[indexPath.row]
+    chat.loadMoreIfEmpty()
     self.performSegue(withIdentifier: "chat", sender: chat)
   }
   

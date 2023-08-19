@@ -375,6 +375,7 @@ public class UIChatRoom: UIViewController, UITextViewDelegate, UIImagePickerCont
     } else if segue.identifier == "group" {
       let group = segue.destination as? UIGroupDrawer
       group?.chat = sender as? Chat
+      group?.room = self
     } else if segue.identifier == "user" {
       let user = segue.destination as? UIProfile
       user?.user = sender as? User

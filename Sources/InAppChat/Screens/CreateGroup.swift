@@ -77,8 +77,15 @@ public class UICreateChat: UIBaseController, UITextFieldDelegate, UITextViewDele
   @IBOutlet var btnNext: UIButton!
   @IBOutlet var imageIndicator: UIActivityIndicatorView!
   @IBOutlet var nextIndicator: UIActivityIndicatorView!
+  @IBOutlet var btnSave: UIButton!
   
-  var chat: Chat?
+  var chat: Chat? {
+    didSet {
+      if viewIfLoaded != nil {
+        self.bindUI()
+      }
+    }
+  }
     
   override public func viewDidLoad() {
     super.viewDidLoad()
@@ -119,6 +126,9 @@ public class UICreateChat: UIBaseController, UITextFieldDelegate, UITextViewDele
     lblPrivacyDescription.textColor = c.text.ui
     nextIndicator.color = c.text.ui
     imageIndicator.color = .white
+    nextIndicator.isHidden = true
+    lblChannelError.isHidden = true
+    btnSave.setAttributedTitle(.init(string: "Save", attributes: [.font: f.headline]), for: .normal)
     bindUI()
   }
   
@@ -126,9 +136,13 @@ public class UICreateChat: UIBaseController, UITextFieldDelegate, UITextViewDele
     didSet {
       if let image = img {
         self.image.sd_setImage(with: image)
+        print("Edit group set image \(image)")
         self.image.isHidden = false
+        self.addImage.isHidden = true
       } else {
+        print("Edit group set image none")
         self.image.isHidden = true
+        self.addImage.isHidden = false
       }
     }
   }
@@ -152,12 +166,17 @@ public class UICreateChat: UIBaseController, UITextFieldDelegate, UITextViewDele
   
   func bindUI() {
     if let chat = chat {
-      img = chat.image?.url
+      img = chat.displayImage?.url
       _private = chat._private
       txtChannel.text = chat.displayName
       updateChannel()
       txtDesc.text = chat.description
+      btnSave.isHidden = false
+      btnNext.isHidden = true
       updateDesc()
+    } else {
+      btnSave.isHidden = true
+      btnNext.isHidden = false
     }
   }
   
@@ -176,8 +195,10 @@ public class UICreateChat: UIBaseController, UITextFieldDelegate, UITextViewDele
     let name = txtChannel.text ?? ""
     if name.count >= 3 {
       btnNext.tintColor = c().primary.ui
+      btnSave.tintColor = c().primary.ui
     } else {
       btnNext.tintColor = c().caption.ui
+      btnSave.tintColor = c().caption.ui
     }
   }
   
@@ -216,6 +237,7 @@ public class UICreateChat: UIBaseController, UITextFieldDelegate, UITextViewDele
   }
   
   @IBAction func tapImage() {
+    print("Tap Image")
     var config = PHPickerConfiguration(photoLibrary: .shared())
     config.filter = .images
     config.preferredAssetRepresentationMode = .current
@@ -287,16 +309,20 @@ public class UICreateChat: UIBaseController, UITextFieldDelegate, UITextViewDele
     self.imageIndicator.startAnimating()
     self.imageIndicator.isHidden = false
     self.image.sd_setImage(with: tmp)
+    print("Loading Image")
     Task.detached {
       do {
+        print("Uploading image")
         let url = try await api.uploadFile(file:.init(url: tmp))
         DispatchQueue.main.async {
+          print("IMage uploaded to \(url)")
           if let url = url.url {
             self.onUpload(url)
           }
         }
       } catch let err {
         Monitoring.error(err)
+        print(err)
         DispatchQueue.main.async {
           self.onUploadError()
         }
@@ -307,6 +333,9 @@ public class UICreateChat: UIBaseController, UITextFieldDelegate, UITextViewDele
   func onUpload(_ url: URL) {
     self.uploadedImageUrl = url
     self.loadingImage = false
+    self.image.sd_setImage(with: url)
+    self.image.isHidden = false
+    self.imageIndicator.stopAnimating()
     if nextOnUpload {
       next()
     }
