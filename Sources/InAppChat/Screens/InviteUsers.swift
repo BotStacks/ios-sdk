@@ -70,7 +70,7 @@ public class UIInviteUsers: UIBaseController, UITableViewDelegate, UITableViewDa
   }
   
   public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCell(withIdentifier: "user") as! UIContactRow
+    let cell = tableView.dequeueReusableCell(withIdentifier: "contact") as! UIContactRow
     cell.user = users[indexPath.row]
     cell.select?.isHidden = cell.user.isCurrent
     cell.setSelect(selected.contains(cell.user))
@@ -97,12 +97,17 @@ public class UIInviteUsers: UIBaseController, UITableViewDelegate, UITableViewDa
   
   @IBAction func submit() {
     if selected.isEmpty || creating {return}
-    creating = true
     activityIndicator.isHidden = false
     activityIndicator.startAnimating()
     if let chat = chat {
-      chat.invite(users: selected)
+      if !selected.isEmpty {
+        chat.invite(users: selected)
+      }
       self.navigationController?.popViewController(animated: true)
+      if let vcs = self.navigationController?.viewControllers {
+        let prev = vcs[vcs.count - 2]
+        prev.view.makeToast(!selected.isEmpty ? "Invites sent" : "No invites sent")
+      }
     } else if !creating, let state = create {
       print("Creating new chat")
       self.creating = true

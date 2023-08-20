@@ -212,12 +212,15 @@ class Api: InterceptorProvider, ApolloInterceptor {
     }
   }
 
-  func send(text: String, to chat: String, inReplyTo parent: String?)
+  func send(id: String, text: String, to chat: String, inReplyTo parent: String?)
     async throws
     -> Message
   {
     return try await send(input: Gql.SendMessageInput(
-      chat: chat, parent: parent.gqlSomeOrNone, text: .some(text)
+      chat: chat,
+      id: id,
+      parent: parent.gqlSomeOrNone,
+      text: .some(text)
     ))
   }
 
@@ -237,10 +240,10 @@ class Api: InterceptorProvider, ApolloInterceptor {
     // TODO
   }
 
-  func send(attachment: Gql.AttachmentInput, to chat: String, inReplyTo parent: String?)
+  func send(id: String, attachment: Gql.AttachmentInput, to chat: String, inReplyTo parent: String?)
     async throws -> Message
   {
-    return try await self.send(input: Gql.SendMessageInput(attachments: [attachment], chat: chat))
+    return try await self.send(input: Gql.SendMessageInput(attachments: [attachment], chat: chat, id: id))
   }
   
   func updateGroup(input: Gql.UpdateGroupInput) async throws -> Bool {

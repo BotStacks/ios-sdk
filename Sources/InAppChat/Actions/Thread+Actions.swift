@@ -19,6 +19,7 @@ extension Chat {
     Task.detached {
       do {
         let newMessage = try await api.send(
+          id: m.id,
           text: text,
           to: self.id,
           inReplyTo: inReplyTo?.id
@@ -56,13 +57,16 @@ extension Chat {
     Task.detached {
       do {
         let newMessage = try await api.send(
+          id: m.id,
           attachment: attachment,
           to: self.id,
           inReplyTo: inReplyTo?.id
         )
         publish {
           self.sending.remove(element: m)
-          self.items.insert(newMessage, at: 0)
+          if !self.items.contains(where: {$0.id == newMessage.id}) {
+            self.items.insert(newMessage, at: 0)
+          }
         }
       } catch let err {
         Monitoring.error(err)

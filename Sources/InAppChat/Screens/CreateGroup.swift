@@ -217,10 +217,15 @@ public class UICreateChat: UIBaseController, UITextFieldDelegate, UITextViewDele
   func updateDesc() {
     let d = txtDesc.text ?? ""
     lblDescCount.text = "\(d.count)/100"
-    if txtDesc.text.count > 100 {
+    if d.count > 100 {
       lblDescCount.textColor = .red
     } else {
       lblDescCount.textColor = c().caption.ui
+    }
+    if d.isEmpty {
+      lblDescPlaceholder.isHidden = false
+    } else {
+      lblDescPlaceholder.isHidden = true
     }
   }
   

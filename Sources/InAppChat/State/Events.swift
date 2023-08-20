@@ -62,7 +62,7 @@ extension Chats {
         }
       } else if let raw = it.entity.asMessage, let chat = Chat.get(raw.chat_id) {
         let message = Message.get(.init(_dataDict: raw.__data))
-        if !chat.items.contains(where: {$0.id == message.id}) {
+        if !isUpdate, !chat.items.contains(where: {$0.id == message.id}) {
           chat.items.insert(message, at: 0)
         }
         if !isUpdate && (chat.latestMessage == nil || chat.latestMessage!.createdAt < message.createdAt) {

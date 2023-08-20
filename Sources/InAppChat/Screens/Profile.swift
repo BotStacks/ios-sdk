@@ -57,6 +57,13 @@ public class UIProfile: UIMyProfile {
     status.setTitle(user.status == .online ? "Online" : user.lastSeen?.timeAgo() ?? "", for: .normal)
     status.setTitleColor((user.status == .online ? c().primary : c().text).ui, for: .normal)
   }
+  
+  public override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    if segue.identifier == "chat" {
+      let room = segue.destination as? UIChatRoom
+      room?.user = user
+    }
+  }
 }
 
 public struct Profile: View {

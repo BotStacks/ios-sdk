@@ -38,11 +38,11 @@ public class UIContactRow: UITableViewCell {
   override public func awakeFromNib() {
     title.font = Theme.current.fonts.title3
     status.font = Theme.current.fonts.body
-    select?.backgroundColor = c().caption.ui
+    select?.tintColor = c().caption.ui
   }
   
   func setSelect(_ bool: Bool) {
-    select?.backgroundColor = bool ? c().primary.ui : c().caption.ui
+    select?.tintColor = bool ? c().primary.ui : c().caption.ui
   }
   
   func bindUI() {

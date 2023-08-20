@@ -15,12 +15,14 @@ public extension Gql {
     public init(
       attachments: GraphQLNullable<[AttachmentInput]> = nil,
       chat: ID,
+      id: ID,
       parent: GraphQLNullable<ID> = nil,
       text: GraphQLNullable<String> = nil
     ) {
       __data = InputDict([
         "attachments": attachments,
         "chat": chat,
+        "id": id,
         "parent": parent,
         "text": text
       ])
@@ -36,6 +38,12 @@ public extension Gql {
     public var chat: ID {
       get { __data["chat"] }
       set { __data["chat"] = newValue }
+    }
+
+    /// The client generated ID for the message
+    public var id: ID {
+      get { __data["id"] }
+      set { __data["id"] = newValue }
     }
 
     /// The ID of the Message this Message is replying to if it is a reply

@@ -113,7 +113,30 @@ public class UIChatRoom: UIViewController, UITextViewDelegate, UIImagePickerCont
     } else if let user = user {
       bind(user: user)
     }
-    
+    NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+  }
+  
+  var original: CGFloat = 0
+  @objc private func keyboardWillShow(notification: NSNotification){
+    guard let keyboardFrame = notification.userInfo![UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
+    if original == 0 {
+      original = inputContainerBottom.constant
+    }
+    inputContainerBottom.constant = keyboardFrame.cgRectValue.size.height - self.view.safeBottomInset + 8.0
+    let duration = (notification.userInfo![UIResponder.keyboardAnimationDurationUserInfoKey] as? Double) ?? 0.25
+    UIView.animate(withDuration: duration) {
+      self.view.layoutIfNeeded()
+    }
+  }
+  
+  @objc private func keyboardWillHide(notification: NSNotification){
+    guard let keyboardFrame = notification.userInfo![UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue else { return }
+    inputContainerBottom.constant = original
+    let duration = (notification.userInfo![UIResponder.keyboardAnimationDurationUserInfoKey] as? Double) ?? 0.25
+    UIView.animate(withDuration: duration) {
+      self.view.layoutIfNeeded()
+    }
   }
   
   var initialInputHeight: CGFloat = 0.0
@@ -197,8 +220,10 @@ public class UIChatRoom: UIViewController, UITextViewDelegate, UIImagePickerCont
       }
       privateChat.isHidden = false
       privateChat.text = "This is a private chat. Gain membership in order to view messages."
+      self.input.isEditable = false
     } else {
       privateChat?.isHidden = true
+      self.input.isEditable = true
     }
   }
   
