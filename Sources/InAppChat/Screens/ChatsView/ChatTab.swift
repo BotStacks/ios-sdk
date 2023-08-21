@@ -12,8 +12,8 @@ public struct ChatTabView: View {
   @Environment(\.iacTheme) var theme
   @Environment(\.geometry) var geometry
 
-  @Binding var current: Chats.List
-  let tab: Chats.List
+  @Binding var current: InAppChatStore.List
+  let tab: InAppChatStore.List
   let unreadCount: Int
 
   var selected: Bool {

@@ -37,7 +37,7 @@ extension Chat {
       do {
         let membership = try await api.join(group: self.id)
         await MainActor.run {
-          Chats.current.memberships.append(m)
+          InAppChatStore.current.memberships.append(m)
         }
       } catch let err {
         Monitoring.error(err)
@@ -65,7 +65,7 @@ extension Chat {
     }
     await MainActor.run {
       self.members.remove(element: me)
-      Chats.current.memberships.remove(element: me)
+      InAppChatStore.current.memberships.remove(element: me)
     }
     do {
       _ = try await api.leave(group: self.id)
@@ -73,7 +73,7 @@ extension Chat {
       Monitoring.error(err)
       await MainActor.run {
         self.members.append(me)
-        Chats.current.memberships.append(me)
+        InAppChatStore.current.memberships.append(me)
       }
     }
     await MainActor.run {
@@ -137,14 +137,14 @@ extension Chat {
   func delete() async throws {
     let _ = try await api.delete(group: self.id)
     await MainActor.run {
-      Chats.current.cache.chats.removeValue(forKey: self.id)
+      InAppChatStore.current.cache.chats.removeValue(forKey: self.id)
       if let m = self.membership {
-        Chats.current.memberships.remove(element: m)
+        InAppChatStore.current.memberships.remove(element: m)
       }
       if self.isDM, let friend = self.friend {
-        Chats.current.cache.chatsByUID.removeValue(forKey: friend.id)
+        InAppChatStore.current.cache.chatsByUID.removeValue(forKey: friend.id)
       }
-      Chats.current.network.items.removeAll(where: {self.id == $0.id})
+      InAppChatStore.current.network.items.removeAll(where: {self.id == $0.id})
     }
   }
 

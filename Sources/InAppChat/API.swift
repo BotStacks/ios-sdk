@@ -97,11 +97,11 @@ class Api: InterceptorProvider, ApolloInterceptor {
   func subscribe() {
     if let client = client, authToken != nil, subscriptions.isEmpty {
       let sub = client.sub(subscription: Gql.CoreSubscription()) { data in
-        Chats.current.onCoreEvent(data.core)
+        InAppChatStore.current.onCoreEvent(data.core)
       }
       subscriptions.append(sub)
       let subme = client.sub(subscription: Gql.MeSubscription()) { data in
-        Chats.current.onMeEvent(data.me)
+        InAppChatStore.current.onMeEvent(data.me)
       }
       subscriptions.append(subme)
     }
@@ -281,9 +281,9 @@ class Api: InterceptorProvider, ApolloInterceptor {
       return await MainActor.run {
         let chat = Chat.get(Gql.FChat.init(_dataDict: g.__data))
         if let member = chat.membership {
-          Chats.current.memberships.append(member)
+          InAppChatStore.current.memberships.append(member)
         }
-        Chats.current.network.items.append(chat)
+        InAppChatStore.current.network.items.append(chat)
         return chat
       }
     }
@@ -401,7 +401,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
     if let login = res.login {
       let user = User.get(.init(_dataDict: login.user.__data))
       try await onLogin(login.token, user: user)
-      try await Chats.current.loadAsync()
+      try await InAppChatStore.current.loadAsync()
       return user
     } else {
       throw APIError(msg: "Failed to login. No result.", critical: true)
@@ -425,7 +425,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
     if let login = res.ethLogin {
       let user = User.get(.init(_dataDict: login.user.__data))
       try await onLogin(login.token, user: user)
-      try await Chats.current.loadAsync()
+      try await InAppChatStore.current.loadAsync()
       return user
     } else {
       throw APIError(msg: "Eth login failed. No response data", critical: true)
@@ -509,7 +509,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
       return await MainActor.run {
         let chat = Chat.get(.init(_dataDict: dm.__data))
         if let member = chat.membership {
-          Chats.current.memberships.append(member)
+          InAppChatStore.current.memberships.append(member)
         }
         return chat
       }
@@ -542,8 +542,8 @@ class Api: InterceptorProvider, ApolloInterceptor {
     return await MainActor.run {
       let user = User.get(.init(_dataDict:res.me.__data))
       User.current = user
-      Chats.current.user = user
-      Chats.current.settings.blocked.append(contentsOf: res.me.blocks ?? [])
+      InAppChatStore.current.user = user
+      InAppChatStore.current.settings.blocked.append(contentsOf: res.me.blocks ?? [])
       let mraw = res.memberships
       let memberships = mraw.map { it in
         let _ = Chat.get(Gql.FChat(_dataDict: it.chat.__data))
@@ -581,6 +581,11 @@ class Api: InterceptorProvider, ApolloInterceptor {
     } else {
       throw APIError(msg: "Unknown upload response \(response.debugDescription) \(String(data: data, encoding: .utf8) ?? "")", critical: true)
     }
+  }
+  
+  func nftConfig() async throws -> Gql.GetNFTConfigQuery.Data.App.Nft? {
+    let res = try await client.fetchAsync(query: Gql.GetNFTConfigQuery())
+    return res.app.nft
   }
 }
 let api = Api(store: ApolloStore())

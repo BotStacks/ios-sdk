@@ -53,7 +53,7 @@ public class UIMyProfile: UIBaseController {
   }
   
   func getUser() -> User {
-    return Chats.current.user!
+    return InAppChatStore.current.user!
   }
     
   deinit {

@@ -150,9 +150,9 @@ public final class Chat: Pager<Message>, Identifiable {
     self._private = _private
     self.invites = Set(invites)
     super.init()
-    Chats.current.cache.chats[id] = self
+    InAppChatStore.current.cache.chats[id] = self
     if (kind == Gql.ChatType.directMessage), let friend = self.friend {
-      Chats.current.cache.chatsByUID[friend.id] = self
+      InAppChatStore.current.cache.chatsByUID[friend.id] = self
     }
   }
 
@@ -185,7 +185,7 @@ public final class Chat: Pager<Message>, Identifiable {
   @Published var inviting = false
 
   static func get(_ chat: Gql.FChat) -> Chat {
-    if let g = Chats.current.cache.chats[chat.id] {
+    if let g = InAppChatStore.current.cache.chats[chat.id] {
       g.update(chat)
       return g
     }
@@ -193,16 +193,16 @@ public final class Chat: Pager<Message>, Identifiable {
   }
 
   static func get(_ id: String) -> Chat? {
-    return Chats.current.cache.chats[id]
+    return InAppChatStore.current.cache.chats[id]
   }
   
   static func get(uid: String) -> Chat? {
-    return Chats.current.cache.chatsByUID[uid]
+    return InAppChatStore.current.cache.chatsByUID[uid]
   }
   
   static func fetch(id: String) {
-    if Chats.current.cache.chatFetches.contains(id) { return }
-    Chats.current.cache.chatFetches.insert(id)
+    if InAppChatStore.current.cache.chatFetches.contains(id) { return }
+    InAppChatStore.current.cache.chatFetches.insert(id)
     Task.detached {
       do {
         let _ = try await api.get(chat: id)

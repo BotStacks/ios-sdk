@@ -27,7 +27,7 @@ extension Message {
     let ogCurrent = self.currentReaction
     let action = react_impl(uid: User.current!.id, reaction: reaction, reactions: &reactions!)
     if action != .delete {
-      Chats.current.onReaction(reaction)
+      InAppChatStore.current.onReaction(reaction)
     }
     Task.detached {
       do {
@@ -86,7 +86,7 @@ extension Message {
 
   func delete() {
     Chat.get(self.chatID)?.items.remove(element: self)
-    Chats.current.cache.messages.removeValue(forKey: self.id)
+    InAppChatStore.current.cache.messages.removeValue(forKey: self.id)
     Task.detached {
       do {
         _ = try await api.delete(message: self.id)

@@ -8,7 +8,7 @@
 import Foundation
 
 
-extension Chats {
+extension InAppChatStore {
   
   func onCoreEvent(_ event: Gql.CoreSubscription.Data.Core) {
     print("Got Core Event \(event.__typename)")

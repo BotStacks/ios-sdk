@@ -29,7 +29,7 @@ public class UIMessageActions: UIViewController {
   var emojis: [String] = []
   
   override public func viewDidLoad() {
-    var emojis = Chats.current.lastUsedReactions
+    var emojis = InAppChatStore.current.lastUsedReactions
     if let current = room.messageForAction?.currentReaction {
       emojis.insert(current, at: 0)
       emojis = emojis.unique()
@@ -90,7 +90,7 @@ public struct EmojiBar: View {
     onEmojiKeyboard: @escaping () -> Void
   ) {
     self.currentEmoji = currentEmoji
-    var emojis = Chats.current.lastUsedReactions
+    var emojis = InAppChatStore.current.lastUsedReactions
     if let current = currentEmoji {
       emojis.insert(current, at: 0)
       emojis = emojis.unique()

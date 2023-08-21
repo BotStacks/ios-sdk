@@ -26,7 +26,7 @@ public class UIProfile: UIMyProfile {
   }
     
   override func getUser() -> User {
-    return user ?? Chats.current.user!
+    return user ?? InAppChatStore.current.user!
   }
   
   deinit {

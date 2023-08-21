@@ -8,8 +8,7 @@ public class Tenant {
 
 let assets =
 Bundle.main.url(forResource: "InAppChat", withExtension: "bundle", subdirectory: "Frameworks/InAppChat.framework").flatMap({Bundle(url: $0)})!
-//??  Bundle.main
-
+  
 public class InAppChat: ObservableObject {
 
   let apiKey: String
@@ -25,7 +24,7 @@ public class InAppChat: ObservableObject {
   public var onLogout: (() -> Void)? = nil
   
   var user: User? {
-    return Chats.current.user
+    return InAppChatStore.current.user
   }
 
   public init(apiKey: String) {
@@ -38,7 +37,7 @@ public class InAppChat: ObservableObject {
     guard !didStartLoading else { return }
     didStartLoading = true
     do {
-      try await Chats.current.loadAsync()
+      try await InAppChatStore.current.loadAsync()
     } catch {
       api.loggedOut()
     }
@@ -110,7 +109,7 @@ public class InAppChat: ObservableObject {
   }
 
   public static func logout() {
-    Chats.current = Chats()
+    InAppChatStore.current = InAppChatStore()
     User.current = nil
     Task.detached {
       do {
@@ -128,7 +127,7 @@ public class InAppChat: ObservableObject {
   }
 
   public static func registerPushToken(_ token: String) {
-    Chats.current.pushToken = token
+    InAppChatStore.current.pushToken = token
     if shared?.isUserLoggedIn != true { return }
     Task {
       do {
@@ -140,7 +139,7 @@ public class InAppChat: ObservableObject {
   }
 
   public static func registerFCMToken(_ token: String) {
-    Chats.current.fcmToken = token
+    InAppChatStore.current.fcmToken = token
     if shared?.isUserLoggedIn != true { return }
     Task {
       do {

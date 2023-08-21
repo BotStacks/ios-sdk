@@ -13,7 +13,7 @@ import Combine
 public class UISyncContactsView: UITableViewCell {
   
   @IBAction func onPress() {
-    Chats.current.contacts.request()
+    InAppChatStore.current.contacts.request()
   }
   
 }
@@ -38,15 +38,15 @@ public class UIContactsController: UIViewController, UITableViewDataSource, UITa
         make.left.equalToSuperview().inset(24.0)
       }
     }
-    Chats.current.contacts.objectWillChange.makeConnectable().autoconnect().sink { [weak self] _ in
+    InAppChatStore.current.contacts.objectWillChange.makeConnectable().autoconnect().sink { [weak self] _ in
       DispatchQueue.main.async {
         self?.tableView.reloadData()
       }
     }.store(in: &bag)
-    Chats.current.contacts.loadMoreIfEmpty()
+    InAppChatStore.current.contacts.loadMoreIfEmpty()
   }
   
-  let ct = Chats.current.contacts
+  let ct = InAppChatStore.current.contacts
   
   func contact(at index: IndexPath) -> User {
     return ct.items[index.row - (ct.requestContacts ? 1 : 0)]
@@ -80,7 +80,7 @@ public class UIContactsController: UIViewController, UITableViewDataSource, UITa
   
   public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     if ct.requestContacts && indexPath.row == 0 { return }
-    Chats.current.contacts.loadMoreIfNeeded(contact(at: indexPath))
+    InAppChatStore.current.contacts.loadMoreIfNeeded(contact(at: indexPath))
   }
   
   @IBAction func back() {
@@ -92,7 +92,7 @@ public struct ContactsView: View {
 
   @Environment(\.iacTheme) var theme
   @Environment(\.geometry) var geometry
-  @ObservedObject var contacts = Chats.current.contacts
+  @ObservedObject var contacts = InAppChatStore.current.contacts
 
   @Binding var scrollToTop: Int
   public init(scrollToTop: Binding<Int>) {

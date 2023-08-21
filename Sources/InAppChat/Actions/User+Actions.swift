@@ -19,7 +19,7 @@ extension User {
         } else {
           let _ = try await api.unblock(user: self.id)
         }
-        Chats.current.settings.setBlock(self.id, self.blocked)
+        InAppChatStore.current.settings.setBlock(self.id, self.blocked)
       } catch let err {
         Monitoring.error(err)
         publish {

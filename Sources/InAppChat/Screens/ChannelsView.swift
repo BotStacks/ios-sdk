@@ -26,7 +26,7 @@ public class UIChannelsController: UIViewController, UITableViewDelegate, UITabl
         make.left.equalToSuperview().inset(24.0)
       }
     }
-    Chats
+    InAppChatStore
       .current
       .network
       .objectWillChange
@@ -38,7 +38,7 @@ public class UIChannelsController: UIViewController, UITableViewDelegate, UITabl
       }
     }.store(in: &bag)
     self.updateUI()
-    Chats.current.network.loadMoreIfEmpty()
+    InAppChatStore.current.network.loadMoreIfEmpty()
     self.emptyView.apply(Theme.current.assets.emptyAllChannels, cta: CTA(
       icon: nil, text: "Create A Channel", action: {
         self.performSegue(withIdentifier: "create", sender: nil)
@@ -46,11 +46,11 @@ public class UIChannelsController: UIViewController, UITableViewDelegate, UITabl
   }
   
   var chats: [Chat] {
-    return Chats.current.network.items
+    return InAppChatStore.current.network.items
   }
   
   func updateUI() {
-    if chats.isEmpty && !Chats.current.network.loading {
+    if chats.isEmpty && !InAppChatStore.current.network.loading {
       self.emptyView.isHidden = false
     } else {
       self.emptyView.isHidden = true
@@ -59,12 +59,12 @@ public class UIChannelsController: UIViewController, UITableViewDelegate, UITabl
   }
   
   public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return Chats.current.network.items.count
+    return InAppChatStore.current.network.items.count
   }
   
   public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell = tableView.dequeueReusableCell(withIdentifier: "channel") as! UIChannelRow
-    cell.chat = Chats.current.network.items[indexPath.row]
+    cell.chat = InAppChatStore.current.network.items[indexPath.row]
     return cell
   }
   
@@ -73,7 +73,7 @@ public class UIChannelsController: UIViewController, UITableViewDelegate, UITabl
   }
   
   public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-    Chats.current.network.loadMoreIfNeeded(Chats.current.network.items[indexPath.row])
+    InAppChatStore.current.network.loadMoreIfNeeded(InAppChatStore.current.network.items[indexPath.row])
   }
   
   public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -98,7 +98,7 @@ public class UIChannelsController: UIViewController, UITableViewDelegate, UITabl
 public struct ChannelsView: View {
   
   @Environment(\.iacTheme) var theme
-  @ObservedObject var chats = Chats.current
+  @ObservedObject var chats = InAppChatStore.current
   @Environment(\.geometry) var geometry
   @EnvironmentObject var navigator: Navigator
   

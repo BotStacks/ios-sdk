@@ -29,7 +29,7 @@ public final class User: ObservableObject, Identifiable {
   }
 
   public var haveChatWith: Bool {
-    return Chats.current.users.contains(where: { $0.id == self.id })
+    return InAppChatStore.current.users.contains(where: { $0.id == self.id })
   }
 
   public init(
@@ -50,7 +50,7 @@ public final class User: ObservableObject, Identifiable {
     self.lastSeen = lastSeen
     self.status = status
     self.blocked = blocked
-    Chats.current.cache.user[id] = self
+    InAppChatStore.current.cache.user[id] = self
   }
 
   public static var current: User? = nil
@@ -83,12 +83,12 @@ public final class User: ObservableObject, Identifiable {
                   avatar: user.image,
                   lastSeen: user.last_seen,
                   status: user.status.value!,
-                  blocked: Chats.current.settings.blocked.contains(user.id)
+                  blocked: InAppChatStore.current.settings.blocked.contains(user.id)
     )
   }
 
   static func get(_ id: String) -> User? {
-    return Chats.current.cache.user[id]
+    return InAppChatStore.current.cache.user[id]
   }
 }
 

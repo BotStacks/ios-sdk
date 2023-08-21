@@ -18,7 +18,7 @@ public struct Assets {
   public let emptyChannels: EmptyScreenConfig
   public let emptyAllChannels: EmptyScreenConfig
 
-  func list(_ list: Chats.List) -> EmptyScreenConfig {
+  func list(_ list: InAppChatStore.List) -> EmptyScreenConfig {
     switch list {
     case .groups:
       return emptyChannels

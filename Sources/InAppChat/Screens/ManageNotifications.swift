@@ -22,7 +22,7 @@ public class UIManageNotifications: UIBaseController {
   
   @IBOutlet var update: UIButton!
   
-  let settings = Chats.current.settings
+  let settings = InAppChatStore.current.settings
   
   var bag = Set<AnyCancellable>()
   
@@ -76,7 +76,7 @@ public class UIManageNotifications: UIBaseController {
 
 public struct ManageNotifications: View {
 
-  @ObservedObject var settings = Chats.current.settings
+  @ObservedObject var settings = InAppChatStore.current.settings
   @Environment(\.iacTheme) var theme
 
   public init() {}

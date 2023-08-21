@@ -20,7 +20,7 @@ public class UIInviteUsers: UIBaseController, UITableViewDelegate, UITableViewDa
   @IBOutlet var activityIndicator: UIActivityIndicatorView!
   
   func loadUsers() -> [User] {
-    var users = Chats.current.contacts.items
+    var users = InAppChatStore.current.contacts.items
     if let chat = chat {
       let m = Set<String>(chat.members.map({$0.user_id}))
       return users.filter({!m.contains($0.id)})
@@ -39,14 +39,14 @@ public class UIInviteUsers: UIBaseController, UITableViewDelegate, UITableViewDa
   
   public override func viewDidLoad() {
     super.viewDidLoad()
-    Chats.current.contacts.loadMoreIfEmpty()
+    InAppChatStore.current.contacts.loadMoreIfEmpty()
     btnBackBottom.tintColor = Theme.current.inverted.softBackground.ui
 //    btnBackBottom.titleLabel?.textColor = Theme.current.inverted.text.ui
     btnSubmit.tintColor = Theme.current.colors.primary.ui
     btnSubmit.setAttributedTitle(.init(string:chat != nil ? "Send Invites" : "Create My Channel", attributes: [.font: Theme.current.fonts.headline]), for: .normal)
     btnSubmit.setTitleColor(c().background.ui, for: .normal)
     
-    Chats.current.contacts.objectWillChange.makeConnectable()
+    InAppChatStore.current.contacts.objectWillChange.makeConnectable()
       .autoconnect()
       .sink { [weak self] _ in
         DispatchQueue.main.async {
@@ -90,7 +90,7 @@ public class UIInviteUsers: UIBaseController, UITableViewDelegate, UITableViewDa
   
   public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     let user = users[indexPath.row]
-    Chats.current.contacts.loadMoreIfNeeded(user)
+    InAppChatStore.current.contacts.loadMoreIfNeeded(user)
   }
   
   var creating = false
@@ -143,7 +143,7 @@ public class UIInviteUsers: UIBaseController, UITableViewDelegate, UITableViewDa
 
 public struct InviteUsers: View {
 
-  @ObservedObject var chats = Chats.current
+  @ObservedObject var chats = InAppChatStore.current
   @Environment(\.geometry) var geometry
   @Environment(\.iacTheme) var theme
   @EnvironmentObject var navigator: Navigator

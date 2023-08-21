@@ -80,7 +80,7 @@ public final class Message: ObservableObject, Identifiable {
     self.currentReaction = currentReaction
     self.replies = replies
     self.makeMarkdown()
-    Chats.current.cache.messages[id] = self
+    InAppChatStore.current.cache.messages[id] = self
   }
 
   public init(_ msg: Gql.FMessage) {
@@ -95,7 +95,7 @@ public final class Message: ObservableObject, Identifiable {
     self.currentReaction = self.reactions?.first(where: {$0.uids.contains(User.current!.id)})?.reaction
     self.update(msg)
     self.makeMarkdown()
-    Chats.current.cache.messages[id] = self
+    InAppChatStore.current.cache.messages[id] = self
 //    fillChat()
     fillParent()
   }
@@ -172,7 +172,7 @@ public final class Message: ObservableObject, Identifiable {
   var editingText = false
 
   static func get(_ id: String) -> Message? {
-    return Chats.current.cache.messages[id]
+    return InAppChatStore.current.cache.messages[id]
   }
 
   static func get(_ msg: Gql.FMessage) -> Message {

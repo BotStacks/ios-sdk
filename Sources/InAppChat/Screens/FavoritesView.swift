@@ -25,7 +25,7 @@ public class UIFavoritesController: UIBaseController {
 
 public struct FavoritesView: View {
 
-  let favorites = Chats.current.favorites
+  let favorites = InAppChatStore.current.favorites
   @Environment(\.geometry) var geometry
 
   public init() {

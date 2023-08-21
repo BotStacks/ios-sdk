@@ -56,7 +56,7 @@ public class ChatsController: UIViewController, UITableViewDelegate, UITableView
         make.left.equalToSuperview().inset(24.0)
       }
     }
-    Chats.current.objectWillChange.makeConnectable().autoconnect().sink { [weak self] _ in
+    InAppChatStore.current.objectWillChange.makeConnectable().autoconnect().sink { [weak self] _ in
       DispatchQueue.main.async {
         self?.updateUI()
       }
@@ -65,10 +65,10 @@ public class ChatsController: UIViewController, UITableViewDelegate, UITableView
   }
   
   var dmsUnreadCount: Int {
-    return Chats.current.dms.reduce(0, {$1.unreadCount + $0})
+    return InAppChatStore.current.dms.reduce(0, {$1.unreadCount + $0})
   }
   var groupsUnreadCount: Int {
-    return Chats.current.groups.reduce(0, {$1.unreadCount + $0})
+    return InAppChatStore.current.groups.reduce(0, {$1.unreadCount + $0})
   }
   
   func updateEmpty() {
@@ -111,7 +111,7 @@ public class ChatsController: UIViewController, UITableViewDelegate, UITableView
   }
   
   var chats: [Chat] {
-    return isChannels ? Chats.current.groups : Chats.current.dms
+    return isChannels ? InAppChatStore.current.groups : InAppChatStore.current.dms
   }
   
   public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -179,8 +179,8 @@ public class ChatsController: UIViewController, UITableViewDelegate, UITableView
 
 public struct ChatsView: View {
 
-  @State var list: Chats.List = .groups
-  @ObservedObject var chats = Chats.current
+  @State var list: InAppChatStore.List = .groups
+  @ObservedObject var chats = InAppChatStore.current
 
   @Environment(\.iacTheme) var theme
   @Environment(\.geometry) var geometry
@@ -228,7 +228,7 @@ public struct ChatsView: View {
         }
         let header = {
           HStack(spacing: 0) {
-            ForEach(Chats.List.all, id: \.rawValue) {
+            ForEach(InAppChatStore.List.all, id: \.rawValue) {
               ChatTabView(
                 current: $list,
                 tab: $0,

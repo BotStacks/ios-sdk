@@ -1,6 +1,6 @@
 import Foundation
 
-public class Chats: ObservableObject {
+public class InAppChatStore: ObservableObject {
 
   @Published var user: User? = nil
 
@@ -35,7 +35,7 @@ public class Chats: ObservableObject {
 
   @Published var loading = false
 
-  public static var current = Chats()
+  public static var current = InAppChatStore()
 
   public func load() {
     if loading { return }
@@ -61,8 +61,21 @@ public class Chats: ObservableObject {
       api.subscribe()
     }
   }
+  
+  public var nft: Gql.GetNFTConfigQuery.Data.App.Nft?
 
   public func loadAsync() async throws {
+    async let nft = loadNft()
+    async let session = loadSession()
+    let res = await [try nft, try session]
+  }
+  
+  private func loadNft() async throws -> Bool {
+    self.nft = try await api.nftConfig()
+    return true
+  }
+  
+  private func loadSession() async throws -> Bool {
     if api.authToken != nil {
       try await loadMe()
       print("got active threads")
@@ -87,6 +100,7 @@ public class Chats: ObservableObject {
     } else {
       print("no current user skipping")
     }
+    return true
   }
 
   var invites: [String: [String]] = [:]

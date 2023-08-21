@@ -70,7 +70,7 @@ public class UIMessageList: UIViewController, UITableViewDelegate, UITableViewDa
   }
   
   var pager: Pager<Message> {
-    return chat ?? Chats.current.favorites
+    return chat ?? InAppChatStore.current.favorites
   }
 
   var onLongPress: (Message) -> Void = {
@@ -92,7 +92,7 @@ public class UIMessageList: UIViewController, UITableViewDelegate, UITableViewDa
     message in
   }
   
-  var messages = Chats.current.favorites.items {
+  var messages = InAppChatStore.current.favorites.items {
     didSet {
       cells = messages.flatMap({ message in
         var ret: [(String, Message)] = []
