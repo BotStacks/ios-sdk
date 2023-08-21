@@ -143,6 +143,10 @@ public class InAppChat: ObservableObject {
       }
     }
   }
+  
+  public static func set(theme: Theme) {
+    Theme.current = theme
+  }
 }
 
 public struct InAppChatError: Error {
