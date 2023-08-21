@@ -30,6 +30,68 @@ InAppChat.setup(apiKey: apiKey)
 
 Note, you can optionally delay load and later call `InAppChat.shared.load` to load IAC in whatever load sequence you please
 
+### Log your user in
+
+Before displaying the UI, you must log your user in to InAppChat via one of the designatied login methods. The methods return a boolean indicating if the user is logged in or not.
+
+```swift
+@IBAction func loginToInAppChat() {
+  self.loading = true
+  Task.detached {
+    do {
+      let loggedIn = try await InAppChat.shared.login(
+            accessToken: nil,
+            userId: id,
+            username: nickname,
+            picture: picture,
+            displayName: name
+          )
+      if loggedIn {
+        displayInAppChat()
+      }
+    } catch let err {
+      print("error logging in \(err)")
+    }
+  }
+}
+```
+
+InAppChat as well as all other state objects in the SDK extend `ObservableObject`. InAppChat maintains an `@Published` isUserLoggedIn that you can use in your SwiftUI apps as well. You can also listen to the `Chats` object which holds state for the entire InAppChat interface.
+
+Listen to InAppChat using combine in your view controllers:
+
+```swift
+InAppChat.shared.objectWillChange
+  .makeConnectable()
+  .autoconnect()
+  .sink(receiveValue: {[weak self] _ in
+    DispatchQueue.main.async {
+      // update my chat UI
+    }
+  }).store(in: bag)
+```
+
+Use `@ObservedObject` in your SwiftUI
+
+```swift
+public struct MyView: View {
+  @ObservedObject var inappchat = InAppChat.shared
+
+  public var body: some View {
+    ZStack {
+      if inappchat.isUserLoggedIn {
+        // Render InAppChat UI
+        InAppChatView {
+          // handle logout
+        }
+      } else {
+        MyLoginView()
+      }
+    }
+  }
+}
+```
+
 ### Display the UI
 
 #### UIKit

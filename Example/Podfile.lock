@@ -1,25 +1,23 @@
 PODS:
   - ActivityIndicatorView (1.1.1)
   - AnyCodable-FlightSchool (0.6.7)
-  - Apollo (1.3.3):
-    - Apollo/Core (= 1.3.3)
-  - Apollo/Core (1.3.3)
-  - Apollo/WebSocket (1.3.3):
+  - Apollo (1.4.0):
+    - Apollo/Core (= 1.4.0)
+  - Apollo/Core (1.4.0)
+  - Apollo/WebSocket (1.4.0):
     - Apollo/Core
   - Auth0 (2.5.0):
     - JWTDecode (~> 3.1)
     - SimpleKeychain (~> 1.1)
-  - BadgeHub (1.0.0)
   - DynamicColor (5.0.1)
   - Gifu (3.3.1)
   - Giphy (2.2.6):
     - libwebp
-  - InAppChat (1.0.14):
+  - InAppChat (1.0.17):
     - ActivityIndicatorView
     - AnyCodable-FlightSchool
     - Apollo
     - Apollo/WebSocket
-    - BadgeHub
     - DynamicColor
     - Gifu
     - Giphy
@@ -46,12 +44,12 @@ PODS:
   - SDWebImage/Core (5.17.0)
   - SDWebImageSwiftUI (2.2.3):
     - SDWebImage (~> 5.10)
-  - Sentry (8.9.4):
-    - Sentry/Core (= 8.9.4)
-    - SentryPrivate (= 8.9.4)
-  - Sentry/Core (8.9.4):
-    - SentryPrivate (= 8.9.4)
-  - SentryPrivate (8.9.4)
+  - Sentry (8.10.0):
+    - Sentry/Core (= 8.10.0)
+    - SentryPrivate (= 8.10.0)
+  - Sentry/Core (8.10.0):
+    - SentryPrivate (= 8.10.0)
+  - SentryPrivate (8.10.0)
   - SimpleKeychain (1.1.0)
   - SnapKit (5.6.0)
   - SwiftDate (7.0.0)
@@ -68,7 +66,6 @@ SPEC REPOS:
     - AnyCodable-FlightSchool
     - Apollo
     - Auth0
-    - BadgeHub
     - DynamicColor
     - Gifu
     - Giphy
@@ -90,19 +87,18 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   ActivityIndicatorView: f14ac8e200a344fe992577807998b0c8562bd964
   AnyCodable-FlightSchool: 261cbe76757802b17d471b9059b21e6fa5edf57b
-  Apollo: ccc6fac4c9d8fcc93f6fb917f58f7b62b7101d56
+  Apollo: d4d06fd38de80fd10c21389f9084fd64e4f712c7
   Auth0: 72f19ad566fdf57f07bf37f828afd0c1570769a5
-  BadgeHub: b227771329f78c37a2dae7502607ec6d00a50bd4
   DynamicColor: d049834ef86d8ecf150b0ca1ebe54ee733a0ec22
   Gifu: 416d4e38c4c2fed012f019e0a1d3ffcb58e5b842
   Giphy: f64bff5937fbc4987b6a26c8ef625501c68a1e97
-  InAppChat: 938beb81ec755f342d0b95c246ca72ba89fc016f
+  InAppChat: a545239b075c937b43d6c14113695d2340b8fa1c
   JWTDecode: 3eaab1e06b6f4dcbdd6716aff09ba4c2104ca8b7
   libwebp: 33dc822fbbf4503668d09f7885bbfedc76c45e96
   SDWebImage: 750adf017a315a280c60fde706ab1e552a3ae4e9
   SDWebImageSwiftUI: 17396b7889f9abc27231caaeb64c537564284aab
-  Sentry: 56c76eed917f7dffd46db50906afbf5c9aa2673a
-  SentryPrivate: f3be34b5deb9fe676fdfb1f1ad5cdb1b740c5688
+  Sentry: 71cd4427146ac56eab6e70401ac7a24384c3d3b5
+  SentryPrivate: 9334613897c85a9e30f2c9d7a331af8aaa4fe71f
   SimpleKeychain: f8707c8e97b38c6a6e687b17732afc9bcef06439
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
   SwiftDate: bbc26e26fc8c0c33fbee8c140c5e8a68293a148a

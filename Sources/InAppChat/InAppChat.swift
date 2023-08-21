@@ -64,8 +64,8 @@ public class InAppChat: ObservableObject {
   public func login(
     accessToken: String?, userId: String, username: String, picture: String?,
     displayName: String?
-  ) async throws {
-    if loggingIn { return }
+  ) async throws -> Bool {
+    if loggingIn { return false }
     await MainActor.run {
       loggingIn = true
     }
@@ -78,6 +78,7 @@ public class InAppChat: ObservableObject {
     await MainActor.run {
       loggingIn = false
     }
+    return isUserLoggedIn
   }
 
   public func nftLogin(
@@ -86,9 +87,11 @@ public class InAppChat: ObservableObject {
     signature: String,
     profilePicture: String,
     username: String
-  ) async throws {
-    if loggingIn { return }
-    loggingIn = true
+  ) async throws -> Bool {
+    if loggingIn { return false }
+    await MainActor.run {
+      loggingIn = true
+    }
     let _ = try await api.nftLogin(
       wallet: address,
       tokenID: tokenID,
@@ -96,6 +99,10 @@ public class InAppChat: ObservableObject {
       profilePicture: profilePicture,
       username: username
     )
+    await MainActor.run {
+      loggingIn = false
+    }
+    return isUserLoggedIn
   }
 
   public static func load() async throws {

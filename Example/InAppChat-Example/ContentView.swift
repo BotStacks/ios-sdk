@@ -17,18 +17,31 @@ enum Routes: Equatable {
 
 struct ContentView: View {
   
-  public init() {}
-
+  
+  
   var body: some View {
     InAppChatUI {
-      IACMainRoutes(initialPath: "/splash") {
+      Router(initialPath: "/splash") {
         Route("splash") {
           Splash()
         }
         Route("login") {
           Login()
         }
+        Route("chats") {
+          ChatView()
+        }
       }
+    }
+  }
+}
+
+struct ChatView: View {
+  @EnvironmentObject var navigator: Navigator
+  
+  var body: some View {
+    InAppChatView {
+      navigator.navigate("login")
     }
   }
 }
