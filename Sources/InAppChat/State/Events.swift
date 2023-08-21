@@ -64,6 +64,7 @@ extension Chats {
         let message = Message.get(.init(_dataDict: raw.__data))
         if !isUpdate, !chat.items.contains(where: {$0.id == message.id}) {
           chat.items.insert(message, at: 0)
+          chat.sending.removeAll(where: {$0.id == message.id})
         }
         if !isUpdate && (chat.latestMessage == nil || chat.latestMessage!.createdAt < message.createdAt) {
           chat.latestMessage = message

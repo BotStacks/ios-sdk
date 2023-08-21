@@ -25,7 +25,10 @@ extension Message {
     self.reactions = self.reactions ?? []
     let og = self.reactions ?? []
     let ogCurrent = self.currentReaction
-    let _ = react_impl(uid: User.current!.id, reaction: reaction, reactions: &reactions!)
+    let action = react_impl(uid: User.current!.id, reaction: reaction, reactions: &reactions!)
+    if action != .delete {
+      Chats.current.onReaction(reaction)
+    }
     Task.detached {
       do {
         _ = try await api.react(to: self.id, reaction: reaction)

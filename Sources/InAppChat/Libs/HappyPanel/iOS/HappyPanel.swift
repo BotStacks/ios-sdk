@@ -8,6 +8,18 @@
 
 import SwiftUI
 
+enum HPConstants {
+  static let screenHeight = UIScreen.main.bounds.size.height
+  static let maxHeight: CGFloat = screenHeight - 24
+  static let midHeight: CGFloat = UIScreen.main.bounds.size.height / 2
+  static let minHeight: CGFloat = 0
+  
+  static let halfOffset: CGFloat = maxHeight - midHeight
+  static let fullOffset: CGFloat = 24
+  static let hiddenOffset: CGFloat = screenHeight
+}
+
+
 struct HappyPanel: View {
 
   @Binding var isOpen: Bool
@@ -18,22 +30,22 @@ struct HappyPanel: View {
     self.onEmoji = onEmoji
   }
 
-  @State var calculatedOffsetY: CGFloat = Constants.halfOffset
-  @State var lastOffsetY: CGFloat = Constants.halfOffset
+  @State var calculatedOffsetY: CGFloat = HPConstants.halfOffset
+  @State var lastOffsetY: CGFloat = HPConstants.halfOffset
   @State var isDraggingDown: Bool = false
 
   @ObservedObject var sharedState = SharedState()
 
   var offsetY: CGFloat {
-    guard isOpen else { return Constants.hiddenOffset }
+    guard isOpen else { return HPConstants.hiddenOffset }
     let shouldToggleFromHalfState =
       sharedState.currentCategory != SharedState.defaultCategory
-      && lastOffsetY == Constants.halfOffset
+      && lastOffsetY == HPConstants.halfOffset
 
     if sharedState.isSearching || shouldToggleFromHalfState {
       DispatchQueue.main.async {
-        self.calculatedOffsetY = Constants.fullOffset
-        self.lastOffsetY = Constants.fullOffset
+        self.calculatedOffsetY = HPConstants.fullOffset
+        self.lastOffsetY = HPConstants.fullOffset
       }
 
       return lastOffsetY
@@ -98,19 +110,19 @@ struct HappyPanel: View {
       .onChanged { gesture in
         
         isDraggingDown = gesture.translation.height > 0
-        calculatedOffsetY = max(gesture.translation.height + lastOffsetY, Constants.fullOffset)
+        calculatedOffsetY = max(gesture.translation.height + lastOffsetY, HPConstants.fullOffset)
       }
       .onEnded { gesture in
-        calculatedOffsetY = max(gesture.translation.height + lastOffsetY, Constants.fullOffset)
+        calculatedOffsetY = max(gesture.translation.height + lastOffsetY, HPConstants.fullOffset)
 
         // magnet
         if isDraggingDown,
-          calculatedOffsetY >= Constants.halfOffset
+          calculatedOffsetY >= HPConstants.halfOffset
         {
-          calculatedOffsetY = Constants.hiddenOffset
+          calculatedOffsetY = HPConstants.hiddenOffset
           resetViews()
         } else {
-          calculatedOffsetY = Constants.fullOffset
+          calculatedOffsetY = HPConstants.fullOffset
         }
 
         lastOffsetY = calculatedOffsetY
@@ -119,7 +131,7 @@ struct HappyPanel: View {
   }
 
   private func resetViews() {
-    calculatedOffsetY = Constants.halfOffset
+    calculatedOffsetY = HPConstants.halfOffset
     lastOffsetY = calculatedOffsetY
     isOpen = false
     sharedState.resetState()

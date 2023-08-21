@@ -14,7 +14,6 @@ import Photos
 import PhotosUI
 import ContactsUI
 import GiphyUISDK
-import ISEmojiView
 
 public class UIChatRoom: UIViewController, UITextViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, PHPickerViewControllerDelegate, CNContactPickerDelegate, UIDocumentPickerDelegate, GiphyDelegate, EmojiViewDelegate  {
   
@@ -341,20 +340,19 @@ public class UIChatRoom: UIViewController, UITextViewDelegate, UIImagePickerCont
     btnSend.isHidden = true
   }
   
-  var emojiMessage: Message? = nil
   func emojiKeyboard() {
     let keyboardSettings = KeyboardSettings(bottomType: .categories)
     keyboardSettings.needToShowDeleteButton = false
     keyboardSettings.needToShowAbcButton = false
     let emojiView = EmojiView(keyboardSettings: keyboardSettings)
-//    emojiView.translatesAutoresizingMaskIntoConstraints = false
+    emojiView.translatesAutoresizingMaskIntoConstraints = false
     emojiView.delegate = self
     input.inputView = emojiView
     input.becomeFirstResponder()
   }
   
   public func emojiViewDidSelectEmoji(_ emoji: String, emojiView: EmojiView) {
-    emojiMessage?.react(emoji)
+    messageForAction?.react(emoji)
     input.resignFirstResponder()
     messageForAction = nil
   }
