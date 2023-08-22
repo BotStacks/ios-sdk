@@ -52,14 +52,6 @@ public class InAppChatStore: ObservableObject {
   
   private func loadMe() async throws {
     let (user, memberships) = try await api.start()
-    print("loaded current user")
-    await MainActor.run {
-      self.user = user
-      User.current = user
-      self.memberships.append(contentsOf: memberships)
-      InAppChat.shared.isUserLoggedIn = true
-      api.subscribe()
-    }
   }
   
   public var nft: Gql.GetNFTConfigQuery.Data.App.Nft?
@@ -67,7 +59,7 @@ public class InAppChatStore: ObservableObject {
   public func loadAsync() async throws {
     async let nft = loadNft()
     async let session = loadSession()
-    let res = await [try nft, try session]
+    _ = await [try nft, try session]
   }
   
   private func loadNft() async throws -> Bool {
@@ -120,14 +112,6 @@ public class InAppChatStore: ObservableObject {
       
     } catch let err {
       Monitoring.error(err)
-    }
-  }
-  
-  func startSession(user: User) {
-    self.user = user
-    Task.detached {
-      try await self.loadMe()
-      try await self.loadGroupInvites()
     }
   }
 

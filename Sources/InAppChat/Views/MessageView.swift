@@ -44,7 +44,7 @@ public class UIMessageRow: UITableViewCell {
       if at.type == .image || at.type == .file {
         return "image"
       } else if at.type == .video || at.type == .audio {
-        return "audio"
+        return "video"
       }
     }
     return "markdown"

@@ -57,41 +57,13 @@ class Api: InterceptorProvider, ApolloInterceptor {
   {
     didSet {
       UserDefaults.standard.set(authToken, forKey: "iac-auth-token")
-      self.client = makeClient()
+      socket?.updateConnectingPayload(connectingPayload)
     }
-  }
-
-  var websocketUrl: String {
-    let server = chatServer()
-    let ext = server.ssl ? "wss" : "ws"
-    return "\(ext)://\(server.host)/graphql"
-  }
-
-  var apiUrl: String {
-    let server = chatServer()
-    let ext = server.ssl ? "https" : "http"
-    return "\(ext)://\(server.host)/graphql"
-  }
-
-  var websocketTransport: WebSocketTransport? {
-    guard let authToken = authToken else {
-      return nil
-    }
-    let url = URL(string: websocketUrl)!
-    let webSocketClient = WebSocket(url: url, protocol: .graphql_transport_ws)
-    let authPayload = ["authToken": authToken, "apiKey": InAppChat.shared.apiKey]
-    let config = WebSocketTransport.Configuration(
-      clientName: "inappchat-ios",
-      clientVersion: "1.0.0",
-      reconnect: true,
-      reconnectionInterval: 60,
-      allowSendingDuplicates: true,
-      connectOnInit: true,
-      connectingPayload: authPayload
-    )
-    return WebSocketTransport(websocket: webSocketClient, config: config)
   }
   
+  var connectingPayload: [String: String] {
+    return authToken != nil ? ["authToken": authToken!, "apiKey": InAppChat.shared.apiKey] : ["apiKey": InAppChat.shared.apiKey]
+  }
   var subscriptions = Array<Cancellable>()
 
   func subscribe() {
@@ -112,20 +84,6 @@ class Api: InterceptorProvider, ApolloInterceptor {
       sub.cancel()
     }
     subscriptions.removeAll()
-  }
-
-  func makeClient() -> ApolloClient {
-    unsubscribe()
-    let apiTransport = RequestChainNetworkTransport(
-      interceptorProvider: self, endpointURL: URL(string: self.apiUrl)!)
-    
-    var networkTransport: NetworkTransport = apiTransport
-    if let socket = websocketTransport {
-      networkTransport = SplitNetworkTransport(
-        uploadingNetworkTransport: apiTransport, webSocketNetworkTransport: socket)
-    }
-    self.client = ApolloClient(networkTransport: networkTransport, store: store)
-    return self.client!
   }
 
   func interceptAsync<Operation>(
@@ -158,6 +116,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
 
   
 //  private var cancelBag: Set<AnyCancellable> = []
+  var socket: WebSocketTransport? = nil
 
   init(store: ApolloStore) {
     self.store = store
@@ -167,16 +126,43 @@ class Api: InterceptorProvider, ApolloInterceptor {
       self.deviceId = UUID().uuidString
       UserDefaults.standard.set(deviceId, forKey: "iac-device-id")
     }
-    self.client = makeClient()
-//    NotificationCenter.Publisher(center: .default, name: UIApplication.willEnterForegroundNotification)
-//      .sink { [weak self] _ in
-//        self?.subscribe()
-//      }.store(in: &cancelBag)
-//    NotificationCenter.Publisher(center: .default, name: UIApplication.willEnterForegroundNotification)
-//      .sink { [weak self] _ in
-//        self?.subscribe()
-//      }.store(in: &cancelBag)
+    let websocketUrl: String = {
+      let server = chatServer()
+      let ext = server.ssl ? "wss" : "ws"
+      return "\(ext)://\(server.host)/graphql"
+    }()
+    
+    let apiUrl: String = {
+      let server = chatServer()
+      let ext = server.ssl ? "https" : "http"
+      return "\(ext)://\(server.host)/graphql"
+    }()
+    let apiTransport = RequestChainNetworkTransport(
+      interceptorProvider: self, endpointURL: URL(string: apiUrl)!)
+    let url = URL(string: websocketUrl)!
+    let webSocketClient = WebSocket(url: url, protocol: .graphql_transport_ws)
+    let config = WebSocketTransport.Configuration(
+      clientName: "inappchat-ios",
+      clientVersion: "1.0.0",
+      reconnect: true,
+      reconnectionInterval: 60,
+      allowSendingDuplicates: true,
+      connectOnInit: true,
+      connectingPayload: connectingPayload
+    )
+    let websocketTransport = WebSocketTransport(websocket: webSocketClient, config: config)
+    self.socket = websocketTransport
+    self.client = ApolloClient(
+      networkTransport:
+        SplitNetworkTransport(
+          uploadingNetworkTransport: apiTransport,
+          webSocketNetworkTransport: websocketTransport
+        ),
+      store: store
+    )
   }
+  
+  
   
   func getGroups(skip: Int = 0, limit: Int = 20) async throws -> [Chat] {
     let res = try await client.fetchAsync(query: Gql.ListGroupsQuery(count: .some(limit), offset: .some(skip)))
@@ -546,9 +532,8 @@ class Api: InterceptorProvider, ApolloInterceptor {
   }
 
   func registerPushToken(_ token: String) async throws -> Bool {
-//    let res = try await client.performAsync(mutation: Gql.RegisterPushMutation(token: token, kind: .case(Gql.DeviceType.ios), fcm: .some(false)))
-//    return res.registerPush
-    return true
+    let res = try await client.performAsync(mutation: Gql.RegisterPushMutation(token: token, kind: .case(Gql.DeviceType.ios), fcm: .some(false)))
+    return res.registerPush
   }
 
   func registerFCMToken(_ token: String) async throws {
@@ -561,13 +546,17 @@ class Api: InterceptorProvider, ApolloInterceptor {
     return await MainActor.run {
       let user = User.get(.init(_dataDict:res.me.__data))
       User.current = user
-      InAppChatStore.current.user = user
-      InAppChatStore.current.settings.blocked.append(contentsOf: res.me.blocks ?? [])
+      let store = InAppChatStore.current
+      store.user = user
+      store.settings.blocked.append(contentsOf: res.me.blocks ?? [])
       let mraw = res.memberships
       let memberships = mraw.map { it in
         let _ = Chat.get(Gql.FChat(_dataDict: it.chat.__data))
         return Member.fromGql(Gql.FMember(_dataDict: it.__data))
       }
+      store.memberships.removeAll()
+      store.memberships.append(contentsOf: memberships)
+      InAppChat.shared.isUserLoggedIn = true
       return (user, memberships)
     }
   }

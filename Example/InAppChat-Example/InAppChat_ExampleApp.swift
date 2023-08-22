@@ -19,6 +19,7 @@ struct InAppChat_ExampleApp: App {
   init() {
     Giphy.configure(apiKey: "y29MF80OOqL4I0YQafUDAlcLiRjea4yI")
     InAppChat.setup(apiKey: "rp1pptcmrxceuwj31oj8uwlo")
+    InAppChat.shared.hideBackButton = true
   }
 
   var body: some Scene {

@@ -39,9 +39,9 @@ struct ContentView: View {
 struct ChatView: View {
   @EnvironmentObject var navigator: Navigator
   
-  var body: some View {
+  var body: some View  {
     InAppChatView {
-      navigator.navigate("login")
+      navigator.navigate("/login")
     }
   }
 }

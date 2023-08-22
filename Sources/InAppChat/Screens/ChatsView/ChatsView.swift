@@ -64,6 +64,10 @@ public class ChatsController: UIViewController, UITableViewDelegate, UITableView
     updateUI()
   }
   
+  override public func viewDidAppear(_ animated: Bool) {
+    updateUI()
+  }
+  
   var dmsUnreadCount: Int {
     return InAppChatStore.current.dms.reduce(0, {$1.unreadCount + $0})
   }
