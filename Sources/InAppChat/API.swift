@@ -218,7 +218,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
   {
     return try await send(input: Gql.SendMessageInput(
       chat: chat,
-      id: id,
+      id: .some(id),
       parent: parent.gqlSomeOrNone,
       text: .some(text)
     ))
@@ -243,7 +243,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
   func send(id: String, attachment: Gql.AttachmentInput, to chat: String, inReplyTo parent: String?)
     async throws -> Message
   {
-    return try await self.send(input: Gql.SendMessageInput(attachments: [attachment], chat: chat, id: id))
+    return try await self.send(input: Gql.SendMessageInput(attachments: [attachment], chat: chat, id: .some(id)))
   }
   
   func updateGroup(input: Gql.UpdateGroupInput) async throws -> Bool {
@@ -407,6 +407,24 @@ class Api: InterceptorProvider, ApolloInterceptor {
       throw APIError(msg: "Failed to login. No result.", critical: true)
     }
   }
+  
+  func basicLogin(email: String, password: String) async throws -> User {
+    let res = try await self.client.performAsync(
+      mutation: Gql.BasicLoginMutation(
+        email: email,
+        password: password
+      ),
+      publishResultToStore: false
+    )
+    if let login = res.basicLogin {
+      let user = User.get(.init(_dataDict: login.user.__data))
+      onLogin(login.token, user: user)
+      try await InAppChatStore.current.loadAsync()
+      return user
+    } else {
+      throw APIError(msg: "Failed to login. No result.", critical: true)
+    }
+  }
 
   public func nftLogin(
     wallet: String,
@@ -424,7 +442,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
       )
     if let login = res.ethLogin {
       let user = User.get(.init(_dataDict: login.user.__data))
-      try await onLogin(login.token, user: user)
+      onLogin(login.token, user: user)
       try await InAppChatStore.current.loadAsync()
       return user
     } else {
@@ -536,6 +554,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
   func registerFCMToken(_ token: String) async throws {
     let _ = try await client.performAsync(mutation: Gql.RegisterPushMutation(token: token, kind: .case(Gql.DeviceType.ios), fcm: .some(true)))
   }
+  
 
   func start() async throws -> (User, [Member]) {
     let res = try await client.fetchAsync(query: Gql.GetMeQuery())

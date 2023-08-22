@@ -79,6 +79,25 @@ public class InAppChat: ObservableObject {
     }
     return isUserLoggedIn
   }
+  
+  public func basicLogin(
+    email: String, password: String
+  ) async throws -> Bool {
+    if loggingIn { return false }
+    await MainActor.run {
+      loggingIn = true
+    }
+    do {
+      let _ = try await api.basicLogin(email: email, password: password)
+    } catch let err {
+      print("Error logging in ", err)
+      Monitoring.error(err)
+    }
+    await MainActor.run {
+      loggingIn = false
+    }
+    return isUserLoggedIn
+  }
 
   public func nftLogin(
     address: String,

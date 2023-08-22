@@ -15,7 +15,7 @@ public extension Gql {
     public init(
       attachments: GraphQLNullable<[AttachmentInput]> = nil,
       chat: ID,
-      id: ID,
+      id: GraphQLNullable<ID> = nil,
       parent: GraphQLNullable<ID> = nil,
       text: GraphQLNullable<String> = nil
     ) {
@@ -41,7 +41,7 @@ public extension Gql {
     }
 
     /// The client generated ID for the message
-    public var id: ID {
+    public var id: GraphQLNullable<ID> {
       get { __data["id"] }
       set { __data["id"] = newValue }
     }

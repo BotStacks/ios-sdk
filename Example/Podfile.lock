@@ -13,7 +13,7 @@ PODS:
   - Gifu (3.3.1)
   - Giphy (2.2.6):
     - libwebp
-  - InAppChat (1.0.17):
+  - InAppChat (1.0.19):
     - ActivityIndicatorView
     - AnyCodable-FlightSchool
     - Apollo
@@ -92,7 +92,7 @@ SPEC CHECKSUMS:
   DynamicColor: d049834ef86d8ecf150b0ca1ebe54ee733a0ec22
   Gifu: 416d4e38c4c2fed012f019e0a1d3ffcb58e5b842
   Giphy: f64bff5937fbc4987b6a26c8ef625501c68a1e97
-  InAppChat: a545239b075c937b43d6c14113695d2340b8fa1c
+  InAppChat: b084f4b8fd728b2faed0ed831df9b8868a4a6e93
   JWTDecode: 3eaab1e06b6f4dcbdd6716aff09ba4c2104ca8b7
   libwebp: 33dc822fbbf4503668d09f7885bbfedc76c45e96
   SDWebImage: 750adf017a315a280c60fde706ab1e552a3ae4e9
