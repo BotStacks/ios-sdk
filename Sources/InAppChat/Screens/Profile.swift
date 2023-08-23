@@ -2,8 +2,9 @@ import Foundation
 import SwiftUI
 import Combine
 import SDWebImage
+import PhotosUI
 
-public class UIProfile: UIMyProfile {
+public class UIProfile: UIMyProfile, PHPickerViewControllerDelegate, UITextFieldDelegate {
   
   @IBOutlet var headerImage: SDAnimatedImageView!
   @IBOutlet var blockTitle: UILabel!
@@ -62,6 +63,114 @@ public class UIProfile: UIMyProfile {
     if segue.identifier == "chat" {
       let room = segue.destination as? UIChatRoom
       room?.user = user
+    }
+  }
+  @IBOutlet var imageLoader: UIActivityIndicatorView!
+  @IBAction func tapProfile() {
+    if getUser().isCurrent {
+      var config = PHPickerConfiguration(photoLibrary: .shared())
+      config.filter = .images
+      config.preferredAssetRepresentationMode = .current
+      let picker = PHPickerViewController(configuration: config)
+      picker.delegate = self
+      self.present(picker, animated: true)
+    }
+  }
+  
+  @IBAction func tapUsername() {
+    if getUser().isCurrent {
+      let alert = UIAlertController(title: "Change Nickname", message: "Input a new nickname if you'd like to change it", preferredStyle: .alert)
+      alert.addTextField { field in
+        field.delegate = self
+      }
+      let cancel = UIAlertAction(title: "Cancel", style: .cancel)
+      alert.addAction(cancel)
+      let submitAction = UIAlertAction(title: "Submit", style: .default) { [unowned alert] _ in
+        let answer = alert.textFields![0]
+        if let text = answer.text, text.count >= 5 {
+          let original = User.current?.displayName
+          User.current?.displayName = text
+          Task.detached {
+            do {
+              let res = try await api.updateProfile(input: .init(display_name: .some(text)))
+              await MainActor.run {
+                self.view.makeToast("Nickname updated")
+              }
+            } catch let err {
+              Monitoring.error(err)
+              await MainActor.run {
+                User.current?.displayName = original
+                self.view.makeToast("Failed to update nickname. Please try again")
+              }
+            }
+          }
+        } else {
+          self.view.makeToast("Nickname must 5 or more characters")
+        }
+        
+      }
+      
+      alert.addAction(submitAction)
+      
+      present(alert, animated: true)
+    }
+  }
+  
+  
+  
+  public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+    if CharacterSet.alphanumerics.isSuperset(of: CharacterSet(charactersIn: string)) || string == "_" {
+      return true
+    }
+    return false
+  }
+  
+  public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+    self.dismiss(animated: true)
+    imageLoader.startAnimating()
+    imageLoader.isHidden = false
+    imageLoader.color = c().primary.ui
+    let identifier = [UTType.image.identifier]
+    print("picker did finsih picking", results)
+    if let result = results.first,
+       let match = identifier.first(where: {
+         result.itemProvider.hasItemConformingToTypeIdentifier($0)
+       })
+    {
+      print("Getting file for ", match)
+      let progress = result.itemProvider.loadFileRepresentation(forTypeIdentifier: match) {
+        url, err in
+        if let err = err {
+          print("Error Loading File", err)
+        } else if let url = url {
+          do {
+            let tmp = try tmpFile()
+            print("Copy from url", url.absoluteString, "to", tmp.absoluteString)
+            try FileManager.default.copyItem(
+              at: url, to: tmp)
+            Task.detached {
+              do {
+                let url = try await api.uploadFile(file: .init(url: tmp))
+                let res = try await api.updateProfile(input: .init(image: .some(url)))
+                await MainActor.run {
+                  User.current?.avatar = url
+                  self.imageLoader.stopAnimating()
+                  self.view.makeToast("Profile picture updated")
+                }
+              } catch let err {
+                Monitoring.error(err)
+                DispatchQueue.main.async {
+                  self.view.makeToast("Image upload failed. Please try again.")
+                }
+              }
+            }
+          } catch let err {
+            print("Failed to copy file", err)
+          }
+        }
+      }
+    } else {
+      print("No picker results")
     }
   }
 }

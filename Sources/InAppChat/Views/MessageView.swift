@@ -154,9 +154,29 @@ public class UIMessageRow: UITableViewCell {
       }
     }
     markdown?.attributedText = md.isEmpty ? .init(string: "") :  .init((try? AttributedString(markdown: md)) ?? AttributedString(""))
+    if message.sending {
+      if spinner == nil {
+        let spinner = UIActivityIndicatorView.init(style: .large)
+        spinner.color = c().primary.ui
+        spinner.hidesWhenStopped = true
+        self.spinner = spinner
+        content.superview?.addSubview(spinner)
+        spinner.snp.makeConstraints { make in
+          make.centerY.equalTo(content.snp.centerY)
+          make.left.equalTo(content.snp.right).offset(12.0)
+        }
+      }
+      spinner?.isHidden = false
+      spinner?.startAnimating()
+    } else {
+      spinner?.stopAnimating()
+      spinner?.isHidden = true
+    }
     self.setNeedsLayout()
     self.layoutIfNeeded()
   }
+  
+  var spinner: UIActivityIndicatorView?
   
   @IBAction func tapReplies() {
     onTapReplies(message)

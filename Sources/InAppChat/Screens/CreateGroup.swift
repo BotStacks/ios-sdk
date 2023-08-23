@@ -78,6 +78,10 @@ public class UICreateChat: UIBaseController, UITextFieldDelegate, UITextViewDele
   @IBOutlet var imageIndicator: UIActivityIndicatorView!
   @IBOutlet var nextIndicator: UIActivityIndicatorView!
   @IBOutlet var btnSave: UIButton!
+  @IBOutlet var scrollview: UIScrollView!
+  @IBOutlet var content: UIView!
+  @IBOutlet var scrollviewBottom: NSLayoutConstraint!
+  @IBOutlet var contentHeight: NSLayoutConstraint!
   
   var chat: Chat? {
     didSet {
@@ -92,7 +96,6 @@ public class UICreateChat: UIBaseController, UITextFieldDelegate, UITextViewDele
     let t = Theme.current
     let c = t.colors
     let f = t.fonts
-    
     addImage.tintColor = c.softBackground.ui
     lblChannel.textColor = c.text.ui
     lblChannel.font = f.headline
@@ -109,7 +112,6 @@ public class UICreateChat: UIBaseController, UITextFieldDelegate, UITextViewDele
     contDesc.layer.borderColor = c.border.cgColor
     lblDescPlaceholder.font = f.headline
     lblDescPlaceholder.textColor = c.caption.ui
-    lblDescPlaceholder.isHidden = true
     txtDesc.font = f.headline
     txtDesc.textColor = c.text.ui
     lblPrivacy.font = f.headline
@@ -130,6 +132,15 @@ public class UICreateChat: UIBaseController, UITextFieldDelegate, UITextViewDele
     lblChannelError.isHidden = true
     btnSave.setAttributedTitle(.init(string: "Save", attributes: [.font: f.headline]), for: .normal)
     bindUI()
+    let notificationCenter = NotificationCenter.default
+    notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillHideNotification, object: nil)
+    notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+  }
+  
+  
+  
+  override public func viewWillAppear(_ animated: Bool) {
+    contentHeight.constant = 0 - self.view.safeAreaInsets.bottom - view.safeAreaInsets.top - 44
   }
   
   var img: URL? {
@@ -164,20 +175,48 @@ public class UICreateChat: UIBaseController, UITextFieldDelegate, UITextViewDele
     }
   }
   
+  @objc func adjustForKeyboard(notification: Notification) {
+    guard let userInfo = notification.userInfo,
+          let animationDurationNumber = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? NSNumber,
+          let animationCurveNumber = userInfo[UIResponder.keyboardAnimationCurveUserInfoKey] as? NSNumber,
+          let keyboardFrameBeginValue = userInfo[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue,
+          let keyboardFrameEndValue = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue
+    else {
+      print("Skip keyboard adjust")
+      return
+    }
+    // Get notification values.
+    let keyboardFrameBegin = keyboardFrameBeginValue.cgRectValue
+    let keyboardFrameEnd = keyboardFrameEndValue.cgRectValue
+    let animationCurveOptions = UIView.AnimationOptions(rawValue: animationCurveNumber.uintValue << 16)
+    let animationDuration = animationDurationNumber.doubleValue
+    scrollviewBottom.constant = notification.name == UIResponder.keyboardWillShowNotification ? keyboardFrameEnd.height : 0
+    UIView.animate(
+      withDuration: animationDuration,
+      delay: 0,
+      options: animationCurveOptions,
+      animations: { [unowned self] in
+        scrollview.layoutIfNeeded()
+      }
+    )
+  }
+  
   func bindUI() {
     if let chat = chat {
       img = chat.displayImage?.url
       _private = chat._private
       txtChannel.text = chat.displayName
-      updateChannel()
+      
       txtDesc.text = chat.description
       btnSave.isHidden = false
       btnNext.isHidden = true
-      updateDesc()
+      
     } else {
       btnSave.isHidden = true
       btnNext.isHidden = false
     }
+    updateChannel()
+    updateDesc()
   }
   
   func updateChannel() {
@@ -222,16 +261,51 @@ public class UICreateChat: UIBaseController, UITextFieldDelegate, UITextViewDele
     } else {
       lblDescCount.textColor = c().caption.ui
     }
-    if d.isEmpty {
+    print("Text Description \(d.count) '\(d)'")
+    if d.isEmpty && !txtDesc.isFirstResponder {
       lblDescPlaceholder.isHidden = false
     } else {
       lblDescPlaceholder.isHidden = true
     }
   }
   
+  public func textViewDidBeginEditing(_ textView: UITextView) {
+    lblDescPlaceholder.isHidden = true
+  }
+  
+  public func textViewDidEndEditing(_ textView: UITextView) {
+    updateDesc()
+  }
+  
   public func textViewDidChange(_ textView: UITextView) {
     self.updateDesc()
   }
+  
+  var isShift = false
+  public override func pressesBegan(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
+    guard let key = presses.first?.key else { return }
+    switch key.keyCode {
+    case .keyboardReturn:
+      if key.modifierFlags == .shift {
+        isShift = true
+      } else {
+        isShift = false
+      }
+      super.pressesBegan(presses, with: event)
+      break
+    default:
+      super.pressesBegan(presses, with: event)
+    }
+  }
+  
+  public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+    if text == "\n" && !isShift {
+      textView.resignFirstResponder()
+      return false
+    }
+    return true
+  }
+  
   
   @IBAction func tapPublic() {
     _private = false

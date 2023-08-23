@@ -18,6 +18,9 @@ public final class Message: ObservableObject, Identifiable {
   public let parentID: String?
   @Published public var parent: Message?
   public let chatID: String
+  public var sending: Bool {
+    return chat.sending.contains(where: {$0.id == self.id})
+  }
 
   public var text: String? {
     didSet {
@@ -118,13 +121,6 @@ public final class Message: ObservableObject, Identifiable {
       }
     }
   }
-  
-  func fillChat() {
-    if chat == nil {
-      print("Message Fill Chat")
-      Chat.fetch(id: chatID)
-    }
-  }
 
   var user: User {
     return User.get(userID)!
@@ -220,3 +216,4 @@ extension Gql.FMessage.Attachment {
     return nil
   }
 }
+

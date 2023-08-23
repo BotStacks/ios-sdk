@@ -105,7 +105,7 @@ public class UIInviteUsers: UIBaseController, UITableViewDelegate, UITableViewDa
       }
       self.navigationController?.popViewController(animated: true)
       if let vcs = self.navigationController?.viewControllers {
-        let prev = vcs[vcs.count - 2]
+        let prev = vcs[vcs.count - 1]
         prev.view.makeToast(!selected.isEmpty ? "Invites sent" : "No invites sent")
       }
     } else if !creating, let state = create {

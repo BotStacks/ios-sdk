@@ -7,7 +7,8 @@
 
 import Foundation
 
-public func ==(lhs: Message, rhs: Message) -> Bool {
-  return lhs.id == rhs.id
+extension Message : Equatable {
+  public static func ==(lhs: Message, rhs: Message) -> Bool {
+    return lhs.id == rhs.id
+  }
 }
-extension Message : Equatable { }

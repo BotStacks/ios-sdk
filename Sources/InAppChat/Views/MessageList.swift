@@ -117,6 +117,15 @@ public class UIMessageList: UIViewController, UITableViewDelegate, UITableViewDa
     super.viewDidLoad()
     if chat != nil {
       tableView.transform = CGAffineTransform(rotationAngle: -CGFloat.pi);
+    } else {
+      InAppChatStore.current.favorites.objectWillChange.makeConnectable()
+        .autoconnect()
+        .throttle(for: 0.1, scheduler: RunLoop.main, latest: true)
+        .sink(receiveValue: { [weak self] _ in
+          DispatchQueue.main.async {
+            self?.messages = self?.pager.items ?? []
+          }
+        }).store(in: &bag)
     }
   }
   

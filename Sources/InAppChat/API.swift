@@ -595,6 +595,11 @@ class Api: InterceptorProvider, ApolloInterceptor {
     let res = try await client.fetchAsync(query: Gql.GetNFTConfigQuery())
     return res.app.nft
   }
+  
+  func updateProfile(input: Gql.UpdateProfileInput) async throws -> Bool {
+    let res = try await client.performAsync(mutation: Gql.UpdateProfileMutation(input: input))
+    return res.updateProfile
+  }
 }
 let api = Api(store: ApolloStore())
 

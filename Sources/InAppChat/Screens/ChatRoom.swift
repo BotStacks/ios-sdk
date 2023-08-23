@@ -234,7 +234,32 @@ public class UIChatRoom: UIViewController, UITextViewDelegate, UIImagePickerCont
     btnMic.setImage(UIImage(systemName: speechRecognizer.transcribing ? "mic.slash.fill" : "mic.fill"), for: .normal)
   }
   
+  var checkSend = true
+  
+  func checkMembership() -> Bool {
+    if chat?.isMember != true {
+      let alert = UIAlertController(title: "Membership Required", message: "To send messages to this chat, you have to join it. Would you like to?", preferredStyle: .alert)
+      alert.addAction(UIAlertAction(title: "Maybe Later", style: .cancel))
+      alert.addAction(UIAlertAction(title: "Join", style: .default, handler: { _ in
+        self.chat?.join()
+        self.view.makeToast("Chat joined")
+        if self.checkSend {
+          self.send()
+        } else {
+          self.tapMedia()
+        }
+      }))
+      self.present(alert, animated: true)
+      return false
+    }
+    return true
+  }
+  
   @IBAction func send() {
+    checkSend = true
+    if !checkMembership() {
+      return
+    }
     if let text = input.text, !text.isEmpty {
       chat?.send(text, inReplyTo: replyingTo)
       input.text = ""
@@ -414,6 +439,14 @@ public class UIChatRoom: UIViewController, UITextViewDelegate, UIImagePickerCont
       let d = segue.destination as? UIInviteUsers
       d?.chat = chat
     }
+  }
+  
+  @IBAction func tapMedia() {
+    checkSend = false
+    if !checkMembership() {
+      return
+    }
+    self.performSegue(withIdentifier: "media", sender: nil)
   }
   
   var isShift = false

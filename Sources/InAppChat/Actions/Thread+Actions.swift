@@ -41,8 +41,8 @@ extension Chat {
     }
   }
 
-  func send(attachment: Gql.AttachmentInput, inReplyTo: Message?) {
-    let m = Message.init(
+  func send(attachment: Gql.AttachmentInput, inReplyTo: Message?, message: Message? = nil) {
+    let m = message ?? Message.init(
       id: UUID().uuidString,
       createdAt: Date(),
       userID: User.current!.id,
@@ -53,7 +53,9 @@ extension Chat {
       reactions: [],
       status: .sending
     )
-    self.sending.insert(m, at: 0)
+    if message == nil {
+      self.sending.insert(m, at: 0)
+    }
     Task.detached {
       do {
         let newMessage = try await api.send(
@@ -80,13 +82,25 @@ extension Chat {
   }
 
   func send(file: File, type: Gql.AttachmentType, inReplyTo: Message?) {
+    let m = Message.init(
+      id: UUID().uuidString,
+      createdAt: Date(),
+      userID: User.current!.id,
+      chatID: self.id,
+      parent: inReplyTo,
+      text: "",
+      attachments: [Gql.AttachmentInput.init(id: UUID().uuidString, type: .case(type), url: file.url.absoluteString).attachment],
+      reactions: [],
+      status: .sending
+    )
+    self.sending.insert(m, at: 0)
     Task.detached {
       do {
         print("upload file \(file.url)")
         let url = try await api.uploadFile(file: file)
         print("Result \(url)")
         DispatchQueue.main.async {
-          self.send(attachment: .init(id: UUID().uuidString, type: .case(type), url: url), inReplyTo: inReplyTo)
+          self.send(attachment: .init(id: UUID().uuidString, type: .case(type), url: url), inReplyTo: inReplyTo, message: m)
         }
       } catch let err {
         Monitoring.error(err)

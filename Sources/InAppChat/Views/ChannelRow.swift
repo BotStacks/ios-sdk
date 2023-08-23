@@ -18,7 +18,9 @@ public class UIChannelRow: UITableViewCell {
       bag.removeAll()
       chat.objectWillChange.makeConnectable().autoconnect()
         .sink { [weak self] _ in
-          self?.bindUI()
+          DispatchQueue.main.async {
+            self?.bindUI()
+          }
         }.store(in: &bag)
       bindUI()
       bindTheme()
@@ -53,7 +55,7 @@ public class UIChannelRow: UITableViewCell {
   func bindUI() {
     title.text = chat.displayName
     subtitle.text = chat.description
-    count.text = String(chat.members.count)
+    count.text = String(chat.activeMembers.count)
 //    join.backgroundColor = chat.isMember ? Theme.current.colors.caption.ui : Theme.current.colors.primary.ui
     pub.bind(chat: chat)
     if let url = chat.image {
