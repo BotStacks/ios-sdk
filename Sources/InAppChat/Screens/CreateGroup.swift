@@ -79,9 +79,8 @@ public class UICreateChat: UIBaseController, UITextFieldDelegate, UITextViewDele
   @IBOutlet var nextIndicator: UIActivityIndicatorView!
   @IBOutlet var btnSave: UIButton!
   @IBOutlet var scrollview: UIScrollView!
-  @IBOutlet var content: UIView!
+  @IBOutlet var spacerHeight: NSLayoutConstraint!
   @IBOutlet var scrollviewBottom: NSLayoutConstraint!
-  @IBOutlet var contentHeight: NSLayoutConstraint!
   
   var chat: Chat? {
     didSet {
@@ -134,14 +133,9 @@ public class UICreateChat: UIBaseController, UITextFieldDelegate, UITextViewDele
     bindUI()
     let notificationCenter = NotificationCenter.default
     notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillHideNotification, object: nil)
-    notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+    notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillShowNotification, object: nil)
   }
   
-  
-  
-  override public func viewWillAppear(_ animated: Bool) {
-    contentHeight.constant = 0 - self.view.safeAreaInsets.bottom - view.safeAreaInsets.top - 44
-  }
   
   var img: URL? {
     didSet {
@@ -185,20 +179,18 @@ public class UICreateChat: UIBaseController, UITextFieldDelegate, UITextViewDele
       print("Skip keyboard adjust")
       return
     }
-    // Get notification values.
-    let keyboardFrameBegin = keyboardFrameBeginValue.cgRectValue
     let keyboardFrameEnd = keyboardFrameEndValue.cgRectValue
-    let animationCurveOptions = UIView.AnimationOptions(rawValue: animationCurveNumber.uintValue << 16)
-    let animationDuration = animationDurationNumber.doubleValue
-    scrollviewBottom.constant = notification.name == UIResponder.keyboardWillShowNotification ? keyboardFrameEnd.height : 0
-    UIView.animate(
-      withDuration: animationDuration,
-      delay: 0,
-      options: animationCurveOptions,
-      animations: { [unowned self] in
-        scrollview.layoutIfNeeded()
-      }
-    )
+    let show = notification.name == UIResponder.keyboardWillShowNotification
+    let height =  show ?  keyboardFrameEnd.height : 0.0
+    spacerHeight.constant = height
+    scrollview.contentInset = .init(top: 0, left: 0, bottom: height, right: 0)
+    scrollview.layoutIfNeeded()
+    let newY = height
+    scrollview.setContentOffset(.init(x: 0, y: newY), animated: true)
+//    scrollviewBottom.constant = notification.name == UIResponder.keyboardWillShowNotification ?  keyboardFrameEnd.height : 0.0
+//    UIView.animate(withDuration: animationDuration, delay: 0.0, options: animationCurveOptions) {
+//      self.view.layoutIfNeeded()
+//    }
   }
   
   func bindUI() {
@@ -217,6 +209,11 @@ public class UICreateChat: UIBaseController, UITextFieldDelegate, UITextViewDele
     }
     updateChannel()
     updateDesc()
+  }
+  
+  @IBAction func tapBG() {
+    txtDesc.resignFirstResponder()
+    txtChannel.resignFirstResponder()
   }
   
   func updateChannel() {
@@ -250,7 +247,7 @@ public class UICreateChat: UIBaseController, UITextFieldDelegate, UITextViewDele
       self.updateChannel()
     }
     self.lblChannelError.isHidden = true
-   return true
+    return true
   }
   
   func updateDesc() {
@@ -309,10 +306,12 @@ public class UICreateChat: UIBaseController, UITextFieldDelegate, UITextViewDele
   
   @IBAction func tapPublic() {
     _private = false
+    tapBG()
   }
   
   @IBAction func tapPrivate() {
     _private = true
+    tapBG()
   }
   
   @IBAction func tapImage() {
@@ -328,6 +327,7 @@ public class UICreateChat: UIBaseController, UITextFieldDelegate, UITextViewDele
   var loading = false
   
   @IBAction func next() {
+    tapBG()
     if loading {return}
     loading = true
     let name = txtChannel.text ?? ""
