@@ -7,6 +7,7 @@
 
 import InAppChat
 import SwiftUI
+import Auth0
 
 
 enum Routes: Equatable {
@@ -31,6 +32,9 @@ struct ContentView: View {
         Route("chats") {
           ChatView()
         }
+        Route("register") {
+          Register()
+        }
       }
     }
   }
@@ -42,6 +46,8 @@ struct ChatView: View {
   var body: some View  {
     InAppChatView {
       navigator.navigate("/login")
+    } onDeleteAccount: {
+      
     }
   }
 }

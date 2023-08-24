@@ -43,6 +43,7 @@ public extension Gql {
       case "Message": return Gql.Objects.Message
       case "Attachment": return Gql.Objects.Attachment
       case "Mention": return Gql.Objects.Mention
+      case "Flag": return Gql.Objects.Flag
       case "Invite": return Gql.Objects.Invite
       case "Subscription": return Gql.Objects.Subscription
       case "InviteEvent": return Gql.Objects.InviteEvent

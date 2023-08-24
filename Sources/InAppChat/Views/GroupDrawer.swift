@@ -46,7 +46,6 @@ public class UIGroupDrawer: UIViewController, UITableViewDelegate, UITableViewDa
   @IBOutlet var invite: UIButton!
   @IBOutlet var leave: UIButton!
   
-  
   override public func viewDidLoad() {
     content.backgroundColor = c().background.ui
     if let i = chat.image {
@@ -128,6 +127,7 @@ public class UIGroupDrawer: UIViewController, UITableViewDelegate, UITableViewDa
   
   var room: UIViewController!
   
+  
   @IBAction func editChat() {
     self.dismiss(animated: true)
     self.room?.performSegue(withIdentifier: "edit", sender: chat)
@@ -182,6 +182,15 @@ public class UIGroupDrawer: UIViewController, UITableViewDelegate, UITableViewDa
     }
   }
   
+  public override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    if segue.identifier == "flag" {
+      let controller = segue.destination as? UIFlagController
+      controller?.chat = chat
+      controller?.onSubmit = {
+        self.dismiss(animated: true)
+      }
+    }
+  }
 }
 
 public class UIGroupHeaderCell: UITableViewCell {

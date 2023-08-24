@@ -22,6 +22,6 @@ public struct GifImageView: View {
   public var body: some View {
     AnimatedImage(url: url)
       .resizable()
-      .scaledToFit()
+      .aspectRatio(contentMode: .fill)
   }
 }

@@ -175,8 +175,15 @@ public class UIMessageList: UIViewController, UITableViewDelegate, UITableViewDa
       }
       let str = NSAttributedString((try? AttributedString(markdown: md)) ?? AttributedString(md))
       let width = tableView.frame.size.width - 32.0 - (m.favorite ? 24.0 : 0.0) - 35.0 - 8.0
-      let rect = str.boundingRect(with: .init(width: width, height: CGFloat.greatestFiniteMagnitude), context: nil)
-      return rect.height + 58.0
+//      let rect = getSizeThatFits(str, maxWidth: width)
+//      let framesetter = CTFramesetterCreateWithAttributedString(str)
+//      let textSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRange(), nil, .init(width: width, height: CGFloat.greatestFiniteMagnitude), nil)
+      
+//      //Option two
+      return UITableView.automaticDimension
+//      let rect = (str as NSString).boundingRect(with: .init(width: width, height: CGFloat.greatestFiniteMagnitude),
+//                                  options: [.usesLineFragmentOrigin, .usesFontLeading, .usesDeviceMetrics], context: nil)
+//      return textSize.height + 58.0
     }
   }
   
@@ -326,4 +333,43 @@ public struct RepliesList: View {
       }
     }
   }
+}
+
+func getSizeThatFits(_ attributedString: NSAttributedString, maxWidth: CGFloat) -> CGSize {
+  let framesetter = CTFramesetterCreateWithAttributedString(attributedString)
+  let rectPath = CGRect(origin: .zero, size: CGSize(width: maxWidth, height: 50000))
+  
+  let ctFrame = CTFramesetterCreateFrame(framesetter, CFRange(), CGPath(rect: rectPath, transform: nil), nil)
+  
+  guard let ctLines = CTFrameGetLines(ctFrame) as? [CTLine], !ctLines.isEmpty else {
+    return .zero
+  }
+  
+  var ctLinesOrigins = Array<CGPoint>(repeating: .zero, count: ctLines.count)
+  // Get origins in CoreGraphics coodrinates
+  CTFrameGetLineOrigins(ctFrame, CFRange(), &ctLinesOrigins)
+  
+  // Transform last origin to iOS coordinates
+  let transform: CGAffineTransform
+#if os(macOS)
+  transform = CGAffineTransform.identity
+#else
+  transform = CGAffineTransform(scaleX: 1, y: -1).concatenating(CGAffineTransform.init(translationX: 0, y: rectPath.height))
+#endif
+  
+  guard let lastCTLineOrigin = ctLinesOrigins.last?.applying(transform), let lastCTLine = ctLines.last else {
+    return .zero
+  }
+  
+  // Get last line metrics and get full height (relative to from origin)
+  var ascent: CGFloat = 0
+  var descent: CGFloat = 0
+  var leading: CGFloat = 0
+  CTLineGetTypographicBounds(lastCTLine, &ascent, &descent, &leading)
+  let lineSpacing = (floor(ascent + descent + leading) * 0.2) + 0.5 // 20% by default, actual value depends on Paragraph
+  let lineHeight = floor(ascent + descent + leading) + 0.5
+  
+  // Calculate maximum height of the frame
+  let maxHeight = lastCTLineOrigin.y + descent + leading + (lineSpacing / 2)
+  return CGSize(width: maxWidth, height: maxHeight)
 }

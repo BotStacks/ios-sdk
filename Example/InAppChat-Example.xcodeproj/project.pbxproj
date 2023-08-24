@@ -18,6 +18,7 @@
 		FB2DB62E2A08176700A9D65D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = FB2DB62D2A08176700A9D65D /* GoogleService-Info.plist */; };
 		FB2DB6332A08186A00A9D65D /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = FB2DB6322A08186A00A9D65D /* FirebaseAnalyticsWithoutAdIdSupport */; };
 		FB4FA42F2A04126200EEC2CE /* Splash.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB4FA42E2A04126200EEC2CE /* Splash.swift */; };
+		FB6C53692A97E12A00F290BB /* Register.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6C53682A97E12A00F290BB /* Register.swift */; };
 		FB9E5A4F2A0598F200B2642C /* Login.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9E5A4E2A0598F200B2642C /* Login.swift */; };
 /* End PBXBuildFile section */
 
@@ -56,6 +57,7 @@
 		FB2381712A03009900D239E2 /* Auth0.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Auth0.plist; sourceTree = "<group>"; };
 		FB2DB62D2A08176700A9D65D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		FB4FA42E2A04126200EEC2CE /* Splash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Splash.swift; sourceTree = "<group>"; };
+		FB6C53682A97E12A00F290BB /* Register.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Register.swift; sourceTree = "<group>"; };
 		FB9E5A4E2A0598F200B2642C /* Login.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Login.swift; sourceTree = "<group>"; };
 		FF6FC7AE54E30D6C1B1EC5C4 /* Pods_InAppChat_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InAppChat_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -139,6 +141,7 @@
 				FB2381712A03009900D239E2 /* Auth0.plist */,
 				FB4FA42E2A04126200EEC2CE /* Splash.swift */,
 				FB9E5A4E2A0598F200B2642C /* Login.swift */,
+				FB6C53682A97E12A00F290BB /* Register.swift */,
 			);
 			path = "InAppChat-Example";
 			sourceTree = "<group>";
@@ -353,6 +356,7 @@
 				FB4FA42F2A04126200EEC2CE /* Splash.swift in Sources */,
 				B827EABC298092430018B848 /* InAppChat_ExampleApp.swift in Sources */,
 				FB9E5A4F2A0598F200B2642C /* Login.swift in Sources */,
+				FB6C53692A97E12A00F290BB /* Register.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -509,7 +513,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "InAppChat-Example/InAppChat_Example.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 23;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"InAppChat-Example/Preview Content\"";
 				DEVELOPMENT_TEAM = WVZBR7DU5M;
@@ -563,7 +567,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "InAppChat-Example/InAppChat_Example.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 23;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"InAppChat-Example/Preview Content\"";
 				DEVELOPMENT_TEAM = WVZBR7DU5M;

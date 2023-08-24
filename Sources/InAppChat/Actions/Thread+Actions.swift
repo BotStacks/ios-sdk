@@ -137,6 +137,25 @@ extension Chat {
       }
     }
   }
+  
+  
+  func hide() {
+    InAppChatStore.current.hiddenChats.append(self.id)
+    InAppChatStore.current.memberships.removeAll(where: {$0.chat.id == self.id})
+    InAppChatStore.current.network.items.remove(element: self)
+  }
+  
+  func flag(_ reason: String) {
+    hide()
+    Task.detached {
+      do {
+        try await api.flag(input:.init(chat: .some(self.id), reason: reason))
+      } catch let err {
+        Monitoring.error(err)
+        print(err)
+      }
+    }
+  }
 }
 
 extension Gql.AttachmentInput {

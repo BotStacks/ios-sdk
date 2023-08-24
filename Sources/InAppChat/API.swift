@@ -16,7 +16,7 @@ let servers = (
   )
 )
 
-let env = "prod"
+let env = "local"
 
 func chatServer() -> (host: String, ssl: Bool) {
   switch env {
@@ -394,6 +394,34 @@ class Api: InterceptorProvider, ApolloInterceptor {
     }
   }
   
+  func register(
+    email: String,
+    password: String,
+    username: String,
+    picture: String?
+  ) async throws -> User {
+    
+    let res = try await self.client.performAsync(
+      mutation: Gql.ChatRegisterMutation(
+        input: Gql.ChatRegisterInput(
+          email: email,
+          image: picture.map({.some($0)}) ?? .none,
+          password: password,
+          username: username
+        )
+      ),
+      publishResultToStore: false
+    )
+    if let login = res.chatRegister {
+      let user = User.get(.init(_dataDict: login.user.__data))
+      onLogin(login.token, user: user)
+      try await InAppChatStore.current.loadAsync()
+      return user
+    } else {
+      throw APIError(msg: "Failed to login. No result.", critical: true)
+    }
+  }
+  
   func basicLogin(email: String, password: String) async throws -> User {
     let res = try await self.client.performAsync(
       mutation: Gql.BasicLoginMutation(
@@ -451,8 +479,15 @@ class Api: InterceptorProvider, ApolloInterceptor {
   }
   
   func loggedOut() {
+    unsubscribe()
     self.authToken = nil
-    InAppChat.shared.onLogout?()
+    
+    DispatchQueue.main.async {
+      InAppChat.shared.isUserLoggedIn = false
+      InAppChat.shared.onLogout?()
+      User.current = nil
+      InAppChatStore.current = InAppChatStore()
+    }
   }
 
   func block(user: String) async throws -> Bool {
@@ -540,6 +575,9 @@ class Api: InterceptorProvider, ApolloInterceptor {
     let _ = try await client.performAsync(mutation: Gql.RegisterPushMutation(token: token, kind: .case(Gql.DeviceType.ios), fcm: .some(true)))
   }
   
+  func flag(input: Gql.CreateFlagInput) async throws {
+    let _ = try await client.perform(mutation: Gql.FlagMutation(input: input))
+  }
 
   func start() async throws -> (User, [Member]) {
     let res = try await client.fetchAsync(query: Gql.GetMeQuery())
@@ -564,6 +602,16 @@ class Api: InterceptorProvider, ApolloInterceptor {
   func listUsers(skip: Int = 0, limit: Int = 20) async throws -> [User] {
     let res = try await client.fetchAsync(query: Gql.ListUsersQuery(count: .some(limit), offset: .some(skip)))
     return res.users.map { User.get(.init(_dataDict: $0.__data))}
+  }
+  
+  func deleteAccount() async {
+    do {
+      let _ = try await client.performAsync(mutation: Gql.DeleteAccountMutation())
+    } catch let err {
+      Monitoring.error(err)
+    }
+    self.loggedOut()
+    InAppChat.shared.onDeleteAccount?()
   }
 
   func uploadFile(file: File) async throws -> String {

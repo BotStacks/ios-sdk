@@ -57,6 +57,7 @@ extension ApolloClient {
             if err.message == "login required" {
               api.loggedOut()
             }
+            print("Error \(err)")
           }
           cont.resume(throwing: APIError(msg: "GQL Errors", critical: true))
         } else {

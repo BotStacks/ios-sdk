@@ -19,8 +19,9 @@ public class InAppChatController: UINavigationController {
 
 public struct InAppChatView: UIViewControllerRepresentable {
   
-  public init(onLogout: @escaping () -> Void) {
+  public init(onLogout: @escaping () -> Void, onDeleteAccount: (() -> Void)?) {
     InAppChat.shared.onLogout = onLogout
+    InAppChat.shared.onDeleteAccount = onDeleteAccount
   }
   
   public func makeUIViewController(context: Context) -> InAppChatController {
@@ -33,6 +34,7 @@ public struct InAppChatView: UIViewControllerRepresentable {
   
   public static func dismantleUIViewController(_ uiViewController: InAppChatController, coordinator: Void) {
     InAppChat.shared.onLogout = nil
+    InAppChat.shared.onDeleteAccount = nil
   }
 
   public typealias UIViewControllerType = InAppChatController

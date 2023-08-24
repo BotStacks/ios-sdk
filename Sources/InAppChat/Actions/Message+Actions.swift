@@ -95,4 +95,23 @@ extension Message {
       }
     }
   }
+  
+  func hide() {
+    if !user.isCurrent {
+      InAppChatStore.current.hiddenMessages.insert(self.id)
+      chat.items.remove(element: self)
+    }
+  }
+  
+  func flag(_ reason: String) {
+    hide()
+    Task.detached {
+      do {
+        try await api.flag(input:.init(message: .some(self.id), reason: reason))
+      } catch let err {
+        Monitoring.error(err)
+        print(err)
+      }
+    }
+  }
 }

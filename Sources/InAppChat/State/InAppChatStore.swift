@@ -89,6 +89,8 @@ public class InAppChatStore: ObservableObject {
         }
       }
       try await loadGroupInvites()
+      network.loadMoreIfEmpty()
+      contacts.loadMoreIfEmpty()
     } else {
       print("no current user skipping")
     }
@@ -148,4 +150,21 @@ public class InAppChatStore: ObservableObject {
   }
 
   var cache = Caches()
+  
+  var hiddenMessages = Set(UserDefaults.standard.stringArray(forKey: "iac-hidden-messages") ?? []) {
+    didSet {
+      UserDefaults.standard.set(hiddenMessages.unique(), forKey: "iac-hidden-messages")
+    }
+  }
+  @Published var hiddenUsers = UserDefaults.standard.stringArray(forKey: "iac-hidden-users") ?? [] {
+    didSet {
+      UserDefaults.standard.set(hiddenUsers, forKey: "iac-hidden-users")
+    }
+  }
+  @Published var hiddenChats = UserDefaults.standard.stringArray(forKey: "iac-hidden-chats") ?? [] {
+    didSet {
+      UserDefaults.standard.set(hiddenChats, forKey: "iac-hidden-chats")
+    }
+  }
+  
 }

@@ -71,6 +71,22 @@ public class UIMessageActions: UIViewController {
     room.messageForAction?.toggleFavorite()
     dismiss(animated: true)
   }
+  
+  @IBAction func hide() {
+    room.messageForAction?.hide()
+    dismiss(animated: true)
+  }
+
+  public override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    if segue.identifier == "flag" {
+      let controller = segue.destination as? UIFlagController
+      controller?.message = room.messageForAction
+      controller?.onSubmit = {
+        self.dismiss(animated: true)
+        self.dismiss(animated: true)
+      }
+    }
+  }
 }
 
 public struct EmojiBar: View {

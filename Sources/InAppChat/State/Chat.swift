@@ -92,8 +92,8 @@ public final class Chat: Pager<Message>, Identifiable {
   
   override public func load(skip: Int, limit: Int) async -> [Message] {
     do {
-      let items = try await api.fetchMessages(
-        self.id, skip: skip, limit: limit)
+      let items = (try await api.fetchMessages(
+        self.id, skip: skip, limit: limit)).filter({!InAppChatStore.current.hiddenMessages.contains($0.id)})
       return items
     } catch let err {
       Monitoring.error(err)

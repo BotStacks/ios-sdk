@@ -33,6 +33,7 @@ public class UIChatRoom: UIViewController, UITextViewDelegate, UIImagePickerCont
         if self.viewIfLoaded != nil {
           self.bind(chat: chat)
         }
+        messages?.chat = chat
       }
     }
   }

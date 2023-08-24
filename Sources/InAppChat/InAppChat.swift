@@ -22,6 +22,7 @@ public class InAppChat: ObservableObject {
   @Published public var appMeta: [String: Any] = [:]
   public var hideBackButton = false
   public var onLogout: (() -> Void)? = nil
+  public var onDeleteAccount: (() -> Void)? = nil
   
   var user: User? {
     return InAppChatStore.current.user
@@ -89,6 +90,27 @@ public class InAppChat: ObservableObject {
     }
     do {
       let _ = try await api.basicLogin(email: email, password: password)
+    } catch let err {
+      print("Error logging in ", err)
+      Monitoring.error(err)
+    }
+    await MainActor.run {
+      loggingIn = false
+    }
+    return isUserLoggedIn
+  }
+  
+  public func register(
+    email: String, password: String,
+    username: String,
+    avatar: String?
+  ) async throws -> Bool {
+    if loggingIn { return false }
+    await MainActor.run {
+      loggingIn = true
+    }
+    do {
+      let _ = try await api.register(email: email, password: password, username: username, picture: avatar)
     } catch let err {
       print("Error logging in ", err)
       Monitoring.error(err)
@@ -167,6 +189,10 @@ public class InAppChat: ObservableObject {
         Monitoring.error(err)
       }
     }
+  }
+  
+  public static func uploadProfilePicture(_ url: URL) async throws -> String {
+    return try await api.uploadFile(file: .init(url: url))
   }
   
   public static func set(theme: Theme) {

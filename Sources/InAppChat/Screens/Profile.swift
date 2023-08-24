@@ -11,6 +11,7 @@ public class UIProfile: UIMyProfile, PHPickerViewControllerDelegate, UITextField
   @IBOutlet var status: UIButton!
   @IBOutlet var blockRow: UIView!
   @IBOutlet var messageRow: UIView!
+  @IBOutlet var reportRow: UIView!
   
   var user: User! {
     didSet {
@@ -50,6 +51,7 @@ public class UIProfile: UIMyProfile, PHPickerViewControllerDelegate, UITextField
     self.lblTitle.text = getUser().username
     self.blockRow.isHidden = getUser().isCurrent
     self.messageRow.isHidden = self.blockRow.isHidden
+    self.reportRow.isHidden = self.blockRow.isHidden
     if let img = user.avatar {
       headerImage.sd_setImage(with: img.url)
     } else {
@@ -63,6 +65,16 @@ public class UIProfile: UIMyProfile, PHPickerViewControllerDelegate, UITextField
     if segue.identifier == "chat" {
       let room = segue.destination as? UIChatRoom
       room?.user = user
+    } else if segue.identifier == "flag" {
+      let room = segue.destination as? UIFlagController
+      room?.user = user
+      room?.onSubmit = { [weak self] in
+        self?.dismiss(animated: true)
+        self?.view.makeToast("User reported. Thanks.")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+          self?.navigationController?.popViewController(animated: true)
+        }
+      }
     }
   }
   @IBOutlet var imageLoader: UIActivityIndicatorView!

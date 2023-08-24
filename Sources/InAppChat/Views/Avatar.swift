@@ -26,8 +26,8 @@ public struct Avatar: View {
     ZStack {
       if let url = url {
         GifImageView(url: url)
-          .aspectRatio(contentMode: .fit)
-          .grow()
+          .aspectRatio(contentMode: .fill)
+          .size(size)
       } else {
         if group {
           GroupPlaceholder(size: size)

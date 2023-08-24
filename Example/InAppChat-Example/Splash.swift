@@ -18,8 +18,9 @@ struct Splash<Content>: View where Content: View {
   @EnvironmentObject var navigator: Navigator
 
   @ObservedObject var app = InAppChat.shared
-
-  init(@ViewBuilder _ content: @escaping () -> Content) {
+  let mini: Bool
+  init(mini: Bool = false, @ViewBuilder _ content: @escaping () -> Content) {
+    self.mini = mini
     self.content = content
   }
 
@@ -32,25 +33,47 @@ struct Splash<Content>: View where Content: View {
       Image("SplashWeb")
         .resizable()
         .aspectRatio(contentMode: .fit)
-      ZStack {
+      if mini {
         VStack {
-            Image("inappchat-icon")
-                .resizable().aspectRatio(contentMode: .fit).size(130.0)
-            Image("inappchat-text").resizable().frame(width: 225.0, height: 28.0)
+          VStack {
+            HStack {
+              Image("inappchat-icon")
+                .resizable().aspectRatio(contentMode: .fit).size(50.0)
+              Image("inappchat-text").resizable().frame(width: 225.0, height: 28.0)
                 .tint(Color.white)
                 .foregroundColor(Color.white)
-          
-          Text("Simple and elegant chat services")
-            .multilineTextAlignment(.center)
-            .foregroundColor(.white)
-          if !app.loaded {
-            Spinner().size(60.0)
+            }
+            if !app.loaded {
+              Spinner().size(60.0)
+            }
+          }.padding(.bottom, 60.0)
+            .padding(.top, geometry.insets.top + 20.0)
+          if let content = content {
+            content()
           }
-        }.padding(.bottom, !app.loaded ? 0.0 : 60.0)
-      }.grow()
-      if let content = content {
-        content()
+        }.grow()
+      } else {
+        ZStack {
+          VStack {
+            Image("inappchat-icon")
+              .resizable().aspectRatio(contentMode: .fit).size(130.0)
+            Image("inappchat-text").resizable().frame(width: 225.0, height: 28.0)
+              .tint(Color.white)
+              .foregroundColor(Color.white)
+            
+            Text("Simple and elegant chat services")
+              .multilineTextAlignment(.center)
+              .foregroundColor(.white)
+            if !app.loaded {
+              Spinner().size(60.0)
+            }
+          }.padding(.bottom, !app.loaded ? 0.0 : 60.0)
+        }.grow()
+        if let content = content {
+          content()
+        }
       }
+      
     }
     .onChange(of: app.loaded) { newValue in
       if newValue {
@@ -66,6 +89,7 @@ struct Splash<Content>: View where Content: View {
 
 extension Splash where Content == EmptyView {
   init() {
+    self.mini = false
     self.content = nil
   }
 }

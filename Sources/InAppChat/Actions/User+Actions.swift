@@ -31,4 +31,23 @@ extension User {
       }
     }
   }
+  
+  func hide() {
+    if !isCurrent {
+      InAppChatStore.current.hiddenUsers.append(self.id)
+      InAppChatStore.current.contacts.items.remove(element: self)
+    }
+  }
+  
+  func flag(_ reason: String) {
+    hide()
+    Task.detached {
+      do {
+        try await api.flag(input:.init(reason: reason, user: .some(self.id)))
+      } catch let err {
+        Monitoring.error(err)
+        print(err)
+      }
+    }
+  }
 }

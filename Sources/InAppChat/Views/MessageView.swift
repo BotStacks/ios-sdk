@@ -22,6 +22,7 @@ public class UIVideo: UIView {
       let video = AVPlayerViewController()
       video.player = player
       video.view.frame = bounds
+      video.showsPlaybackControls = true
       addSubview(video.view)
       player.play()
       NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: player.currentItem, queue: .main) { _ in
@@ -172,8 +173,20 @@ public class UIMessageRow: UITableViewCell {
       spinner?.stopAnimating()
       spinner?.isHidden = true
     }
+    flip()
+    content.backgroundColor = message.user.isCurrent ? c().senderBubble.ui : c().bubble.ui
+    markdown?.textColor = message.user.isCurrent ? c().senderText.ui : c().bubbleText.ui
     self.setNeedsLayout()
     self.layoutIfNeeded()
+  }
+  
+  func flip() {
+    let t  = CGAffineTransformMakeScale(message.user.isCurrent ? -1 : 1, 1)
+    contentView.layer.setAffineTransform(t)
+    content.layer.setAffineTransform(t)
+    username.layer.setAffineTransform(t)
+    timestamp.layer.setAffineTransform(t)
+    avatar.layer.setAffineTransform(t)
   }
   
   var spinner: UIActivityIndicatorView?
@@ -198,6 +211,7 @@ public class UIReactionsView: UITableViewCell {
   }
   
   func render() {
+    contentView.layer.setAffineTransform(.init(scaleX: message.user.isCurrent ? -1 : 1, y: 1))
     if let reactions = message.reactions {
       for (i, r) in reactions.enumerated() {
         let old = i < content.subviews.count
@@ -268,6 +282,10 @@ public class UIReactionPill: UIView {
     } else {
       self.layer.borderWidth = 0.0
     }
+    backgroundColor = message.user.isCurrent ? c().senderBubble.ui : c().bubble.ui
+    label.textColor = message.user.isCurrent ? c().senderText.ui : c().senderBubble.ui
+    let t = CGAffineTransform(scaleX: message.user.isCurrent ? -1 : 1, y: 1)
+    self.layer.setAffineTransform(t)
   }
   
   public override func layoutSubviews() {
@@ -284,6 +302,9 @@ public class UIRepliesCell: UITableViewCell {
   
   var message: Message! {
     didSet {
+      let t = CGAffineTransform(scaleX: message.user.isCurrent ? -1 : 1, y: 1)
+      contentView.layer.setAffineTransform(t)
+      label.layer.setAffineTransform(t)
       label.text = "\(message.replyCount) repl\(message.replyCount > 1 ? "ies" : "y")"
     }
   }

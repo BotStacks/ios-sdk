@@ -28,6 +28,17 @@ public class UIBaseController: UIViewController {
   @IBAction func back() {
     self.navigationController?.popViewController(animated: true)
   }
+  
+  @IBAction func more() {
+    let controller = UIAlertController(title: "Delete account?", message: "You can delete your account. All your profile information will be deleted. This action is permanent", preferredStyle: .alert)
+    controller.addAction(.init(title: "No thanks", style: .cancel))
+    controller.addAction(.init(title: "Delete My Account", style: .destructive, handler: { _ in
+      Task.detached {
+        await api.deleteAccount()
+      }
+    }))
+    self.present(controller, animated: true)
+  }
 }
 
 

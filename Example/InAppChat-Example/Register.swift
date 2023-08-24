@@ -14,26 +14,41 @@ import UserNotifications
 import WebKit
 
 
-struct Login: View {
 
+
+struct Register: View {
+  
+  enum Field {
+    case name
+    case email
+    case password
+  }
+  
   @Environment(\.openURL) private var openURL
   @Environment(\.geometry) private var geometry
   @EnvironmentObject var navigator: Navigator
-    @ObservedObject var app = InAppChat.shared
-    @State var loggingIn = false
-
-  let isEth = InAppChat.shared.tenant.loginType != "email"
+  @ObservedObject var app = InAppChat.shared
+  @State var loggingIn = false
+  
   @State var terms = false
   @State var email = ""
   @State var password = ""
-  @FocusState var passwordFocus
+  @State var displayName = ""
+  @State var localImage: URL? = nil
+  @State var image: URL? = nil
+  @FocusState var focus: Field?
   
   @State var didError = false
   @State var message = ""
   
-  func login() {
+  @State var pickImage = false
+  
+  func register() {
     if !loggingIn {
-      if email.isEmpty || !email.isEmail() {
+      if displayName.isEmpty || displayName.count < 5 {
+        message = "Username must be 5 or more characters"
+        didError = true
+      } else if email.isEmpty || !email.isEmail() {
         message = "Please enter a valid email."
         didError = true
       } else if password.isEmpty || password.count < 4 {
@@ -46,19 +61,16 @@ struct Login: View {
         loggingIn = true
         Task {
           do {
-            let res = try await InAppChat.shared.basicLogin(
+            let res = try await InAppChat.shared.register(
               email: email,
-              password: password
+              password: password,
+              username: displayName,
+              avatar: image?.absoluteString
             )
             print("Finish login")
             if res {
               await MainActor.run {
                 self.navigator.navigate("/chats")
-              }
-            } else {
-              await MainActor.run {
-                message = "Invalid credentials. Please try again"
-                didError = true
               }
             }
           } catch let err {
@@ -73,22 +85,60 @@ struct Login: View {
     }
   }
   
-
+  var canRegister:Bool {
+    return email.isEmail() && password.count >= 5 && displayName.count >= 5
+  }
+  
   var body: some View {
-    Splash {
-      VStack {
-          Spacer()
-          if loggingIn {
-            Spinner().size(60.0)
-          }
+    Splash(mini: true) {
+      VStack(spacing: 12.0) {
+        Spacer()
+        if loggingIn {
+          Spinner().size(60.0)
+        }
+        Button {
+          pickImage = true
+        } label: {
+          ZStack {
+            Avatar(url: image?.absoluteString, size: 120.0)
+            if localImage != nil && image == nil {
+              Spinner()
+            }
+          }.size(120.0)
+        }
+        HStack {
+          TextField("Display Name", text: Binding(
+            get: {
+              displayName
+            },
+            set: { value, tx in
+              if CharacterSet.alphanumerics.isSuperset(of: CharacterSet(charactersIn: value)) {
+                displayName = value
+              }
+            }))
+            .textContentType(.username)
+            .autocapitalization(.none)
+            .submitLabel(.next)
+            .focused($focus, equals: .name)
+            .onSubmit {
+              focus = .email
+            }
+            .grow()
+        }
+        .padding(.horizontal, 16)
+        .background(Color.white)
+        .cornerRadius(8)
+        .height(44)
+        .padding(.horizontal, 32)
         HStack {
           TextField("Email", text: $email)
             .keyboardType(.emailAddress)
             .textContentType(.emailAddress)
             .autocapitalization(.none)
             .submitLabel(.next)
+            .focused($focus, equals: .email)
             .onSubmit {
-              
+              focus = .password
             }
             .grow()
         }
@@ -99,11 +149,11 @@ struct Login: View {
         .padding(.horizontal, 32)
         HStack {
           SecureField("Password", text: $password)
-            .focused($passwordFocus)
-            .textContentType(.password)
+            .focused($focus, equals: .password)
+            .textContentType(.newPassword)
             .submitLabel(.done)
             .onSubmit({
-              login()
+              register()
             })
             .grow()
         }
@@ -112,24 +162,24 @@ struct Login: View {
         .cornerRadius(8)
         .height(44)
         .padding(.horizontal, 32)
-        
+        Spacer()
         Button {
-          navigator.navigate("/register")
+          navigator.navigate("/login")
         } label: {
           HStack {
-            Text("Don't have an account?")
+            Text("Already have an account?")
               .foregroundColor(.white)
-            Text("Sign up")
+            Text("Login")
               .foregroundColor(.blue)
               .underline()
           }
         }
         Button {
-          login()
+          register()
         } label: {
           HStack {
             HStack {
-              Text("Login")
+              Text("Register")
                 .foregroundColor(Color.white)
                 .textCase(.uppercase)
                 .font(.title2)
@@ -177,42 +227,35 @@ struct Login: View {
       }
     } message: { details in
       Text(details)
+    }.sheet(isPresented: $pickImage) {
+      PhotoPicker(onFile: { url in
+        self.localImage = url
+        self.image = nil
+        Task.detached {
+          do {
+            let uploaded = try await InAppChat.uploadProfilePicture(url)
+            await MainActor.run {
+              self.localImage = nil
+              self.image = .init(string: uploaded)!
+            }
+          } catch let err {
+            print("err")
+            await MainActor.run {
+              self.localImage = nil
+              self.image = nil
+              self.message = "Failed to upload photo. Please try again"
+              self.didError = true
+            }
+          }
+        }
+      })
     }
   }
   
 }
 
-struct Login_Previews: PreviewProvider {
+struct Register_Previews: PreviewProvider {
   static var previews: some View {
-    Login()
-  }
-}
-
-let __firstpart = "[A-Z0-9a-z]([A-Z0-9a-z._%+-]{0,30}[A-Z0-9a-z])?"
-let __serverpart = "([A-Z0-9a-z]([A-Z0-9a-z-]{0,30}[A-Z0-9a-z])?\\.){1,5}"
-let __emailRegex = __firstpart + "@" + __serverpart + "[A-Za-z]{2,8}"
-let __emailPredicate = NSPredicate(format: "SELF MATCHES %@", __emailRegex)
-
-extension String {
-  func isEmail() -> Bool {
-    return __emailPredicate.evaluate(with: self)
-  }
-}
-
-
-struct SwiftUIWebView: UIViewRepresentable {
-  typealias UIViewType = WKWebView
-  
-  let webView: WKWebView
-  
-  init(url: URL) {
-    webView = WKWebView(frame: .zero)
-    webView.load(.init(url: url))
-  }
-  
-  func makeUIView(context: Context) -> WKWebView {
-    webView
-  }
-  func updateUIView(_ uiView: WKWebView, context: Context) {
+    Register()
   }
 }
