@@ -16,7 +16,7 @@ let servers = (
   )
 )
 
-let env = "local"
+let env = "prod"
 
 func chatServer() -> (host: String, ssl: Bool) {
   switch env {
@@ -586,11 +586,13 @@ class Api: InterceptorProvider, ApolloInterceptor {
       User.current = user
       let store = InAppChatStore.current
       store.user = user
-      store.settings.blocked.append(contentsOf: res.me.blocks ?? [])
+      store.hiddenUsers.formUnion(res.me.blocks ?? [])
       let mraw = res.memberships
-      let memberships = mraw.map { it in
+      let memberships: [Member] = mraw.map { it in
         let _ = Chat.get(Gql.FChat(_dataDict: it.chat.__data))
         return Member.fromGql(Gql.FMember(_dataDict: it.__data))
+      }.filter {
+        !($0.chat.isDM && store.hiddenUsers.contains($0.chat.friend?.id ?? ""))
       }
       store.memberships.removeAll()
       store.memberships.append(contentsOf: memberships)

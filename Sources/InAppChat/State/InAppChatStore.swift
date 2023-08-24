@@ -156,9 +156,9 @@ public class InAppChatStore: ObservableObject {
       UserDefaults.standard.set(hiddenMessages.unique(), forKey: "iac-hidden-messages")
     }
   }
-  @Published var hiddenUsers = UserDefaults.standard.stringArray(forKey: "iac-hidden-users") ?? [] {
+  var hiddenUsers = Set(UserDefaults.standard.stringArray(forKey: "iac-hidden-users") ?? []) {
     didSet {
-      UserDefaults.standard.set(hiddenUsers, forKey: "iac-hidden-users")
+      UserDefaults.standard.set(hiddenUsers.unique(), forKey: "iac-hidden-users")
     }
   }
   @Published var hiddenChats = UserDefaults.standard.stringArray(forKey: "iac-hidden-chats") ?? [] {

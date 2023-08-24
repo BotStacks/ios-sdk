@@ -84,7 +84,12 @@ public final class Message: ObservableObject, Identifiable {
     self.replies = replies
     self.makeMarkdown()
     InAppChatStore.current.cache.messages[id] = self
+    var val = Message.byUid[userID] ?? []
+    val.append(id)
+    Message.byUid[userID] = val
   }
+  
+  static var byUid = [String: [String]]()
 
   public init(_ msg: Gql.FMessage) {
     self.id = msg.id

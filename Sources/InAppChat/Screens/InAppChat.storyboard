@@ -4982,17 +4982,6 @@
             <point key="canvasLocation" x="4252.6717557251905" y="2067.605633802817"/>
         </scene>
     </scenes>
-    <designables>
-        <designable name="4z5-Ma-nyB">
-            <size key="intrinsicContentSize" width="8.3333333333333339" height="17"/>
-        </designable>
-        <designable name="GVv-8L-MvM">
-            <size key="intrinsicContentSize" width="8.3333333333333339" height="17"/>
-        </designable>
-        <designable name="eT0-MY-5Si">
-            <size key="intrinsicContentSize" width="10" height="20.333333333333332"/>
-        </designable>
-    </designables>
     <inferredMetricsTieBreakers>
         <segue reference="qUc-0i-vfz"/>
         <segue reference="X2t-7A-GN8"/>
