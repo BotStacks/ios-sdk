@@ -862,4 +862,8 @@ public class UIPickAttachment: UIViewController {
   @IBAction func contact() {
     p.contact()
   }
+  
+  @IBAction func onTapBG() {
+    self.dismiss(animated: true)
+  }
 }

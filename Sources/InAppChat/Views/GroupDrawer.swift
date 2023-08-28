@@ -45,6 +45,7 @@ public class UIGroupDrawer: UIViewController, UITableViewDelegate, UITableViewDa
   @IBOutlet var edit: UIButton!
   @IBOutlet var invite: UIButton!
   @IBOutlet var leave: UIButton!
+  @IBOutlet var report: UIButton!
   
   override public func viewDidLoad() {
     content.backgroundColor = c().background.ui
@@ -73,6 +74,7 @@ public class UIGroupDrawer: UIViewController, UITableViewDelegate, UITableViewDa
     leave.titleLabel?.font = f.mini
     
     tableView.separatorStyle = .none
+    report.tintColor = c.unread.ui
     bindUI()
   }
   
@@ -103,7 +105,7 @@ public class UIGroupDrawer: UIViewController, UITableViewDelegate, UITableViewDa
     self.cells = cells
     
     if chat.isMember {
-      leave.setAttributedTitle(.init(string: "Leave", attributes: [.font: Theme.current.fonts.mini]), for: .normal)
+      leave.setAttributedTitle(.init(string: chat.isAdmin ? "Delete" : "Leave", attributes: [.font: Theme.current.fonts.mini]), for: .normal)
       leave.setImage(UIImage(systemName: "trash.fill"), for: .normal)
     } else {
       leave.setAttributedTitle(.init(string: "Join", attributes: [.font: Theme.current.fonts.mini]), for: .normal)
@@ -112,7 +114,25 @@ public class UIGroupDrawer: UIViewController, UITableViewDelegate, UITableViewDa
   }
   
   @IBAction func leaveChat() {
-    if chat.isMember {
+    if chat.isAdmin {
+      let alert = UIAlertController(title: "Permanently Delete \(chat.displayName)?", message: "Are you sure? This action is none reversable.", preferredStyle: .alert)
+      alert.addAction(.init(title: "Cancel", style: .cancel))
+      alert.addAction(.init(title: "Permanently Delete", style: .destructive, handler: { _ in
+        Task.detached {
+          do {
+            try await api.deleteChat(id:self.chat.id)
+          } catch let err {
+            Monitoring.error(err)
+          }
+        }
+        self.dismiss(animated: true)
+        if let nav = self.room?.navigationController {
+          nav.popToRootViewController(animated: true)
+          nav.view.makeToast("Chat deleted")
+        }
+      }))
+      self.present(alert, animated:true)
+    } else if chat.isMember {
       chat.leave()
       self.dismiss(animated: true)
       self.room?.navigationController?.popViewController(animated: true)
@@ -182,12 +202,17 @@ public class UIGroupDrawer: UIViewController, UITableViewDelegate, UITableViewDa
     }
   }
   
+  @IBAction func onTapBG() {
+    self.dismiss(animated: true)
+  }
+  
   public override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
     if segue.identifier == "flag" {
       let controller = segue.destination as? UIFlagController
       controller?.chat = chat
       controller?.onSubmit = {
         self.dismiss(animated: true)
+        self.view.makeToast("Chat reported. Thank you.")
       }
     }
   }

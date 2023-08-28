@@ -209,6 +209,15 @@ class Api: InterceptorProvider, ApolloInterceptor {
       text: .some(text)
     ))
   }
+  
+  func deleteChat(id: String) async throws {
+    let _ = try await api.client.performAsync(mutation: Gql.DeleteGroupMutation(id: id))
+    await MainActor.run {
+      let store = InAppChatStore.current
+      store.network.items.removeAll(where: {$0.id == id})
+      store.memberships.removeAll(where: {$0.chat_id == id})
+    }
+  }
 
   func markRead(_ message: Message) async throws {
     try await updateMessageStatus(message, status: .seen)

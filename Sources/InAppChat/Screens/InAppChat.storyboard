@@ -1531,7 +1531,7 @@
                                         </connections>
                                     </button>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Gxh-kZ-In7" customClass="SDAnimatedImageView">
-                                        <rect key="frame" x="52" y="4.6666666666666643" width="35" height="35.000000000000007"/>
+                                        <rect key="frame" x="52" y="4.6666666666666643" width="35" height="35"/>
                                         <color key="backgroundColor" name="grey70"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="35" id="Lec-rm-auM"/>
@@ -2833,7 +2833,7 @@
                                         </connections>
                                     </button>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="cHh-vL-XIw">
-                                        <rect key="frame" x="52" y="4.6666666666666643" width="35" height="35.000000000000007"/>
+                                        <rect key="frame" x="52" y="4.6666666666666643" width="35" height="35"/>
                                         <color key="backgroundColor" name="grey70"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="35" id="4Q6-u3-ArX"/>
@@ -2846,7 +2846,7 @@
                                         </userDefinedRuntimeAttributes>
                                     </imageView>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalCentering" alignment="top" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="BOv-5N-PqK">
-                                        <rect key="frame" x="95" y="4.6666666666666643" width="238" height="35.000000000000007"/>
+                                        <rect key="frame" x="95" y="4.6666666666666643" width="238" height="35"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XTo-LQ-vwe">
                                                 <rect key="frame" x="0.0" y="0.0" width="55" height="15"/>
@@ -2883,7 +2883,7 @@
                                         </subviews>
                                     </stackView>
                                     <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zTm-xt-mrK" customClass="UIGroupPlaceholder" customModule="InAppChat" customModuleProvider="target">
-                                        <rect key="frame" x="52" y="4.6666666666666643" width="35" height="35.000000000000007"/>
+                                        <rect key="frame" x="52" y="4.6666666666666643" width="35" height="35"/>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
                                                 <real key="value" value="17.5"/>
@@ -3348,8 +3348,7 @@
                                                                 <color key="baseForegroundColor" name="negative"/>
                                                             </buttonConfiguration>
                                                             <connections>
-                                                                <action selector="leaveChat" destination="K8P-Vm-Df8" eventType="touchUpInside" id="QPE-Z7-5h2"/>
-                                                                <segue destination="1Hi-mM-Zxo" kind="presentation" id="dMQ-sR-TSh"/>
+                                                                <segue destination="1Hi-mM-Zxo" kind="presentation" identifier="flag" id="dMQ-sR-TSh"/>
                                                             </connections>
                                                         </button>
                                                     </subviews>
@@ -3406,12 +3405,16 @@
                             </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="hal-Xo-HAw"/>
+                        <gestureRecognizers/>
                         <constraints>
                             <constraint firstItem="JhA-9N-XT3" firstAttribute="leading" secondItem="hal-Xo-HAw" secondAttribute="leading" id="L6L-OH-ZkP"/>
                             <constraint firstItem="JhA-9N-XT3" firstAttribute="bottom" secondItem="hal-Xo-HAw" secondAttribute="bottom" id="WZ8-4E-dv8"/>
                             <constraint firstItem="JhA-9N-XT3" firstAttribute="trailing" secondItem="hal-Xo-HAw" secondAttribute="trailing" id="je8-dz-xjF"/>
                             <constraint firstItem="JhA-9N-XT3" firstAttribute="height" secondItem="svs-fu-cjZ" secondAttribute="height" multiplier="0.86" id="zaf-sR-4yu"/>
                         </constraints>
+                        <connections>
+                            <outletCollection property="gestureRecognizers" destination="UgQ-MC-2Pj" appends="YES" id="eTP-Sk-4Dg"/>
+                        </connections>
                     </view>
                     <connections>
                         <outlet property="allmembers" destination="mVA-jz-Zvu" id="SiU-IX-jHs"/>
@@ -3425,10 +3428,16 @@
                         <outlet property="leave" destination="DtE-3Y-OvU" id="fjk-ad-UGh"/>
                         <outlet property="name" destination="AgL-CK-D3N" id="lPV-YJ-OiW"/>
                         <outlet property="placeholder" destination="pdx-ud-Xcj" id="lab-C4-p4u"/>
+                        <outlet property="report" destination="6rO-0G-7mc" id="RMk-NW-Wmw"/>
                         <outlet property="tableView" destination="do2-ge-ezB" id="7Ug-Hs-8l1"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="fL1-V1-4B6" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <tapGestureRecognizer id="UgQ-MC-2Pj">
+                    <connections>
+                        <action selector="onTapBG" destination="K8P-Vm-Df8" id="ulM-3C-u7Q"/>
+                    </connections>
+                </tapGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="3125.9541984732823" y="538.73239436619724"/>
         </scene>
@@ -3776,6 +3785,9 @@
                             <constraint firstItem="QSV-gb-TDw" firstAttribute="leading" secondItem="2jH-AE-DcN" secondAttribute="leading" id="P6e-nG-BXV"/>
                             <constraint firstItem="QSV-gb-TDw" firstAttribute="bottom" secondItem="SjA-PP-VPs" secondAttribute="bottom" id="y6i-Lh-XwL"/>
                         </constraints>
+                        <connections>
+                            <outletCollection property="gestureRecognizers" destination="kQq-jI-sjZ" appends="YES" id="Gvc-le-40E"/>
+                        </connections>
                     </view>
                     <navigationItem key="navigationItem" id="CKH-N6-zWc"/>
                 </viewController>
@@ -3813,6 +3825,11 @@
                 <tapGestureRecognizer id="PTC-iJ-A1h">
                     <connections>
                         <action selector="contact" destination="hcF-Pf-YB2" id="bPm-IE-rkJ"/>
+                    </connections>
+                </tapGestureRecognizer>
+                <tapGestureRecognizer id="kQq-jI-sjZ">
+                    <connections>
+                        <action selector="onTapBG" destination="hcF-Pf-YB2" id="36E-K3-z8B"/>
                     </connections>
                 </tapGestureRecognizer>
             </objects>
@@ -4144,6 +4161,9 @@
                             <constraint firstItem="PMt-Tr-P70" firstAttribute="leading" secondItem="lWO-Ja-eq7" secondAttribute="leading" id="kcf-g9-LHl"/>
                             <constraint firstItem="PMt-Tr-P70" firstAttribute="leading" secondItem="lWO-Ja-eq7" secondAttribute="leading" id="pNE-nH-Uah"/>
                         </constraints>
+                        <connections>
+                            <outletCollection property="gestureRecognizers" destination="akZ-O1-XgS" appends="YES" id="NUq-UX-CkW"/>
+                        </connections>
                     </view>
                     <navigationItem key="navigationItem" id="Ikv-Kx-CsN"/>
                     <connections>
@@ -4175,6 +4195,11 @@
                 <tapGestureRecognizer id="xe2-o5-qfh">
                     <connections>
                         <action selector="hide" destination="66X-6m-lDU" id="bBI-wM-4hU"/>
+                    </connections>
+                </tapGestureRecognizer>
+                <tapGestureRecognizer id="akZ-O1-XgS">
+                    <connections>
+                        <action selector="onTapBG" destination="66X-6m-lDU" id="YVU-g9-MbZ"/>
                     </connections>
                 </tapGestureRecognizer>
             </objects>
@@ -4982,10 +5007,21 @@
             <point key="canvasLocation" x="4252.6717557251905" y="2067.605633802817"/>
         </scene>
     </scenes>
+    <designables>
+        <designable name="4z5-Ma-nyB">
+            <size key="intrinsicContentSize" width="8.3333333333333339" height="17"/>
+        </designable>
+        <designable name="GVv-8L-MvM">
+            <size key="intrinsicContentSize" width="8.3333333333333339" height="17"/>
+        </designable>
+        <designable name="eT0-MY-5Si">
+            <size key="intrinsicContentSize" width="10" height="20.333333333333332"/>
+        </designable>
+    </designables>
     <inferredMetricsTieBreakers>
         <segue reference="qUc-0i-vfz"/>
         <segue reference="X2t-7A-GN8"/>
-        <segue reference="6JO-ED-vcf"/>
+        <segue reference="dMQ-sR-TSh"/>
         <segue reference="6FX-Q9-dqj"/>
         <segue reference="nVX-zA-bsb"/>
         <segue reference="7vb-Wf-Lgu"/>

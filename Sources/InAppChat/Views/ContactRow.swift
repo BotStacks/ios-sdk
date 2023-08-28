@@ -29,7 +29,9 @@ public class UIContactRow: UITableViewCell {
       bag.removeAll()
       user.objectWillChange.makeConnectable().autoconnect()
         .sink { [weak self] _ in
-          self?.bindUI()
+          DispatchQueue.main.async {
+            self?.bindUI()
+          }
         }.store(in: &bag)
       bindUI()
     }

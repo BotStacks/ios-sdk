@@ -96,7 +96,7 @@ public class UIInviteUsers: UIBaseController, UITableViewDelegate, UITableViewDa
   var creating = false
   
   @IBAction func submit() {
-    if selected.isEmpty || creating {return}
+    if (selected.isEmpty && create == nil) || creating {return}
     activityIndicator.isHidden = false
     activityIndicator.startAnimating()
     if let chat = chat {
@@ -123,11 +123,12 @@ public class UIInviteUsers: UIBaseController, UITableViewDelegate, UITableViewDa
           )
           await MainActor.run {
             CreateChatState.current = nil
-            self.navigationController?.popViewController(animated: false)
-            self.navigationController?.popViewController(animated: true)
-            let room = UIChatRoom.instance()
-            room.chat = chat
-            self.navigationController?.pushViewController(room, animated: true)
+            if let nav = self.navigationController {
+              nav.popToRootViewController(animated: true)
+                let room = UIChatRoom.instance()
+                room.chat = chat
+                nav.pushViewController(room, animated: true)
+            }
           }
         } catch let err {
           print("Error creating chat \(err)")

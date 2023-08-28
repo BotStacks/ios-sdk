@@ -28,6 +28,10 @@ public class UIMessageActions: UIViewController {
   
   var emojis: [String] = []
   
+  @IBAction func onTapBG() {
+    self.dismiss(animated: true)
+  }
+  
   override public func viewDidLoad() {
     var emojis = InAppChatStore.current.lastUsedReactions
     if let current = room.messageForAction?.currentReaction {
