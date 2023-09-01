@@ -7,18 +7,31 @@
 
 import InAppChat
 import SwiftUI
-import Firebase
 import GiphyUISDK
 
 @main
 struct InAppChat_ExampleApp: App {
     
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+  
 
-
+  func envVar(_ name: String, defaultValue: String) -> String {
+    guard let path = Bundle.main.path(forResource: "Keys", ofType: "plist") else {
+      print("No Keys File")
+      return defaultValue
+    }
+    let dict = NSDictionary(contentsOfFile: path)
+    print("Got dict \(dict.debugDescription)")
+    guard let val = dict?.value(forKey: name) as? String, !val.isEmpty  else {
+      print("Invalid Value")
+      return defaultValue
+    }
+    return val
+  }
+  
   init() {
-    Giphy.configure(apiKey: "y29MF80OOqL4I0YQafUDAlcLiRjea4yI")
-    InAppChat.setup(apiKey: "rp1pptcmrxceuwj31oj8uwlo")
+    Giphy.configure(apiKey: envVar("giphy-api-key", defaultValue: ""))
+    InAppChat.setup(apiKey: envVar("inappchat-api-key", defaultValue: ""))
     InAppChat.shared.hideBackButton = true
   }
 
@@ -45,7 +58,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     
     func application(_ application: UIApplication,
                       didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-       FirebaseApp.configure()
        return true
      }
 }

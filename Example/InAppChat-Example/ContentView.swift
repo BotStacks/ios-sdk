@@ -7,7 +7,6 @@
 
 import InAppChat
 import SwiftUI
-import Auth0
 
 
 enum Routes: Equatable {

@@ -6,14 +6,11 @@ PODS:
   - Apollo/Core (1.4.0)
   - Apollo/WebSocket (1.4.0):
     - Apollo/Core
-  - Auth0 (2.5.0):
-    - JWTDecode (~> 3.1)
-    - SimpleKeychain (~> 1.1)
   - DynamicColor (5.0.1)
   - Gifu (3.3.1)
   - Giphy (2.2.6):
     - libwebp
-  - InAppChat (1.0.25):
+  - InAppChat (1.0.26):
     - ActivityIndicatorView
     - AnyCodable-FlightSchool
     - Apollo
@@ -26,7 +23,6 @@ PODS:
     - SnapKit
     - SwiftDate
     - SwiftyJSON
-  - JWTDecode (3.1.0)
   - libwebp (1.3.1):
     - libwebp/demux (= 1.3.1)
     - libwebp/mux (= 1.3.1)
@@ -50,13 +46,11 @@ PODS:
   - Sentry/Core (8.10.0):
     - SentryPrivate (= 8.10.0)
   - SentryPrivate (8.10.0)
-  - SimpleKeychain (1.1.0)
   - SnapKit (5.6.0)
   - SwiftDate (7.0.0)
   - SwiftyJSON (5.0.1)
 
 DEPENDENCIES:
-  - Auth0 (~> 2.0)
   - Giphy
   - InAppChat (from `../`)
 
@@ -65,17 +59,14 @@ SPEC REPOS:
     - ActivityIndicatorView
     - AnyCodable-FlightSchool
     - Apollo
-    - Auth0
     - DynamicColor
     - Gifu
     - Giphy
-    - JWTDecode
     - libwebp
     - SDWebImage
     - SDWebImageSwiftUI
     - Sentry
     - SentryPrivate
-    - SimpleKeychain
     - SnapKit
     - SwiftDate
     - SwiftyJSON
@@ -88,22 +79,19 @@ SPEC CHECKSUMS:
   ActivityIndicatorView: f14ac8e200a344fe992577807998b0c8562bd964
   AnyCodable-FlightSchool: 261cbe76757802b17d471b9059b21e6fa5edf57b
   Apollo: d4d06fd38de80fd10c21389f9084fd64e4f712c7
-  Auth0: 72f19ad566fdf57f07bf37f828afd0c1570769a5
   DynamicColor: d049834ef86d8ecf150b0ca1ebe54ee733a0ec22
   Gifu: 416d4e38c4c2fed012f019e0a1d3ffcb58e5b842
   Giphy: f64bff5937fbc4987b6a26c8ef625501c68a1e97
-  InAppChat: 6658fe7053962bb9ed3cbbe0b0407af87a772d26
-  JWTDecode: 3eaab1e06b6f4dcbdd6716aff09ba4c2104ca8b7
+  InAppChat: a7bc4e6c790201c239dc16806f753c4695aa1c2b
   libwebp: 33dc822fbbf4503668d09f7885bbfedc76c45e96
   SDWebImage: 750adf017a315a280c60fde706ab1e552a3ae4e9
   SDWebImageSwiftUI: 17396b7889f9abc27231caaeb64c537564284aab
   Sentry: 71cd4427146ac56eab6e70401ac7a24384c3d3b5
   SentryPrivate: 9334613897c85a9e30f2c9d7a331af8aaa4fe71f
-  SimpleKeychain: f8707c8e97b38c6a6e687b17732afc9bcef06439
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
   SwiftDate: bbc26e26fc8c0c33fbee8c140c5e8a68293a148a
   SwiftyJSON: 2f33a42c6fbc52764d96f13368585094bfd8aa5e
 
-PODFILE CHECKSUM: 75a3dc15f51e5f794ede9ee83ad4675960c88424
+PODFILE CHECKSUM: 4c73f3cbeec1678b417ada04c2abb3f1257a47d6
 
 COCOAPODS: 1.12.1

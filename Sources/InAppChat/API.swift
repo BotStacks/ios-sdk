@@ -95,6 +95,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
     }
     request.addHeader(name: "X-API-Key", value: InAppChat.shared.apiKey)
     request.addHeader(name: "X-Device-ID", value: deviceId)
+    request.addHeader(name: "Referer", value: Bundle.main.bundleIdentifier ?? "ios-sdk")
     chain.proceedAsync(request: request, response: response, interceptor: self, completion: completion)
   }
 

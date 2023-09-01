@@ -5,11 +5,9 @@
 //  Created by Zaid Daghestani on 1/28/23.
 //
 
-import Auth0
 import Foundation
 import InAppChat
 import SwiftUI
-import JWTDecode
 import UserNotifications
 import WebKit
 

@@ -4,9 +4,11 @@
 
 Delightful chat for your iOS apps
 
+Try it out, download [InAppChat iOS](https://apps.apple.com/us/app/inappchat/id6448892489)
+
 ## Overview
 
-This SDK integrates a fully serviced chat experience on the [InAppChat](https://inappchat.io) platform.
+This SDK integrates a fully serviced chat experience on the [InAppChat](https://inappchat.io) platform. InAppChat provides the entire UI and backend to enable chat for your users. All you have to do is log your user in to the SDK and display the InAppChat view controller. You can also checkout the `/Example` directory for a running example of an InAppChat enabled app.
 
 ## Installation
 
@@ -123,6 +125,19 @@ struct ContentView: View {
 }
 ```
 
+### Enabling Giphy support
+
+The UI Kit comes with support for Giphy built in. If you'd to have Giphy enabled in your chat app, get a Giphy API key from [Giphy](https://developers.giphy.com/). Then import and setup in Giphy SDK in your startup code:
+
+```swift
+import GiphyUISDK
+
+func onAppStartup() {
+  Giphy.configure(apiKey: "your-api-key")
+}
+
+```
+
 ## Theming
 
 You can theme your InAppChat UI by passing in a theme to `InAppChat` any time before displaying the UI. The theme supports fonts, colors and things like bubble border radius and image sizes. Provide a `Theme` to InAppChatUI
@@ -207,6 +222,17 @@ There are empty screen configurations as well:
       )
     )
 ```
+
+## Running the Sample App
+
+Get an API key at [InAppChat](https://inappchat.io/app) by clicking on your project and clicking project settings in the top right.
+Get a Giphy API key if you'd like Giphy in your Sample.
+
+Add both keys to the `Example/InAppChat-Example/InAppChat_ExampleApp.swift`
+
+Run the app
+
+---
 
 Fin!
 

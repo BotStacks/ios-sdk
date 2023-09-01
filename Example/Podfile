@@ -4,6 +4,5 @@ platform :ios, '15.0'
 
 target 'InAppChat-Example' do
   pod 'InAppChat', :path => '../'
-  pod 'Auth0', '~> 2.0'
   pod 'Giphy'
 end

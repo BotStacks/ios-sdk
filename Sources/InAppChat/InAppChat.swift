@@ -48,6 +48,9 @@ public class InAppChat: ObservableObject {
   }
 
   public static func setup(apiKey: String, delayLoad: Bool = false) {
+    if apiKey.isEmpty {
+      fatalError("InAppChat must be initiated with a valid api key.")
+    }
     InAppChat.shared = InAppChat(apiKey: apiKey)
     if !delayLoad {
       Task {
