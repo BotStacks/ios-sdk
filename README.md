@@ -1,28 +1,60 @@
-# InAppChat iOS SDK
-
 [![CodeFactor](https://www.codefactor.io/repository/github/ripbullnetworks/inappchat-ios/badge)](https://www.codefactor.io/repository/github/ripbullnetworks/inappchat-ios) ![Cocoapods](https://img.shields.io/cocoapods/v/InAppChat?style=flat-square) ![GitHub issues](https://img.shields.io/github/issues/RipBullNetworks/inappchat-ios) ![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ripbullnetworks/inappchat-ios)
 
-Delightful chat for your iOS apps
+![IAC IOS](https://github.com/ShadowArcanist/IACios/assets/106978117/45eba8e1-bb01-4dce-8c79-68ab8a1056b3)
 
-Try it out, download [InAppChat iOS](https://apps.apple.com/us/app/inappchat/id6448892489)
+# In-AppChat iOS SDK
 
-## Overview
+> Delightful chat for your iOS apps. Try it out, download [In-AppChat iOS](https://apps.apple.com/us/app/inappchat/id6448892489)
 
-This SDK integrates a fully serviced chat experience on the [InAppChat](https://inappchat.io) platform. InAppChat provides the entire UI and backend to enable chat for your users. All you have to do is log your user in to the SDK and display the InAppChat view controller. You can also checkout the `/Example` directory for a running example of an InAppChat enabled app.
+&nbsp;  
 
-## Installation
+# 📃 Table of Contents
+- [Overview](https://github.com/ShadowArcanist/IACios/blob/main/README.md#-overview)
+- [Installation](https://github.com/ShadowArcanist/IACios/blob/main/README.md#-installation)
+- [Getting Started](https://github.com/ShadowArcanist/IACios/blob/main/README.md#-getting-started)
+- [Theming](https://github.com/ShadowArcanist/IACios/blob/main/README.md#-Theming)
+- [Running the Sample App](https://github.com/ShadowArcanist/IACios/blob/main/README.md#-running-the-sample-app)
+
+&nbsp;  
+
+# ✨ Overview
+
+This SDK integrates a fully serviced chat experience on the [InAppChat](https://inappchat.io) platform. 
+
+**InAppChat provides the entire UI and backend to enable chat for your users.**
+
+All you have to do is log your user in to the SDK and display the InAppChat view controller. 
+
+&nbsp;  
+
+You can also checkout the `/Example` directory for a running example of an InAppChat enabled app.
+
+&nbsp;  
+
+# ⚙ Installation
 
 This SDK is accessible via conventional means as a Cocoapod
+
+```
+.package(url: "https://github.com/RipBullNetworks/inappchat-ios", .upToNextMajor(from: "1.0.0")),
+```
+
+&nbsp;  
 
 ### CocoaPods
 
 Add the pod to your podfile
 
-`pod "InAppChat"`
+```
+pod "InAppChat"
+```
 
-## Usage
+&nbsp;  
 
-### Initialize the SDK
+# 🚀 Getting Started
+
+
+### Step 1: Initialize the SDK
 
 In your app delegate, or anywhere else you put your startup logic, initialize the InAppChat SDK
 
@@ -30,11 +62,17 @@ In your app delegate, or anywhere else you put your startup logic, initialize th
 InAppChat.setup(apiKey: apiKey)
 ```
 
+&nbsp;  
+
 Note, you can optionally delay load and later call `InAppChat.shared.load` to load IAC in whatever load sequence you please
 
-### Log your user in
+&nbsp;  
 
-Before displaying the UI, you must log your user in to InAppChat via one of the designatied login methods. The methods return a boolean indicating if the user is logged in or not.
+### Step 2: Log your user in
+
+Before displaying the UI, you **must** log your user in to InAppChat via one of the designatied login methods. 
+
+The methods return a boolean indicating if the user is logged in or not.
 
 ```swift
 @IBAction func loginToInAppChat() {
@@ -58,7 +96,11 @@ Before displaying the UI, you must log your user in to InAppChat via one of the 
 }
 ```
 
+&nbsp;  
+
 InAppChat as well as all other state objects in the SDK extend `ObservableObject`. InAppChat maintains an `@Published` isUserLoggedIn that you can use in your SwiftUI apps as well. You can also listen to the `Chats` object which holds state for the entire InAppChat interface.
+
+&nbsp;  
 
 Listen to InAppChat using combine in your view controllers:
 
@@ -72,6 +114,8 @@ InAppChat.shared.objectWillChange
     }
   }).store(in: bag)
 ```
+
+&nbsp;  
 
 Use `@ObservedObject` in your SwiftUI
 
@@ -94,9 +138,11 @@ public struct MyView: View {
 }
 ```
 
-### Display the UI
+&nbsp;  
 
-#### UIKit
+## Step 3: Display the UI
+
+### A. UIKit
 
 If you're using UI kit, just push or present the InAppChat controller from anywhere in your UI code. For example, on a messaging button press:
 
@@ -109,7 +155,9 @@ If you're using UI kit, just push or present the InAppChat controller from anywh
 }
 ```
 
-#### SwiftUI
+&nbsp;  
+
+### B. SwiftUI
 
 Render InAppChat in any full screen view by rendering InAppChatView. Include a logout handler to return to your own UI upon user logout.
 
@@ -125,7 +173,9 @@ struct ContentView: View {
 }
 ```
 
-### Enabling Giphy support
+&nbsp;  
+
+## Step 4: Enabling Giphy support
 
 The UI Kit comes with support for Giphy built in. If you'd to have Giphy enabled in your chat app, get a Giphy API key from [Giphy](https://developers.giphy.com/). Then import and setup in Giphy SDK in your startup code:
 
@@ -138,7 +188,9 @@ func onAppStartup() {
 
 ```
 
-## Theming
+&nbsp;  
+
+# 🖍 Theming
 
 You can theme your InAppChat UI by passing in a theme to `InAppChat` any time before displaying the UI. The theme supports fonts, colors and things like bubble border radius and image sizes. Provide a `Theme` to InAppChatUI
 
@@ -146,7 +198,9 @@ You can theme your InAppChat UI by passing in a theme to `InAppChat` any time be
 InAppChat.set(theme: Theme())
 ```
 
-### Colors
+&nbsp;  
+
+### A. Colors
 
 You can provide your own color themes to the theme object with a wide array of parameters. The UI kit uses both a light and a dark theme so provide both.
 
@@ -168,7 +222,9 @@ theme:
 )
 ```
 
-### Fonts
+&nbsp;  
+
+### B. Fonts
 
 The UI kit uses the same Fonts styles as the iOS. You can provide your own Fonts object to customize those fonts:
 
@@ -188,7 +244,9 @@ InAppChat.set(theme:
 )
 ```
 
-### Assets
+&nbsp;  
+
+### C. Assets
 
 There are customizable assets and text that you can use in your UI Kit as well. Most importantly is the default image you want to use for groups.
 
@@ -199,6 +257,8 @@ InAppChat.set(theme:
   )
 )
 ```
+
+&nbsp;  
 
 There are empty screen configurations as well:
 
@@ -223,17 +283,23 @@ There are empty screen configurations as well:
     )
 ```
 
-## Running the Sample App
+&nbsp;  
+
+# ⚡ Running the Sample App
 
 Get an API key at [InAppChat](https://inappchat.io/app) by clicking on your project and clicking project settings in the top right.
+
 Get a Giphy API key if you'd like Giphy in your Sample.
 
 Add both keys to the `Example/InAppChat-Example/InAppChat_ExampleApp.swift`
 
-Run the app
+**Run the app**
+
+&nbsp;  
+
+# 🙋‍♂️ Help
+
+If you don't understand something in the documentation, you are experiencing problems, or you just need a gentle nudge in the right direction, please join our [Discord server](https://discord.com/invite/5kwyQCz3zZ)
 
 ---
-
-Fin!
-
-All content copyright Rip Bull Networks, Inc
+**All Content Copyright © 2023 Rip Bull Networks**
