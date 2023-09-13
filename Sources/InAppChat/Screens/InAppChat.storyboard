@@ -1184,8 +1184,9 @@
                                     <constraint firstAttribute="height" constant="44" id="o2b-YK-tPq"/>
                                 </constraints>
                             </view>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="GYd-26-TwX" customClass="SDAnimatedImageView">
+                            <imageView clipsSubviews="YES" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="GYd-26-TwX" customClass="SDAnimatedImageView">
                                 <rect key="frame" x="121.66666666666669" y="123" width="150" height="150"/>
+                                <gestureRecognizers/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="150" id="Sc2-By-FV8"/>
                                     <constraint firstAttribute="height" constant="150" id="e5b-oT-HX4"/>
@@ -1195,12 +1196,19 @@
                                         <integer key="value" value="75"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <outletCollection property="gestureRecognizers" destination="JXs-Db-mQW" appends="YES" id="zBs-e2-3VZ"/>
+                                </connections>
                             </imageView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oJe-5j-6CZ">
+                            <label opaque="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oJe-5j-6CZ">
                                 <rect key="frame" x="175.66666666666666" y="293" width="42" height="21"/>
+                                <gestureRecognizers/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
+                                <connections>
+                                    <outletCollection property="gestureRecognizers" destination="U1O-Zq-A0M" appends="YES" id="zNy-8K-mpc"/>
+                                </connections>
                             </label>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="LyN-Iv-G4Y" customClass="UIRow" customModule="InAppChat" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="334" width="393" height="84"/>
@@ -1419,10 +1427,14 @@
                                     <constraint firstAttribute="height" constant="1" id="sZN-ko-jjr"/>
                                 </constraints>
                             </view>
+                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="large" translatesAutoresizingMaskIntoConstraints="NO" id="Vf6-eV-dqn">
+                                <rect key="frame" x="178" y="179.66666666666666" width="37" height="37"/>
+                            </activityIndicatorView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="O8D-YW-YHK"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="Vf6-eV-dqn" firstAttribute="centerX" secondItem="GYd-26-TwX" secondAttribute="centerX" id="1Ql-a7-drN"/>
                             <constraint firstItem="Aoi-kK-COJ" firstAttribute="top" secondItem="unC-u3-8Jw" secondAttribute="topMargin" id="1U7-vf-DYb"/>
                             <constraint firstItem="myz-ud-It5" firstAttribute="trailing" secondItem="O8D-YW-YHK" secondAttribute="trailing" id="2HH-4y-lBB"/>
                             <constraint firstItem="ZhK-kp-eeT" firstAttribute="top" secondItem="myz-ud-It5" secondAttribute="bottom" id="2wV-MT-DI3"/>
@@ -1446,6 +1458,7 @@
                             <constraint firstItem="myz-ud-It5" firstAttribute="top" secondItem="LyN-Iv-G4Y" secondAttribute="bottom" id="Ups-dd-cbH"/>
                             <constraint firstItem="mMX-7b-AkC" firstAttribute="trailing" secondItem="O8D-YW-YHK" secondAttribute="trailing" id="UsH-CL-0FT"/>
                             <constraint firstItem="OwG-LI-b7b" firstAttribute="leading" secondItem="O8D-YW-YHK" secondAttribute="leading" id="ar0-rF-Z6S"/>
+                            <constraint firstItem="Vf6-eV-dqn" firstAttribute="centerY" secondItem="GYd-26-TwX" secondAttribute="centerY" id="eKb-0s-o5e"/>
                             <constraint firstItem="gts-NZ-KcV" firstAttribute="leading" secondItem="unC-u3-8Jw" secondAttribute="leading" id="fNe-Uc-BxX"/>
                             <constraint firstItem="mMX-7b-AkC" firstAttribute="top" secondItem="unC-u3-8Jw" secondAttribute="top" id="gYm-C3-Mzq"/>
                             <constraint firstAttribute="trailing" secondItem="gts-NZ-KcV" secondAttribute="trailing" id="iN9-uw-zT8"/>
@@ -1458,6 +1471,7 @@
                         <outlet property="btnBack" destination="UZ9-uT-9dw" id="37M-2m-7R1"/>
                         <outlet property="displayName" destination="oJe-5j-6CZ" id="kxx-Gt-cBu"/>
                         <outlet property="image" destination="GYd-26-TwX" id="Dri-Jg-2Te"/>
+                        <outlet property="imageLoader" destination="Vf6-eV-dqn" id="5gW-hQ-WG5"/>
                         <outlet property="lblTitle" destination="kRq-Zz-lEY" id="VGC-eR-1XX"/>
                     </connections>
                 </viewController>
@@ -1480,6 +1494,16 @@
                 <tapGestureRecognizer id="E48-s4-Ssy">
                     <connections>
                         <segue destination="o7l-7F-cal" kind="show" id="7vb-Wf-Lgu"/>
+                    </connections>
+                </tapGestureRecognizer>
+                <tapGestureRecognizer id="JXs-Db-mQW">
+                    <connections>
+                        <action selector="tapProfile" destination="kud-LZ-f5d" id="Dnj-oA-VvK"/>
+                    </connections>
+                </tapGestureRecognizer>
+                <tapGestureRecognizer id="U1O-Zq-A0M">
+                    <connections>
+                        <action selector="tapUsername" destination="kud-LZ-f5d" id="LQC-AN-kDp"/>
                     </connections>
                 </tapGestureRecognizer>
             </objects>
@@ -5022,7 +5046,7 @@
         <segue reference="qUc-0i-vfz"/>
         <segue reference="X2t-7A-GN8"/>
         <segue reference="6JO-ED-vcf"/>
-        <segue reference="6FX-Q9-dqj"/>
+        <segue reference="LPS-hN-eV7"/>
         <segue reference="nVX-zA-bsb"/>
         <segue reference="7vb-Wf-Lgu"/>
     </inferredMetricsTieBreakers>

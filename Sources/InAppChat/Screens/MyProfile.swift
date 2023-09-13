@@ -3,6 +3,7 @@ import SwiftUI
 import UIKit
 import Combine
 import SDWebImage
+import PhotosUI
 
 public class UIBaseController: UIViewController {
   @IBOutlet var lblTitle: UILabel!
@@ -42,7 +43,7 @@ public class UIBaseController: UIViewController {
 }
 
 
-public class UIMyProfile: UIBaseController {
+public class UIMyProfile: UIBaseController, PHPickerViewControllerDelegate, UITextFieldDelegate {
   
   @IBOutlet var displayName: UILabel!
   @IBOutlet var image: SDAnimatedImageView!
@@ -97,6 +98,128 @@ public class UIMyProfile: UIBaseController {
     )
     self.present(alert, animated: true)
   }
+  
+  @IBOutlet var imageLoader: UIActivityIndicatorView!
+  @IBAction func tapProfile() {
+    if getUser().isCurrent {
+      var config = PHPickerConfiguration(photoLibrary: .shared())
+      config.filter = .images
+      config.preferredAssetRepresentationMode = .current
+      let picker = PHPickerViewController(configuration: config)
+      picker.delegate = self
+      self.present(picker, animated: true)
+    }
+  }
+  
+  @IBAction func tapUsername() {
+    if getUser().isCurrent {
+      let alert = UIAlertController(title: "Change Nickname", message: "Input a new nickname if you'd like to change it", preferredStyle: .alert)
+      alert.addTextField { field in
+        field.delegate = self
+      }
+      let cancel = UIAlertAction(title: "Cancel", style: .cancel)
+      alert.addAction(cancel)
+      let submitAction = UIAlertAction(title: "Submit", style: .default) { [unowned alert] _ in
+        let answer = alert.textFields![0]
+        if let text = answer.text, text.count >= 5 {
+          let original = User.current?.displayName
+          User.current?.displayName = text
+          Task.detached {
+            do {
+              let res = try await api.updateProfile(input: .init(display_name: .some(text)))
+              await MainActor.run {
+                self.view.makeToast("Nickname updated")
+              }
+            } catch let err {
+              Monitoring.error(err)
+              await MainActor.run {
+                User.current?.displayName = original
+                self.view.makeToast("Failed to update nickname. Please try again")
+              }
+            }
+          }
+        } else {
+          self.view.makeToast("Nickname must 5 or more characters")
+        }
+        
+      }
+      
+      alert.addAction(submitAction)
+      
+      present(alert, animated: true)
+    }
+  }
+  
+  
+  
+  public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+    if CharacterSet.alphanumerics.isSuperset(of: CharacterSet(charactersIn: string)) || string == "_" {
+      return true
+    }
+    return false
+  }
+  
+  public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+    self.dismiss(animated: true)
+    imageLoader.startAnimating()
+    imageLoader.isHidden = false
+    imageLoader.color = c().primary.ui
+    if let result = results.first
+    {
+      result.file { tmp in
+        Task.detached {
+          do {
+            let url = try await api.uploadFile(file: .init(url: tmp))
+            let _ = try await api.updateProfile(input: .init(image: .some(url)))
+            await MainActor.run {
+              User.current?.avatar = url
+              self.imageLoader.stopAnimating()
+              self.view.makeToast("Profile picture updated")
+            }
+          } catch let err {
+            Monitoring.error(err)
+            print("Error \(err)")
+            DispatchQueue.main.async {
+              self.imageLoader.stopAnimating()
+              self.view.makeToast("Image upload failed. Please try again.")
+            }
+          }
+        }
+      }
+    } else {
+      print("No picker results")
+    }
+  }
+}
+
+public extension PHPickerResult {
+  func file(_ cb: @escaping (URL) -> Void) {
+    let identifiers = [UTType.gif.identifier, UTType.image.identifier]
+    guard let match = identifiers.first(where: {itemProvider.hasItemConformingToTypeIdentifier($0)}) else {
+      return
+    }
+    let isGif = itemProvider.hasItemConformingToTypeIdentifier(UTType.gif.identifier)
+    itemProvider.loadFileRepresentation(forTypeIdentifier: match) {
+      url, err in
+      if let err = err {
+        print("Error Loading File", err)
+      } else if let url = url {
+        do {
+          let tmp = try tmpFile(ext: isGif ? "gif" : "png")
+          print("Copy from url", url.absoluteString, "to", tmp.absoluteString)
+          if isGif {
+            try FileManager.default.copyItem(at: url, to: tmp)
+          } else {
+            try UIImage(data: try Data(contentsOf: url))?.png(isOpaque: false)?.write(to: tmp)
+          }
+          cb(tmp)
+        } catch let err {
+          print("Failed to copy file", err)
+        }
+      }
+    }
+  }
+
 }
 
 public struct MyProfile: View {
