@@ -530,33 +530,36 @@ public class UIChatRoom: UIViewController, UITextViewDelegate, UIImagePickerCont
     let identifier =
     self.video
     ? [UTType.video.identifier, UTType.movie.identifier, UTType.mpeg.identifier]
-    : [UTType.image.identifier]
+    : [UTType.gif.identifier, UTType.image.identifier]
     print("picker did finsih picking", results)
-    if let result = results.first,
-       let match = identifier.first(where: {
-         result.itemProvider.hasItemConformingToTypeIdentifier($0)
-       })
+    if let result = results.first
     {
-      print("Getting file for ", match)
-      let progress = result.itemProvider.loadFileRepresentation(forTypeIdentifier: match) {
-        url, err in
-        if let err = err {
-          print("Error Loading File", err)
-        } else if let url = url {
-          do {
-            let tmp = try tmpFile()
-            print("Copy from url", url.absoluteString, "to", tmp.absoluteString)
-            try FileManager.default.copyItem(
-              at: url, to: tmp)
-            DispatchQueue.main.async {
-              if self.video {
+      if self.video, let match = identifier.first(where: {
+        result.itemProvider.hasItemConformingToTypeIdentifier($0)
+      }) {
+        let progress = result.itemProvider.loadFileRepresentation(forTypeIdentifier: match) {
+          url, err in
+          if let err = err {
+            print("Error Loading File", err)
+          } else if let url = url {
+            do {
+              let tmp = try tmpFile()
+              print("Copy from url", url.absoluteString, "to", tmp.absoluteString)
+              try FileManager.default.copyItem(
+                at: url, to: tmp)
+              DispatchQueue.main.async {
                 self.onVideo(tmp)
-              } else {
-                self.onImage(tmp)
               }
+            } catch let err {
+              print("Failed to copy file", err)
             }
-          } catch let err {
-            print("Failed to copy file", err)
+          }
+        }
+        print("Getting file for ", match)
+      } else {
+        result.file { tmp in
+          DispatchQueue.main.async {
+            self.onImage(tmp)
           }
         }
       }
@@ -567,6 +570,17 @@ public class UIChatRoom: UIViewController, UITextViewDelegate, UIImagePickerCont
   
   static func instance() -> UIChatRoom {
     return UIStoryboard(name: "InAppChat", bundle: assets).instantiateViewController(withIdentifier: "chat") as! UIChatRoom
+  }
+}
+
+extension UIImage {
+  func png(isOpaque: Bool = true) -> Data? { flattened(isOpaque: isOpaque)?.pngData() }
+  func flattened(isOpaque: Bool = true) -> UIImage? {
+    if imageOrientation == .up { return self }
+    UIGraphicsBeginImageContextWithOptions(size, isOpaque, scale)
+    defer { UIGraphicsEndImageContext() }
+    draw(in: CGRect(origin: .zero, size: size))
+    return UIGraphicsGetImageFromCurrentImageContext()
   }
 }
 

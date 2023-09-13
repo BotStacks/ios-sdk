@@ -142,47 +142,61 @@ public class UIProfile: UIMyProfile, PHPickerViewControllerDelegate, UITextField
     imageLoader.startAnimating()
     imageLoader.isHidden = false
     imageLoader.color = c().primary.ui
-    let identifier = [UTType.image.identifier]
-    print("picker did finsih picking", results)
-    if let result = results.first,
-       let match = identifier.first(where: {
-         result.itemProvider.hasItemConformingToTypeIdentifier($0)
-       })
+    let identifier = [UTType.image.identifier, UTType.gif.identifier]
+    print("picker did finish picking", results)
+    if let result = results.first
     {
-      print("Getting file for ", match)
-      let progress = result.itemProvider.loadFileRepresentation(forTypeIdentifier: match) {
-        url, err in
-        if let err = err {
-          print("Error Loading File", err)
-        } else if let url = url {
+      let isGif = result.itemProvider.hasItemConformingToTypeIdentifier(UTType.gif.identifier)
+      result.file { tmp in
+        Task.detached {
           do {
-            let tmp = try tmpFile()
-            print("Copy from url", url.absoluteString, "to", tmp.absoluteString)
-            try FileManager.default.copyItem(
-              at: url, to: tmp)
-            Task.detached {
-              do {
-                let url = try await api.uploadFile(file: .init(url: tmp))
-                let res = try await api.updateProfile(input: .init(image: .some(url)))
-                await MainActor.run {
-                  User.current?.avatar = url
-                  self.imageLoader.stopAnimating()
-                  self.view.makeToast("Profile picture updated")
-                }
-              } catch let err {
-                Monitoring.error(err)
-                DispatchQueue.main.async {
-                  self.view.makeToast("Image upload failed. Please try again.")
-                }
-              }
+            let url = try await api.uploadFile(file: .init(url: tmp))
+            let _ = try await api.updateProfile(input: .init(image: .some(url)))
+            await MainActor.run {
+              User.current?.avatar = url
+              self.imageLoader.stopAnimating()
+              self.view.makeToast("Profile picture updated")
             }
           } catch let err {
-            print("Failed to copy file", err)
+            Monitoring.error(err)
+            print("Error \(err)")
+            DispatchQueue.main.async {
+              self.view.makeToast("Image upload failed. Please try again.")
+            }
           }
         }
       }
     } else {
       print("No picker results")
+    }
+  }
+}
+
+public extension PHPickerResult {
+  func file(_ cb: @escaping (URL) -> Void) {
+    let identifiers = [UTType.gif.identifier, UTType.image.identifier]
+    guard let match = identifiers.first(where: {itemProvider.hasItemConformingToTypeIdentifier($0)}) else {
+      return
+    }
+    let isGif = itemProvider.hasItemConformingToTypeIdentifier(UTType.gif.identifier)
+    itemProvider.loadFileRepresentation(forTypeIdentifier: match) {
+      url, err in
+      if let err = err {
+        print("Error Loading File", err)
+      } else if let url = url {
+        do {
+          let tmp = try tmpFile(ext: isGif ? "gif" : "png")
+          print("Copy from url", url.absoluteString, "to", tmp.absoluteString)
+          if isGif {
+            try FileManager.default.copyItem(at: url, to: tmp)
+          } else {
+            try UIImage(data: try Data(contentsOf: url))?.png(isOpaque: false)?.write(to: tmp)
+          }
+          cb(tmp)
+        } catch let err {
+          print("Failed to copy file", err)
+        }
+      }
     }
   }
 }

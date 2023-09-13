@@ -654,7 +654,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
     
     /// Fire the request using URL sesson or anything else...
     let (data, response) = try await URLSession.shared.data(for: request)
-    
+    print("Upload response \(String(data: data, encoding: .utf8))")
     
     if let json = try JSONSerialization.jsonObject(with: data, options: []) as? Dictionary<String, Any>,  let url = json["url"].flatMap({$0 as? String}) {
       return url

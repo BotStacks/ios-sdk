@@ -428,28 +428,11 @@ public class UICreateChat: UIBaseController, UITextFieldDelegate, UITextViewDele
     self.dismiss(animated: true)
     let identifier =  [UTType.image.identifier]
     print("picker did finsih picking", results)
-    if let result = results.first,
-       let match = identifier.first(where: {
-         result.itemProvider.hasItemConformingToTypeIdentifier($0)
-       })
+    if let result = results.first
     {
-      print("Getting file for ", match)
-      let progress = result.itemProvider.loadFileRepresentation(forTypeIdentifier: match) {
-        url, err in
-        if let err = err {
-          print("Error Loading File", err)
-        } else if let url = url {
-          do {
-            let tmp = try tmpFile()
-            print("Copy from url", url.absoluteString, "to", tmp.absoluteString)
-            try FileManager.default.copyItem(
-              at: url, to: tmp)
-            DispatchQueue.main.async {
-              self.onImageFile(tmp)
-            }
-          } catch let err {
-            print("Failed to copy file", err)
-          }
+      result.file { tmp in
+        DispatchQueue.main.async {
+          self.onImageFile(tmp)
         }
       }
     } else {
