@@ -58,6 +58,8 @@ class Api: InterceptorProvider, ApolloInterceptor {
     didSet {
       UserDefaults.standard.set(authToken, forKey: "iac-auth-token")
       socket?.updateConnectingPayload(connectingPayload)
+      socket?.pauseWebSocketConnection()
+      socket?.resumeWebSocketConnection()
     }
   }
   
@@ -148,7 +150,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
       reconnect: true,
       reconnectionInterval: 60,
       allowSendingDuplicates: true,
-      connectOnInit: true,
+      connectOnInit: false,
       connectingPayload: connectingPayload
     )
     let websocketTransport = WebSocketTransport(websocket: webSocketClient, config: config)

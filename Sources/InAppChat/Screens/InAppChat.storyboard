@@ -2067,7 +2067,7 @@
                                     <constraint firstAttribute="height" constant="60" id="A9M-m3-j1K"/>
                                 </constraints>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="filled" title="UPDATE"/>
+                                <buttonConfiguration key="configuration" style="filled" title="UPDATE" cornerStyle="capsule"/>
                                 <connections>
                                     <action selector="save" destination="pog-x3-Afi" eventType="touchUpInside" id="5gE-4f-aLI"/>
                                 </connections>
@@ -5021,7 +5021,7 @@
     <inferredMetricsTieBreakers>
         <segue reference="qUc-0i-vfz"/>
         <segue reference="X2t-7A-GN8"/>
-        <segue reference="dMQ-sR-TSh"/>
+        <segue reference="6JO-ED-vcf"/>
         <segue reference="6FX-Q9-dqj"/>
         <segue reference="nVX-zA-bsb"/>
         <segue reference="7vb-Wf-Lgu"/>
