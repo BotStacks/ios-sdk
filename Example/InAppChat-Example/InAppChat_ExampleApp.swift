@@ -53,7 +53,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
       let tokenParts = deviceToken.map { data in String(format: "%02.2hhx", data) }
       let token = tokenParts.joined()
       print("Device Token: \(token)")
-        InAppChat.registerPushToken(token)
+      InAppChat.registerPushToken(token)
     }
     
     func application(_ application: UIApplication,

@@ -175,6 +175,7 @@ public class InAppChat: ObservableObject {
     if shared?.isUserLoggedIn != true { return }
     Task {
       do {
+        print("Call Register Push")
         let _ = try await api.registerPushToken(token)
       } catch let err {
         Monitoring.error(err)

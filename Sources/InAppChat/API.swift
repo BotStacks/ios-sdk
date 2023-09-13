@@ -29,6 +29,8 @@ func chatServer() -> (host: String, ssl: Bool) {
   }
 }
 
+var debug = false
+
 extension String {
   var sha256: String {
     return SHA256.hash(data: Data(utf8)).compactMap { String(format: "%02x", $0) }.joined()
@@ -69,15 +71,20 @@ class Api: InterceptorProvider, ApolloInterceptor {
   var subscriptions = Array<Cancellable>()
 
   func subscribe() {
+    print("Subscribe")
     if let client = client, authToken != nil, subscriptions.isEmpty {
+      print("Create subs")
       let sub = client.sub(subscription: Gql.CoreSubscription()) { data in
+        print("Got subscription event \(data.__data._data)")
         InAppChatStore.current.onCoreEvent(data.core)
       }
       subscriptions.append(sub)
       let subme = client.sub(subscription: Gql.MeSubscription()) { data in
+        print("Got subscription event \(data.__data._data)")
         InAppChatStore.current.onMeEvent(data.me)
       }
       subscriptions.append(subme)
+      socket?.resumeWebSocketConnection(autoReconnect: true)
     }
   };
   
@@ -86,6 +93,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
       sub.cancel()
     }
     subscriptions.removeAll()
+    socket?.pauseWebSocketConnection()
   }
 
   func interceptAsync<Operation>(
@@ -398,7 +406,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
       )
     if let login = res.login {
       let user = User.get(.init(_dataDict: login.user.__data))
-      try await onLogin(login.token, user: user)
+      onLogin(login.token, user: user)
       try await InAppChatStore.current.loadAsync()
       return user
     } else {
@@ -580,6 +588,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
 
   func registerPushToken(_ token: String) async throws -> Bool {
     let res = try await client.performAsync(mutation: Gql.RegisterPushMutation(token: token, kind: .case(Gql.DeviceType.ios), fcm: .some(false)))
+    print("Did register push")
     return res.registerPush
   }
 
@@ -609,6 +618,7 @@ class Api: InterceptorProvider, ApolloInterceptor {
       store.memberships.removeAll()
       store.memberships.append(contentsOf: memberships)
       InAppChat.shared.isUserLoggedIn = true
+      subscribe()
       return (user, memberships)
     }
   }

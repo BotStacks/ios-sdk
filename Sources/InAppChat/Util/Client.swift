@@ -44,7 +44,9 @@ extension ApolloClient {
   
   func handler<T>(_ cont: CheckedContinuation<T, Error>) -> GraphQLResultHandler<T> {
     return { result in
-      print("GQL Result \(result)")
+      if debug {
+        print("GQL Result \(result)")
+      }
       switch (result) {
       case .success(let res):
         if let data = res.data {
@@ -94,7 +96,9 @@ class RequestLoggingInterceptor: ApolloInterceptor {
     response: HTTPResponse<Operation>?,
     completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void
   ) {
-    print( "Outgoing request: \(try! request.toURLRequest().cURL(pretty: true))")
+    if debug {
+      print( "Outgoing request: \(try! request.toURLRequest().cURL(pretty: true))")
+    }
     chain.proceedAsync(
       request: request,
       response: response,

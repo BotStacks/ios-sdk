@@ -143,6 +143,13 @@ public class UIChatRoom: UIViewController, UITextViewDelegate, UIImagePickerCont
   override public func viewDidAppear(_ animated: Bool) {
     self.initialInputHeight = inputHeightConstraint.constant
     chat?.markRead()
+    Chat.current = chat?.id
+  }
+  
+  public override func viewWillDisappear(_ animated: Bool) {
+    if Chat.current == chat?.id {
+      Chat.current = nil
+    }
   }
   
   func updateSpeech() {

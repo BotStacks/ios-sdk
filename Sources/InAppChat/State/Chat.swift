@@ -10,6 +10,8 @@ import Combine
 
 public final class Chat: Pager<Message>, Identifiable {
 
+  static var current: String? = nil
+  
   public let id: String
   public let kind: Gql.ChatType
 
@@ -145,7 +147,6 @@ public final class Chat: Pager<Message>, Identifiable {
     self.kind = kind
     self.members = members
     self.unreadCount = unreadCount
-    print("Chat get with unread count \(unreadCount)")
     self.latestMessage = latestMessage
     self._private = _private
     self.invites = Set(invites)

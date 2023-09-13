@@ -21,7 +21,7 @@ public class UIMessageList: UIViewController, UITableViewDelegate, UITableViewDa
       bag.forEach({$0.cancel()})
       bag.removeAll()
       if let chat = chat {
-        print("MessageList did set chat")
+        Chat.current = chat.id
         chat.objectWillChange.makeConnectable()
           .autoconnect()
           .throttle(for: 0.1, scheduler: RunLoop.main, latest: true)
@@ -138,7 +138,6 @@ public class UIMessageList: UIViewController, UITableViewDelegate, UITableViewDa
   }
   
   public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    print("Message LIst number of row \(messages.count)")
     return cells.count
   }
   

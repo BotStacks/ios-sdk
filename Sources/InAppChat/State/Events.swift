@@ -71,6 +71,10 @@ extension InAppChatStore {
         }
         if isUpdate {
           chat.sub.send(message.id)
+        } else {
+          if Chat.current != chat.id {
+            chat.unreadCount += 1
+          }
         }
       }
     }
