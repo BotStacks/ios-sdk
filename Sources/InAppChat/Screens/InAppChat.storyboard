@@ -4867,7 +4867,7 @@
                                                     <rect key="frame" x="20" y="12" width="60" height="60"/>
                                                     <subviews>
                                                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="3Wm-kW-T3Z" customClass="SDAnimatedImageView">
-                                                            <rect key="frame" x="2" y="2" width="56" height="56"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="60" height="60"/>
                                                         </imageView>
                                                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="user-fill" translatesAutoresizingMaskIntoConstraints="NO" id="zXI-Uq-IrZ">
                                                             <rect key="frame" x="14.666666666666664" y="14.666666666666668" width="31" height="31.000000000000004"/>
@@ -4880,14 +4880,14 @@
                                                     </subviews>
                                                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                                     <constraints>
-                                                        <constraint firstItem="3Wm-kW-T3Z" firstAttribute="top" secondItem="0Iy-3s-VD5" secondAttribute="top" constant="2" id="APa-td-hxk"/>
-                                                        <constraint firstAttribute="trailing" secondItem="3Wm-kW-T3Z" secondAttribute="trailing" constant="2" id="FjT-sW-kcW"/>
+                                                        <constraint firstItem="3Wm-kW-T3Z" firstAttribute="top" secondItem="0Iy-3s-VD5" secondAttribute="top" id="APa-td-hxk"/>
+                                                        <constraint firstAttribute="trailing" secondItem="3Wm-kW-T3Z" secondAttribute="trailing" id="FjT-sW-kcW"/>
                                                         <constraint firstItem="zXI-Uq-IrZ" firstAttribute="centerX" secondItem="0Iy-3s-VD5" secondAttribute="centerX" id="JAc-D4-3oj"/>
                                                         <constraint firstAttribute="width" constant="60" id="KuB-9q-d5G"/>
                                                         <constraint firstAttribute="height" constant="60" id="LDh-gg-l0k"/>
-                                                        <constraint firstItem="3Wm-kW-T3Z" firstAttribute="leading" secondItem="0Iy-3s-VD5" secondAttribute="leading" constant="2" id="M3i-bu-W8i"/>
+                                                        <constraint firstItem="3Wm-kW-T3Z" firstAttribute="leading" secondItem="0Iy-3s-VD5" secondAttribute="leading" id="M3i-bu-W8i"/>
                                                         <constraint firstItem="zXI-Uq-IrZ" firstAttribute="centerY" secondItem="0Iy-3s-VD5" secondAttribute="centerY" id="OD7-fa-aX0"/>
-                                                        <constraint firstAttribute="bottom" secondItem="3Wm-kW-T3Z" secondAttribute="bottom" constant="2" id="aVe-oF-LNZ"/>
+                                                        <constraint firstAttribute="bottom" secondItem="3Wm-kW-T3Z" secondAttribute="bottom" id="aVe-oF-LNZ"/>
                                                     </constraints>
                                                     <userDefinedRuntimeAttributes>
                                                         <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">

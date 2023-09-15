@@ -75,8 +75,9 @@ struct Register: View {
                   if let error = error {
                     // Handle the error here.
                   }
-                  UIApplication.shared.registerForRemoteNotifications()
-                  // Enable or disable features based on the authorization.
+                  DispatchQueue.main.async {
+                    UIApplication.shared.registerForRemoteNotifications()
+                  }
                 }
               }
             }

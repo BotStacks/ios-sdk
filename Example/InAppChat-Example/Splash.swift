@@ -85,7 +85,9 @@ struct Splash<Content>: View where Content: View {
               if let error = error {
                 // Handle the error here.
               }
-              UIApplication.shared.registerForRemoteNotifications()
+              DispatchQueue.main.async {
+                UIApplication.shared.registerForRemoteNotifications()
+              }
               // Enable or disable features based on the authorization.
             }
           }

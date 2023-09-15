@@ -171,6 +171,13 @@ class Api: InterceptorProvider, ApolloInterceptor {
         ),
       store: store
     )
+    NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { [unowned self] notification in
+      self.unsubscribe()
+    }
+    NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: nil, using: {
+      [unowned self] notification in
+      self.subscribe()
+    })
   }
   
   

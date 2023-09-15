@@ -313,7 +313,7 @@ public class UIReactionPill: UIView {
       self.layer.borderWidth = 0.0
     }
     backgroundColor = message.user.isCurrent ? c().senderBubble.ui : c().bubble.ui
-    label.textColor = message.user.isCurrent ? c().senderText.ui : c().senderBubble.ui
+    label.textColor = message.user.isCurrent ? c().senderText.ui : c().bubbleText.ui
     let t = CGAffineTransform(scaleX: message.user.isCurrent ? -1 : 1, y: 1)
     self.layer.setAffineTransform(t)
   }

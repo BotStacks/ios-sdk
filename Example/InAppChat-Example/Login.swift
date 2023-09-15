@@ -55,7 +55,9 @@ struct Login: View {
                 self.navigator.navigate("/chats")
                 let center = UNUserNotificationCenter.current()
                 center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-                  UIApplication.shared.registerForRemoteNotifications()
+                  DispatchQueue.main.async {
+                    UIApplication.shared.registerForRemoteNotifications()
+                  }
                 }
               }
             } else {

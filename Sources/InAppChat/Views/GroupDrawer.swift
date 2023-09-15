@@ -72,9 +72,10 @@ public class UIGroupDrawer: UIViewController, UITableViewDelegate, UITableViewDa
     edit.titleLabel?.font = f.mini
     invite.titleLabel?.font = f.mini
     leave.titleLabel?.font = f.mini
+    report.tintColor = c.unread.ui
     
     tableView.separatorStyle = .none
-    report.tintColor = c.unread.ui
+    
     bindUI()
   }
   

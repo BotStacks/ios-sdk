@@ -115,7 +115,16 @@ public class UIChatRoom: UIViewController, UITextViewDelegate, UIImagePickerCont
     }
     NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+    NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: nil, using: {[weak self] _ in
+      if let room = self, room.visible {
+        Task.detached {
+          await room.chat?.refresh()
+        }
+      }
+    })
   }
+  
+  var visible = false
   
   var original: CGFloat = 0
   @objc private func keyboardWillShow(notification: NSNotification){
@@ -141,12 +150,23 @@ public class UIChatRoom: UIViewController, UITextViewDelegate, UIImagePickerCont
   
   var initialInputHeight: CGFloat = 0.0
   override public func viewDidAppear(_ animated: Bool) {
+    visible = true
     self.initialInputHeight = inputHeightConstraint.constant
     chat?.markRead()
     Chat.current = chat?.id
+    if let chat = self.chat {
+      if chat.items.isEmpty {
+        chat.loadMore()
+      } else {
+        Task.detached {
+          await chat.refresh()
+        }
+      }
+    }
   }
   
   public override func viewWillDisappear(_ animated: Bool) {
+    visible = false
     if Chat.current == chat?.id {
       Chat.current = nil
     }
