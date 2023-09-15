@@ -79,8 +79,15 @@ struct Splash<Content>: View where Content: View {
       if newValue {
         navigator.navigate(app.isUserLoggedIn ? "/chats" : "/login", replace: true)
           if (app.isUserLoggedIn) {
-              UIApplication.shared
-                  .registerForRemoteNotifications()
+            let center = UNUserNotificationCenter.current()
+            center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+              
+              if let error = error {
+                // Handle the error here.
+              }
+              UIApplication.shared.registerForRemoteNotifications()
+              // Enable or disable features based on the authorization.
+            }
           }
       }
     }.preferredColorScheme(.dark)

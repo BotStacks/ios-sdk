@@ -2367,7 +2367,7 @@
                                                         <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="LJR-DN-qu7">
                                                             <rect key="frame" x="0.0" y="0.0" width="35" height="35"/>
                                                             <subviews>
-                                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="aqf-r6-5TO" customClass="SDAnimatedImageView">
+                                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="aqf-r6-5TO" customClass="SDAnimatedImageView">
                                                                     <rect key="frame" x="0.0" y="0.0" width="35" height="35"/>
                                                                 </imageView>
                                                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="user-fill" translatesAutoresizingMaskIntoConstraints="NO" id="S0k-sJ-qKJ">

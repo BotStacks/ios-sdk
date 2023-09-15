@@ -8,29 +8,59 @@ import Combine
 
 public class UIVideo: UIView {
   
+  // Override the property to make AVPlayerLayer the view's backing layer.
+  public override static var layerClass: AnyClass { AVPlayerLayer.self }
+  
+  // The associated player object.
+  var player: AVPlayer? {
+    get { playerLayer.player }
+    set { playerLayer.player = newValue }
+  }
+  
+  private var playerLayer: AVPlayerLayer { layer as! AVPlayerLayer }
+  
   var url: String? {
     didSet {
-      update()
+      if oldValue != url {
+        update()
+      }
     }
   }
   
   func update() {
-    self.subviews.forEach { $0.removeFromSuperview() }
     if let url = url?.url {
-      let player = AVPlayer(url: url)
-      player.isMuted = true
-      let video = AVPlayerViewController()
-      video.player = player
-      video.view.frame = bounds
-      video.showsPlaybackControls = true
-      addSubview(video.view)
-      player.play()
-      NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: player.currentItem, queue: .main) { _ in
-        player.seek(to: CMTime.zero)
+      print("Video PLayer with url \(url)")
+      if player == nil {
+        let player = AVPlayer(url: url)
+        player.isMuted = true
+        self.player = player
         player.play()
+        
+      } else {
+        player?.replaceCurrentItem(with: AVPlayerItem(url: url))
+        player?.play()
       }
-    } else {
-      self.subviews.forEach { $0.removeFromSuperview() }
+    }
+    if let item = player?.currentItem {
+      NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: item, queue: .main) { _ in
+        self.player?.seek(to: CMTime.zero)
+        self.player?.play()
+      }
+      item.addObserver(self, forKeyPath: "status", options: .new, context: nil)
+    }
+  }
+  
+  public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+    let playerItem = object as! AVPlayerItem
+    if keyPath == "status" {
+      if playerItem.status == .failed{
+        if let error = playerItem.error as NSError? {
+          let errorCode = error.code
+          print("Error \(error)")
+        }
+      } else {
+        print("PLayer Item Status \(playerItem.status)")
+      }
     }
   }
 }

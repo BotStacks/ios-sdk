@@ -50,8 +50,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
       _ application: UIApplication,
       didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
-      let tokenParts = deviceToken.map { data in String(format: "%02.2hhx", data) }
-      let token = tokenParts.joined()
+      let token = deviceToken.map { String(format: "%.2hhx", $0) }.joined()
       print("Device Token: \(token)")
       InAppChat.registerPushToken(token)
     }

@@ -527,23 +527,20 @@ public class UIChatRoom: UIViewController, UITextViewDelegate, UIImagePickerCont
   
   public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
     self.dismiss(animated: true)
-    let identifier =
-    self.video
-    ? [UTType.video.identifier, UTType.movie.identifier, UTType.mpeg.identifier]
-    : [UTType.gif.identifier, UTType.image.identifier]
+    let identifier = [ UTType.mpeg4Movie, UTType.quickTimeMovie, UTType.mpeg, UTType.avi, UTType.movie, UTType.video]
     print("picker did finsih picking", results)
     if let result = results.first
     {
       if self.video, let match = identifier.first(where: {
-        result.itemProvider.hasItemConformingToTypeIdentifier($0)
+        result.itemProvider.hasItemConformingToTypeIdentifier($0.identifier)
       }) {
-        let progress = result.itemProvider.loadFileRepresentation(forTypeIdentifier: match) {
+        let progress = result.itemProvider.loadFileRepresentation(forTypeIdentifier: match.identifier) {
           url, err in
           if let err = err {
             print("Error Loading File", err)
           } else if let url = url {
             do {
-              let tmp = try tmpFile()
+              let tmp = try tmpFile(ext: match.preferredFilenameExtension)
               print("Copy from url", url.absoluteString, "to", tmp.absoluteString)
               try FileManager.default.copyItem(
                 at: url, to: tmp)

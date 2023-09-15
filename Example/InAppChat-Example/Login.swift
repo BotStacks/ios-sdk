@@ -16,6 +16,7 @@ struct Login: View {
 
   @Environment(\.openURL) private var openURL
   @Environment(\.geometry) private var geometry
+  @Environment(\.iacTheme) private var theme
   @EnvironmentObject var navigator: Navigator
     @ObservedObject var app = InAppChat.shared
     @State var loggingIn = false
@@ -52,6 +53,10 @@ struct Login: View {
             if res {
               await MainActor.run {
                 self.navigator.navigate("/chats")
+                let center = UNUserNotificationCenter.current()
+                center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+                  UIApplication.shared.registerForRemoteNotifications()
+                }
               }
             } else {
               await MainActor.run {
@@ -85,8 +90,9 @@ struct Login: View {
             .textContentType(.emailAddress)
             .autocapitalization(.none)
             .submitLabel(.next)
+            .foregroundColor(theme.colors.text)
             .onSubmit {
-              
+              passwordFocus = true
             }
             .grow()
         }
@@ -100,6 +106,7 @@ struct Login: View {
             .focused($passwordFocus)
             .textContentType(.password)
             .submitLabel(.done)
+            .foregroundColor(theme.colors.text)
             .onSubmit({
               login()
             })

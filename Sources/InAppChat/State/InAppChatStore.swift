@@ -91,6 +91,15 @@ public class InAppChatStore: ObservableObject {
       try await loadGroupInvites()
       network.loadMoreIfEmpty()
       contacts.loadMoreIfEmpty()
+      if let token = pushToken {
+        Task.detached {
+          do {
+            let _ = try await api.registerPushToken(token)
+          } catch let err {
+            Monitoring.error(err)
+          }
+        }
+      }
     } else {
       print("no current user skipping")
     }

@@ -69,6 +69,15 @@ struct Register: View {
             if res {
               await MainActor.run {
                 self.navigator.navigate("/chats")
+                let center = UNUserNotificationCenter.current()
+                center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+                  
+                  if let error = error {
+                    // Handle the error here.
+                  }
+                  UIApplication.shared.registerForRemoteNotifications()
+                  // Enable or disable features based on the authorization.
+                }
               }
             }
           } catch let err {

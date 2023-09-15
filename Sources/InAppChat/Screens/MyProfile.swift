@@ -161,11 +161,11 @@ public class UIMyProfile: UIBaseController, PHPickerViewControllerDelegate, UITe
   
   public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
     self.dismiss(animated: true)
-    imageLoader.startAnimating()
-    imageLoader.isHidden = false
-    imageLoader.color = c().primary.ui
     if let result = results.first
     {
+      imageLoader.startAnimating()
+      imageLoader.isHidden = false
+      imageLoader.color = c().primary.ui
       result.file { tmp in
         Task.detached {
           do {
@@ -174,6 +174,7 @@ public class UIMyProfile: UIBaseController, PHPickerViewControllerDelegate, UITe
             await MainActor.run {
               User.current?.avatar = url
               self.imageLoader.stopAnimating()
+              self.imageLoader.isHidden = true
               self.view.makeToast("Profile picture updated")
             }
           } catch let err {
@@ -181,6 +182,7 @@ public class UIMyProfile: UIBaseController, PHPickerViewControllerDelegate, UITe
             print("Error \(err)")
             DispatchQueue.main.async {
               self.imageLoader.stopAnimating()
+              self.imageLoader.isHidden = true
               self.view.makeToast("Image upload failed. Please try again.")
             }
           }
