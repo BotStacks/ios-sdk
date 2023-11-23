@@ -1,16 +1,12 @@
 PODS:
   - ActivityIndicatorView (1.1.1)
   - AnyCodable-FlightSchool (0.6.7)
-  - Apollo (1.4.0):
-    - Apollo/Core (= 1.4.0)
-  - Apollo/Core (1.4.0)
-  - Apollo/WebSocket (1.4.0):
+  - Apollo (1.7.1):
+    - Apollo/Core (= 1.7.1)
+  - Apollo/Core (1.7.1)
+  - Apollo/WebSocket (1.7.1):
     - Apollo/Core
-  - DynamicColor (5.0.1)
-  - Gifu (3.3.1)
-  - Giphy (2.2.6):
-    - libwebp
-  - InAppChat (1.0.26):
+  - BotStacksChat (1.0.32):
     - ActivityIndicatorView
     - AnyCodable-FlightSchool
     - Apollo
@@ -23,6 +19,10 @@ PODS:
     - SnapKit
     - SwiftDate
     - SwiftyJSON
+  - DynamicColor (5.0.1)
+  - Gifu (3.3.1)
+  - Giphy (2.2.6):
+    - libwebp
   - libwebp (1.3.1):
     - libwebp/demux (= 1.3.1)
     - libwebp/mux (= 1.3.1)
@@ -35,24 +35,24 @@ PODS:
   - libwebp/sharpyuv (1.3.1)
   - libwebp/webp (1.3.1):
     - libwebp/sharpyuv
-  - SDWebImage (5.17.0):
-    - SDWebImage/Core (= 5.17.0)
-  - SDWebImage/Core (5.17.0)
-  - SDWebImageSwiftUI (2.2.3):
+  - SDWebImage (5.18.5):
+    - SDWebImage/Core (= 5.18.5)
+  - SDWebImage/Core (5.18.5)
+  - SDWebImageSwiftUI (2.2.4):
     - SDWebImage (~> 5.10)
-  - Sentry (8.10.0):
-    - Sentry/Core (= 8.10.0)
-    - SentryPrivate (= 8.10.0)
-  - Sentry/Core (8.10.0):
-    - SentryPrivate (= 8.10.0)
-  - SentryPrivate (8.10.0)
+  - Sentry (8.15.2):
+    - Sentry/Core (= 8.15.2)
+    - SentryPrivate (= 8.15.2)
+  - Sentry/Core (8.15.2):
+    - SentryPrivate (= 8.15.2)
+  - SentryPrivate (8.15.2)
   - SnapKit (5.6.0)
   - SwiftDate (7.0.0)
   - SwiftyJSON (5.0.1)
 
 DEPENDENCIES:
+  - BotStacksChat (from `../`)
   - Giphy
-  - InAppChat (from `../`)
 
 SPEC REPOS:
   trunk:
@@ -72,26 +72,26 @@ SPEC REPOS:
     - SwiftyJSON
 
 EXTERNAL SOURCES:
-  InAppChat:
+  BotStacksChat:
     :path: "../"
 
 SPEC CHECKSUMS:
   ActivityIndicatorView: f14ac8e200a344fe992577807998b0c8562bd964
   AnyCodable-FlightSchool: 261cbe76757802b17d471b9059b21e6fa5edf57b
-  Apollo: d4d06fd38de80fd10c21389f9084fd64e4f712c7
+  Apollo: 419a0a42ae64979345bed12bae3a0d3e39fcf30c
+  BotStacksChat: 2f912b7db3737d8ca78da4d98d6e8a1f442dd8ae
   DynamicColor: d049834ef86d8ecf150b0ca1ebe54ee733a0ec22
   Gifu: 416d4e38c4c2fed012f019e0a1d3ffcb58e5b842
   Giphy: f64bff5937fbc4987b6a26c8ef625501c68a1e97
-  InAppChat: a7bc4e6c790201c239dc16806f753c4695aa1c2b
   libwebp: 33dc822fbbf4503668d09f7885bbfedc76c45e96
-  SDWebImage: 750adf017a315a280c60fde706ab1e552a3ae4e9
-  SDWebImageSwiftUI: 17396b7889f9abc27231caaeb64c537564284aab
-  Sentry: 71cd4427146ac56eab6e70401ac7a24384c3d3b5
-  SentryPrivate: 9334613897c85a9e30f2c9d7a331af8aaa4fe71f
+  SDWebImage: 7ac2b7ddc5e8484c79aa90fc4e30b149d6a2c88f
+  SDWebImageSwiftUI: a3ed505b65903252560fcf37ff493d9d97648ae5
+  Sentry: 6f5742b4c47c17c9adcf265f6f328cf4a0ed1923
+  SentryPrivate: b2f7996f37781080f04a946eb4e377ff63c64195
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
   SwiftDate: bbc26e26fc8c0c33fbee8c140c5e8a68293a148a
   SwiftyJSON: 2f33a42c6fbc52764d96f13368585094bfd8aa5e
 
-PODFILE CHECKSUM: 4c73f3cbeec1678b417ada04c2abb3f1257a47d6
+PODFILE CHECKSUM: afe17e456a46246104fb458565600e4aeb5b32ac
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.14.3

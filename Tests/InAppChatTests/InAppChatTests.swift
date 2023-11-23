@@ -1,11 +1,11 @@
 import XCTest
-@testable import InAppChat
+@testable import BotStacksChat
 
-final class InAppChatTests: XCTestCase {
+final class BotStacksChatTests: XCTestCase {
     func testExample() throws {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
-      XCTAssertEqual(InAppChat.shared.isUserLoggedIn, false)
+      XCTAssertEqual(BotStacksChat.shared.isUserLoggedIn, false)
     }
 }

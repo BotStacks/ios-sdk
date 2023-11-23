@@ -3,15 +3,15 @@
 import PackageDescription
 
 let package = Package(
-  name: "InAppChat",
+  name: "BotStacksChat",
   platforms: [
     .iOS(.v15)
   ],
   products: [
     // Products define the executables and libraries produced by a package, and make them visible to other packages.
     .library(
-      name: "InAppChat",
-      targets: ["InAppChat"]
+      name: "BotStacksChat",
+      targets: ["BotStacksChat"]
     )
   ],
   dependencies: [
@@ -32,7 +32,7 @@ let package = Package(
     // Targets are the basic building blocks of a package. A target can define a module or a test suite.
     // Targets can depend on other targets in this package, and on products in packages which this package depends on.
     .target(
-      name: "InAppChat",
+      name: "BotStacksChat",
       dependencies: [
         "AnyCodable",
         "SwiftDate",
@@ -49,10 +49,10 @@ let package = Package(
         "CocoaMQTT",
         "Gifu",
       ],
-      path: "Sources/InAppChat"
+      path: "Sources/BotStacksChat"
     ),
     .testTarget(
-      name: "InAppChatTests",
-      dependencies: ["InAppChat"]),
+      name: "BotStacksChatTests",
+      dependencies: ["BotStacksChat"]),
   ]
 )

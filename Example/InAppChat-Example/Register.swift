@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import InAppChat
+import BotStacksChat
 import SwiftUI
 import UserNotifications
 import WebKit
@@ -25,7 +25,7 @@ struct Register: View {
   @Environment(\.openURL) private var openURL
   @Environment(\.geometry) private var geometry
   @EnvironmentObject var navigator: Navigator
-  @ObservedObject var app = InAppChat.shared
+  @ObservedObject var app = BotStacksChat.shared
   @State var loggingIn = false
   
   @State var terms = false
@@ -59,7 +59,7 @@ struct Register: View {
         loggingIn = true
         Task {
           do {
-            let res = try await InAppChat.shared.register(
+            let res = try await BotStacksChat.shared.register(
               email: email,
               password: password,
               username: displayName,
@@ -241,7 +241,7 @@ struct Register: View {
         self.image = nil
         Task.detached {
           do {
-            let uploaded = try await InAppChat.uploadProfilePicture(url)
+            let uploaded = try await BotStacksChat.uploadProfilePicture(url)
             await MainActor.run {
               self.localImage = nil
               self.image = .init(string: uploaded)!

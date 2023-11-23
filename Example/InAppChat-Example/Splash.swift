@@ -7,8 +7,8 @@
 
 import ActivityIndicatorView
 import Foundation
-import InAppChat
 import SwiftUI
+import BotStacksChat
 
 
 struct Splash<Content>: View where Content: View {
@@ -17,7 +17,7 @@ struct Splash<Content>: View where Content: View {
   let content: (() -> Content)?
   @EnvironmentObject var navigator: Navigator
 
-  @ObservedObject var app = InAppChat.shared
+  @ObservedObject var app = BotStacksChat.shared
   let mini: Bool
   init(mini: Bool = false, @ViewBuilder _ content: @escaping () -> Content) {
     self.mini = mini
@@ -37,11 +37,8 @@ struct Splash<Content>: View where Content: View {
         VStack {
           VStack {
             HStack {
-              Image("inappchat-icon")
-                .resizable().aspectRatio(contentMode: .fit).size(50.0)
-              Image("inappchat-text").resizable().frame(width: 225.0, height: 28.0)
-                .tint(Color.white)
-                .foregroundColor(Color.white)
+              Image("botstacks-full")
+                  .resizable().aspectRatio(contentMode: .fit).padding(.horizontal, 40).padding(.bottom, 16)
             }
             if !app.loaded {
               Spinner().size(60.0)
@@ -55,11 +52,8 @@ struct Splash<Content>: View where Content: View {
       } else {
         ZStack {
           VStack {
-            Image("inappchat-icon")
-              .resizable().aspectRatio(contentMode: .fit).size(130.0)
-            Image("inappchat-text").resizable().frame(width: 225.0, height: 28.0)
-              .tint(Color.white)
-              .foregroundColor(Color.white)
+            Image("botstacks-full")
+                  .resizable().aspectRatio(contentMode: .fit).padding(.horizontal, 40).padding(.bottom, 16)
             
             Text("Simple and elegant chat services")
               .multilineTextAlignment(.center)

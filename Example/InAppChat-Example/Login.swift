@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import InAppChat
+import BotStacksChat
 import SwiftUI
 import UserNotifications
 import WebKit
@@ -18,10 +18,10 @@ struct Login: View {
   @Environment(\.geometry) private var geometry
   @Environment(\.iacTheme) private var theme
   @EnvironmentObject var navigator: Navigator
-    @ObservedObject var app = InAppChat.shared
+    @ObservedObject var app = BotStacksChat.shared
     @State var loggingIn = false
 
-  let isEth = InAppChat.shared.tenant.loginType != "email"
+  let isEth = BotStacksChat.shared.tenant.loginType != "email"
   @State var terms = false
   @State var email = ""
   @State var password = ""
@@ -45,7 +45,7 @@ struct Login: View {
         loggingIn = true
         Task {
           do {
-            let res = try await InAppChat.shared.basicLogin(
+            let res = try await BotStacksChat.shared.basicLogin(
               email: email,
               password: password
             )

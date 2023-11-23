@@ -5,7 +5,7 @@
 //  Created by Zaid Daghestani on 1/24/23.
 //
 
-import InAppChat
+import BotStacksChat
 import SwiftUI
 
 
@@ -20,7 +20,7 @@ struct ContentView: View {
   
   
   var body: some View {
-    InAppChatUI {
+    BotStacksChatUI {
       Router(initialPath: "/splash") {
         Route("splash") {
           Splash()
@@ -43,7 +43,7 @@ struct ChatView: View {
   @EnvironmentObject var navigator: Navigator
   
   var body: some View  {
-    InAppChatView {
+    BotStacksChatView {
       navigator.navigate("/login")
     } onDeleteAccount: {
       

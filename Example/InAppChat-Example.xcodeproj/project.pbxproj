@@ -495,6 +495,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 			};
@@ -517,7 +518,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "InAppChat-Example/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = InAppChat;
+				INFOPLIST_KEY_CFBundleDisplayName = BotStacksChat;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Upload photos and videos to InAppChat chat";
 				INFOPLIST_KEY_NSContactsUsageDescription = "Find your friends on InAppChat with your contact book";
@@ -571,7 +572,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "InAppChat-Example/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = InAppChat;
+				INFOPLIST_KEY_CFBundleDisplayName = BotStacksChat;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Upload photos and videos to InAppChat chat";
 				INFOPLIST_KEY_NSContactsUsageDescription = "Find your friends on InAppChat with your contact book";

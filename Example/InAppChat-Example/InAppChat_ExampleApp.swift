@@ -5,7 +5,7 @@
 //  Created by Zaid Daghestani on 1/24/23.
 //
 
-import InAppChat
+import BotStacksChat
 import SwiftUI
 import GiphyUISDK
 
@@ -31,8 +31,8 @@ struct InAppChat_ExampleApp: App {
   
   init() {
     Giphy.configure(apiKey: envVar("giphy-api-key", defaultValue: ""))
-    InAppChat.setup(apiKey: envVar("inappchat-api-key", defaultValue: ""))
-    InAppChat.shared.hideBackButton = true
+    BotStacksChat.setup(apiKey: envVar("inappchat-api-key", defaultValue: ""))
+    BotStacksChat.shared.hideBackButton = true
   }
 
   var body: some Scene {
@@ -52,7 +52,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     ) {
       let token = deviceToken.map { String(format: "%.2hhx", $0) }.joined()
       print("Device Token: \(token)")
-      InAppChat.registerPushToken(token)
+      BotStacksChat.registerPushToken(token)
     }
     
     func application(_ application: UIApplication,

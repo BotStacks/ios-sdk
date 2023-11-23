@@ -59,7 +59,7 @@ pod "InAppChat"
 In your app delegate, or anywhere else you put your startup logic, initialize the InAppChat SDK
 
 ```swift
-InAppChat.setup(apiKey: apiKey)
+BotStacksChat.setup(apiKey: apiKey)
 ```
 
 &nbsp;  
@@ -148,7 +148,7 @@ If you're using UI kit, just push or present the InAppChat controller from anywh
 
 ```swift
 @IBAction func onPressMessaging() {
-  let inapphatController = InAppChatController.instance()
+  let inapphatController = BotStacksChatController.instance()
   self.navigationController?.push(inappchatController, animated: true)
   // or you can present
   self.present(inappchatController, animated: true)

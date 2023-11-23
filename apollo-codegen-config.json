@@ -4,18 +4,18 @@
     "cocoapodsCompatibleImportStatements": true
   },
   "input": {
-    "operationSearchPaths": ["../inappchat-js/libs/sdk/**/*.graphql"],
-    "schemaSearchPaths": ["../inappchat-js/libs/common/**/*.graphql"]
+    "operationSearchPaths": ["../core/libs/sdk/**/*.graphql"],
+    "schemaSearchPaths": ["../core/libs/common/**/*.graphql"]
   },
   "output": {
     "testMocks": {
       "none": {}
     },
     "schemaTypes": {
-      "path": "./Sources/InAppChat/GQL",
+      "path": "./Sources/BotStacksChat/GQL",
       "moduleType": {
         "embeddedInTarget": {
-          "name": "InAppChat",
+          "name": "BotStacksChat",
           "accessModifier": "public"
         }
       }

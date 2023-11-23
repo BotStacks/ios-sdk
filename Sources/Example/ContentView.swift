@@ -10,7 +10,7 @@ import InAppChat
 
 struct ContentView: View {
     var body: some View {
-        InAppChatUI {
+        BotStacksChatUI {
             ScrollView {
                 VStack {
                     MessageView.sample
