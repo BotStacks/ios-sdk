@@ -1,17 +1,18 @@
 ![Cocoapods](https://img.shields.io/cocoapods/v/BotStacksChat?style=flat-square)
 
-![IAC IOS](https://github.com/ShadowArcanist/IACios/assets/106978117/45eba8e1-bb01-4dce-8c79-68ab8a1056b3)
+![BotStacks IOS](https://github.com/BotStacks/ios-sdk/assets/106978117/845c259b-a78b-4a90-ba9d-ba017886eaba)
+
 
 # BotStacksChat iOS SDK
 
 &nbsp;  
 
 # 📃 Table of Contents
-- [Overview](https://github.com/ShadowArcanist/IACios/blob/main/README.md#-overview)
-- [Installation](https://github.com/ShadowArcanist/IACios/blob/main/README.md#-installation)
-- [Getting Started](https://github.com/ShadowArcanist/IACios/blob/main/README.md#-getting-started)
-- [Theming](https://github.com/ShadowArcanist/IACios/blob/main/README.md#-Theming)
-- [Running the Sample App](https://github.com/ShadowArcanist/IACios/blob/main/README.md#-running-the-sample-app)
+- [Overview](https://github.com/BotStacks/ios-sdk#-overview)
+- [Installation](https://github.com/BotStacks/ios-sdk#-installation)
+- [Getting Started](https://github.com/BotStacks/ios-sdk#-getting-started)
+- [Theming](https://github.com/BotStacks/ios-sdk#-theming)
+- [Running the Sample App](https://github.com/BotStacks/ios-sdk#-running-the-sample-app)
 
 &nbsp;  
 
@@ -300,4 +301,4 @@ Add both keys to the `Example/InAppChat-Example/InAppChat_ExampleApp.swift`
 If you don't understand something in the documentation, you are experiencing problems, or you just need a gentle nudge in the right direction, please join our [Discord server](https://discord.com/invite/5kwyQCz3zZ)
 
 ---
-**All Content Copyright © 2023 Rip Bull Networks**
+**All Content Copyright © 2023 BotStacks**
