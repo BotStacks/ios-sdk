@@ -1,10 +1,8 @@
-[![CodeFactor](https://www.codefactor.io/repository/github/ripbullnetworks/inappchat-ios/badge)](https://www.codefactor.io/repository/github/ripbullnetworks/inappchat-ios) ![Cocoapods](https://img.shields.io/cocoapods/v/InAppChat?style=flat-square) ![GitHub issues](https://img.shields.io/github/issues/RipBullNetworks/inappchat-ios) ![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ripbullnetworks/inappchat-ios)
+![Cocoapods](https://img.shields.io/cocoapods/v/BotStacksChat?style=flat-square)
 
 ![IAC IOS](https://github.com/ShadowArcanist/IACios/assets/106978117/45eba8e1-bb01-4dce-8c79-68ab8a1056b3)
 
-# In-AppChat iOS SDK
-
-> Delightful chat for your iOS apps. Try it out, download [In-AppChat iOS](https://apps.apple.com/us/app/inappchat/id6448892489)
+# BotStacksChat iOS SDK
 
 &nbsp;  
 
@@ -19,15 +17,15 @@
 
 # ✨ Overview
 
-This SDK integrates a fully serviced chat experience on the [InAppChat](https://inappchat.io) platform. 
+This SDK integrates a fully serviced chat experience on the [BotStacks](https://botstacks.ai) platform. 
 
-**InAppChat provides the entire UI and backend to enable chat for your users.**
+**BotStacksChat provides the entire UI and backend to enable chat for your users.**
 
-All you have to do is log your user in to the SDK and display the InAppChat view controller. 
+All you have to do is log your user in to the SDK and display the BotStacksChat view controller. 
 
 &nbsp;  
 
-You can also checkout the `/Example` directory for a running example of an InAppChat enabled app.
+You can also checkout the `/Example` directory for a running example of an BotStacksChat enabled app.
 
 &nbsp;  
 
@@ -36,7 +34,7 @@ You can also checkout the `/Example` directory for a running example of an InApp
 This SDK is accessible via conventional means as a Cocoapod
 
 ```
-.package(url: "https://github.com/RipBullNetworks/inappchat-ios", .upToNextMajor(from: "1.0.0")),
+.package(url: "https://github.com/BotStacks/ios-sdk", .upToNextMajor(from: "1.0.0")),
 ```
 
 &nbsp;  
@@ -46,7 +44,7 @@ This SDK is accessible via conventional means as a Cocoapod
 Add the pod to your podfile
 
 ```
-pod "InAppChat"
+pod "BotStacksChat"
 ```
 
 &nbsp;  
@@ -56,7 +54,7 @@ pod "InAppChat"
 
 ### Step 1: Initialize the SDK
 
-In your app delegate, or anywhere else you put your startup logic, initialize the InAppChat SDK
+In your app delegate, or anywhere else you put your startup logic, initialize the BotStacksChat SDK
 
 ```swift
 BotStacksChat.setup(apiKey: apiKey)
@@ -64,22 +62,22 @@ BotStacksChat.setup(apiKey: apiKey)
 
 &nbsp;  
 
-Note, you can optionally delay load and later call `InAppChat.shared.load` to load IAC in whatever load sequence you please
+Note, you can optionally delay load and later call `BotStacksChat.shared.load` to load BotStacks in whatever load sequence you please
 
 &nbsp;  
 
 ### Step 2: Log your user in
 
-Before displaying the UI, you **must** log your user in to InAppChat via one of the designatied login methods. 
+Before displaying the UI, you **must** log your user in to BotStacks via one of the designatied login methods. 
 
 The methods return a boolean indicating if the user is logged in or not.
 
 ```swift
-@IBAction func loginToInAppChat() {
+@IBAction func loginToBotStacksChat() {
   self.loading = true
   Task.detached {
     do {
-      let loggedIn = try await InAppChat.shared.login(
+      let loggedIn = try await BotStacksChat.shared.login(
             accessToken: nil,
             userId: id,
             username: nickname,
@@ -87,7 +85,7 @@ The methods return a boolean indicating if the user is logged in or not.
             displayName: name
           )
       if loggedIn {
-        displayInAppChat()
+        displayBotStacksChat()
       }
     } catch let err {
       print("error logging in \(err)")
@@ -98,14 +96,14 @@ The methods return a boolean indicating if the user is logged in or not.
 
 &nbsp;  
 
-InAppChat as well as all other state objects in the SDK extend `ObservableObject`. InAppChat maintains an `@Published` isUserLoggedIn that you can use in your SwiftUI apps as well. You can also listen to the `Chats` object which holds state for the entire InAppChat interface.
+BotStacksChat as well as all other state objects in the SDK extend `ObservableObject`. BotStacksChat maintains an `@Published` isUserLoggedIn that you can use in your SwiftUI apps as well. You can also listen to the `Chats` object which holds state for the entire BotStacksChat interface.
 
 &nbsp;  
 
-Listen to InAppChat using combine in your view controllers:
+Listen to BotStacksChat using combine in your view controllers:
 
 ```swift
-InAppChat.shared.objectWillChange
+BotStacksChat.shared.objectWillChange
   .makeConnectable()
   .autoconnect()
   .sink(receiveValue: {[weak self] _ in
@@ -121,13 +119,13 @@ Use `@ObservedObject` in your SwiftUI
 
 ```swift
 public struct MyView: View {
-  @ObservedObject var inappchat = InAppChat.shared
+  @ObservedObject var inappchat = BotStacksChat.shared
 
   public var body: some View {
     ZStack {
       if inappchat.isUserLoggedIn {
         // Render InAppChat UI
-        InAppChatView {
+        BotStacksChatView {
           // handle logout
         }
       } else {
@@ -144,14 +142,14 @@ public struct MyView: View {
 
 ### A. UIKit
 
-If you're using UI kit, just push or present the InAppChat controller from anywhere in your UI code. For example, on a messaging button press:
+If you're using UI kit, just push or present the BotStacksChat controller from anywhere in your UI code. For example, on a messaging button press:
 
 ```swift
 @IBAction func onPressMessaging() {
-  let inapphatController = BotStacksChatController.instance()
-  self.navigationController?.push(inappchatController, animated: true)
+  let chatController = BotStacksChatController.instance()
+  self.navigationController?.push(chatController, animated: true)
   // or you can present
-  self.present(inappchatController, animated: true)
+  self.present(chatController, animated: true)
 }
 ```
 
@@ -159,13 +157,13 @@ If you're using UI kit, just push or present the InAppChat controller from anywh
 
 ### B. SwiftUI
 
-Render InAppChat in any full screen view by rendering InAppChatView. Include a logout handler to return to your own UI upon user logout.
+Render BotStacksChat in any full screen view by rendering BotStacksChatView. Include a logout handler to return to your own UI upon user logout.
 
 ```swift
 struct ContentView: View {
 
   var body: some View {
-    InAppChatView {
+    BotStacksChatView {
       // handle logout
       displayUserLogin()
     }
@@ -192,10 +190,10 @@ func onAppStartup() {
 
 # 🖍 Theming
 
-You can theme your InAppChat UI by passing in a theme to `InAppChat` any time before displaying the UI. The theme supports fonts, colors and things like bubble border radius and image sizes. Provide a `Theme` to InAppChatUI
+You can theme your BotStacksChat UI by passing in a theme to `BotStacksChat` any time before displaying the UI. The theme supports fonts, colors and things like bubble border radius and image sizes. Provide a `Theme` to BotStacksChatUI
 
 ```swift
-InAppChat.set(theme: Theme())
+BotStacksChat.set(theme: Theme())
 ```
 
 &nbsp;  
@@ -205,7 +203,7 @@ InAppChat.set(theme: Theme())
 You can provide your own color themes to the theme object with a wide array of parameters. The UI kit uses both a light and a dark theme so provide both.
 
 ```swift
-InAppChat.set(
+BotStacksChat.set(
 theme:
   Theme(
     light:
@@ -229,7 +227,7 @@ theme:
 The UI kit uses the same Fonts styles as the iOS. You can provide your own Fonts object to customize those fonts:
 
 ```swift
-InAppChat.set(theme:
+BotStacksChat.set(theme:
   Theme(
     fonts: Fonts(
       title: .app(22, .black),
@@ -251,7 +249,7 @@ InAppChat.set(theme:
 There are customizable assets and text that you can use in your UI Kit as well. Most importantly is the default image you want to use for groups.
 
 ```swift
-InAppChat.set(theme:
+BotStacksChat.set(theme:
   Theme(
     assets: Assets(group: Image("my-group-placeholder"))
   )
@@ -263,7 +261,7 @@ InAppChat.set(theme:
 There are empty screen configurations as well:
 
 ```swift
-  InAppChat.set(theme:
+  BotStacksChat.set(theme:
       Theme(
         emptyChannels: EmptyScreenConfig(
           image: Image("empty-channels"),
@@ -287,7 +285,7 @@ There are empty screen configurations as well:
 
 # ⚡ Running the Sample App
 
-Get an API key at [InAppChat](https://inappchat.io/app) by clicking on your project and clicking project settings in the top right.
+Get an API key at [BotStacksChat](https://dashboard.botstacks.ai) by navigating to Workspace -> Settings -> General.
 
 Get a Giphy API key if you'd like Giphy in your Sample.
 
