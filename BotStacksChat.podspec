@@ -7,7 +7,7 @@
 
 Pod::Spec.new do |s|
   s.name = 'BotStacksChat'
-  s.version      = "1.0.32"
+  s.version      = "1.0.1"
   s.summary      = 'BotStacks Chat iOS Framework'
   s.description  = 'Messaging and Chat API for Mobile Apps and Websites'
   s.homepage     = 'https://botstacks.ai'

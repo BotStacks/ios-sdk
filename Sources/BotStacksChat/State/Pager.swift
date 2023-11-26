@@ -12,13 +12,13 @@ open class Pager<T>: ObservableObject where T: Identifiable {
     return false
   }
 
-  func loadMoreIfEmpty() {
+  public func loadMoreIfEmpty() {
     if items.isEmpty {
       loadMore()
     }
   }
 
-  func loadMoreIfNeeded(_ item: T) {
+  public func loadMoreIfNeeded(_ item: T) {
     if isSinglePage || !hasMore { return }
     if items.count < pageSize * 2 {
       self.loadMore()

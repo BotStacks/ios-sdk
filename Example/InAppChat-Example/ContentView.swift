@@ -17,8 +17,6 @@ enum Routes: Equatable {
 
 struct ContentView: View {
   
-  
-  
   var body: some View {
     BotStacksChatUI {
       Router(initialPath: "/splash") {
