@@ -1,7 +1,5 @@
 ![Cocoapods](https://img.shields.io/cocoapods/v/BotStacksChat?style=flat-square)
 
-![IAC IOS](https://github.com/ShadowArcanist/IACios/assets/106978117/45eba8e1-bb01-4dce-8c79-68ab8a1056b3)
-
 # BotStacksChat iOS SDK
 
 &nbsp;  
