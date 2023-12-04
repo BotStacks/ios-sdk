@@ -14,11 +14,11 @@ public class BotStacksChatStore: ObservableObject {
     return self.memberships.filter { $0.chat.kind == Gql.ChatType.group && $0.isMember }.map(\.chat)
   }
   
-  let messages = ThreadsPager()
-  let favorites = Favorites()
-  let settings = Settings()
-  let network = ChannelsPager()
-  let contacts = ContactsPager()
+  public let messages = ThreadsPager()
+  public let favorites = Favorites()
+  public let settings = Settings()
+  public let network = ChannelsPager()
+  public let contacts = ContactsPager()
 
   var pushToken: String?
   var fcmToken: String?
@@ -36,6 +36,8 @@ public class BotStacksChatStore: ObservableObject {
   @Published var loading = false
 
   public static var current = BotStacksChatStore()
+    
+  public init() {}
 
   public func load() {
     if loading { return }

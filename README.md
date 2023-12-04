@@ -2,7 +2,6 @@
 
 ![BotStacks IOS](https://github.com/BotStacks/ios-sdk/assets/106978117/845c259b-a78b-4a90-ba9d-ba017886eaba)
 
-
 # BotStacksChat iOS SDK
 
 &nbsp;  

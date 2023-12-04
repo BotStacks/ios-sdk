@@ -100,6 +100,10 @@ public struct ChannelRow: View {
 
   @ObservedObject var chat: Chat
   @Environment(\.iacTheme) var theme
+    
+    public init(chat: Chat) {
+      self.chat = chat
+    }
 
   public var body: some View {
     if chat.isMember || !chat._private {
